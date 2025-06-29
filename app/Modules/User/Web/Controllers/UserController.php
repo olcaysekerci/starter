@@ -4,6 +4,7 @@ namespace App\Modules\User\Web\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\User\Services\UserService;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -14,7 +15,7 @@ class UserController extends Controller
     ) {}
 
     /**
-     * Kullanıcı listesi sayfası
+     * Kullanıcı listesi sayfası 
      */
     public function index(): Response
     {
@@ -32,11 +33,16 @@ class UserController extends Controller
     {
         $user = $this->userService->getUserById($id);
         
-        if (!$user) {
-            abort(404);
-        }
-        
         return Inertia::render('Modules/User/Web/Pages/Show', [
+            'user' => $user
+        ]);
+    }
+
+    public function profile(): Response
+    {
+        $user = auth()->user();
+        
+        return Inertia::render('Modules/User/Web/Pages/Profile', [
             'user' => $user
         ]);
     }

@@ -4,12 +4,21 @@ namespace App\Modules\User\Repositories;
 
 use App\Modules\User\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class UserRepository
 {
     public function __construct(
         private User $model
     ) {}
+
+    /**
+     * Tüm kullanıcıları getir (sayfalama olmadan)
+     */
+    public function getAll(): Collection
+    {
+        return $this->model->all();
+    }
 
     /**
      * Tüm kullanıcıları sayfalı olarak getir
@@ -33,6 +42,17 @@ class UserRepository
     public function findByEmail(string $email): ?User
     {
         return $this->model->where('email', $email)->first();
+    }
+
+    /**
+     * Kullanıcı arama
+     */
+    public function search(string $query, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->model
+            ->where('name', 'like', "%{$query}%")
+            ->orWhere('email', 'like', "%{$query}%")
+            ->paginate($perPage);
     }
 
     /**

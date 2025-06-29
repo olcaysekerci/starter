@@ -4,6 +4,7 @@ namespace App\Modules\User\Panel\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\User\Services\UserService;
+use App\Modules\User\Requests\UpdateUserRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -19,9 +20,9 @@ class UserController extends Controller
      */
     public function index(): Response
     {
-        $users = $this->userService->getAllUsers();
+        $users = $this->userService->getAllUsersWithPagination();
         
-        return Inertia::render('Modules/User/Panel/Pages/Index', [
+        return Inertia::render('Modules/User/Panel/Pages/Dashboard', [
             'users' => $users
         ]);
     }
@@ -32,10 +33,6 @@ class UserController extends Controller
     public function show(int $id): Response
     {
         $user = $this->userService->getUserById($id);
-        
-        if (!$user) {
-            abort(404);
-        }
         
         return Inertia::render('Modules/User/Panel/Pages/Show', [
             'user' => $user
@@ -49,10 +46,6 @@ class UserController extends Controller
     {
         $user = $this->userService->getUserById($id);
         
-        if (!$user) {
-            abort(404);
-        }
-        
         return Inertia::render('Modules/User/Panel/Pages/Edit', [
             'user' => $user
         ]);
@@ -61,15 +54,10 @@ class UserController extends Controller
     /**
      * Kullanıcı güncelleme
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateUserRequest $request, int $id): Response
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $id,
-        ]);
-
-        $this->userService->updateUser($id, $validated);
-
+        $this->userService->updateUser($id, $request->validated());
+        
         return redirect()->route('panel.users.index')
             ->with('success', 'Kullanıcı başarıyla güncellendi.');
     }
@@ -77,10 +65,10 @@ class UserController extends Controller
     /**
      * Kullanıcı silme
      */
-    public function destroy(int $id)
+    public function destroy(int $id): Response
     {
         $this->userService->deleteUser($id);
-
+        
         return redirect()->route('panel.users.index')
             ->with('success', 'Kullanıcı başarıyla silindi.');
     }

@@ -21,4 +21,8 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+    
+    // User modülü route'larını yükle
+    require __DIR__ . '/../app/Modules/User/Web/routes.php';
+    require __DIR__ . '/../app/Modules/User/Panel/routes.php';
 });
