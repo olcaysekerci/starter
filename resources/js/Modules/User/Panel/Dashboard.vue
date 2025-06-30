@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import PanelLayout from '@/Components/Panel/Layout/PanelLayout.vue'
+import PanelLayout from '@/Layouts/PanelLayout.vue'
 import Breadcrumb from '@/Components/Panel/Header/Breadcrumb.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
