@@ -11,7 +11,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // User modülü service provider'ını kaydet
+        $this->app->register(\App\Modules\User\UserServiceProvider::class);
     }
 
     /**

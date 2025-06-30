@@ -75,7 +75,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { usePage, Link } from '@inertiajs/vue3'
-import { HomeIcon, UsersIcon, DocumentTextIcon, EnvelopeIcon, Cog6ToothIcon } from '@heroicons/vue/24/outline'
+import { HomeIcon, UsersIcon, DocumentTextIcon, EnvelopeIcon, Cog6ToothIcon, ShieldCheckIcon, KeyIcon } from '@heroicons/vue/24/outline'
 
 const emit = defineEmits(['close'])
 const props = defineProps({
@@ -85,7 +85,13 @@ const props = defineProps({
 const page = usePage()
 const menuItems = [
   { name: 'dashboard', label: 'Dashboard', href: route('panel.dashboard'), icon: HomeIcon },
-  { name: 'users', label: 'Kullanıcılar', href: route('panel.users.index'), icon: UsersIcon },
+  {
+    name: 'users', label: 'Kullanıcı Yönetimi', icon: UsersIcon, children: [
+      { name: 'users-list', label: 'Kullanıcılar', href: route('panel.users.index') },
+      { name: 'roles', label: 'Roller', href: route('panel.roles.index') },
+      { name: 'permissions', label: 'Yetkiler', href: route('panel.permissions.index') }
+    ]
+  },
   { name: 'logs', label: 'Aktivite Logları', href: route('panel.activity-logs.index'), icon: DocumentTextIcon },
   { name: 'mails', label: 'Mail Bildirimleri', href: route('panel.mail-notifications.index'), icon: EnvelopeIcon },
   {
@@ -117,6 +123,8 @@ const dropdownOpen = ref(null)
 const checkAndOpenDropdown = () => {
   if (page.url && page.url.includes('/settings/')) {
     dropdownOpen.value = 'settings'
+  } else if (page.url && (page.url.includes('/users/') || page.url.includes('/roles/') || page.url.includes('/permissions/'))) {
+    dropdownOpen.value = 'users'
   }
 }
 

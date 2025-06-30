@@ -90,4 +90,12 @@ class UserRepository
 
         return $user->delete();
     }
+
+    /**
+     * Model instance'ını getir
+     */
+    public function getModel(): User
+    {
+        return $this->model;
+    }
 } 

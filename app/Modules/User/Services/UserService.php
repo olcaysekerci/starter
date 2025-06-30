@@ -55,7 +55,16 @@ class UserService
      */
     public function createUser(array $data): User
     {
+        // Rolleri ayır
+        $roles = $data['roles'] ?? [];
+        unset($data['roles']);
+        
         $user = $this->userRepository->create($data);
+        
+        // Rolleri ata
+        if (!empty($roles)) {
+            $user->assignRole($roles);
+        }
         
         // Hoş geldin maili gönder
         $this->sendWelcomeEmail($user);
@@ -69,7 +78,17 @@ class UserService
     public function updateUser(int $id, array $data): bool
     {
         $user = $this->userRepository->findById($id);
+        
+        // Rolleri ayır
+        $roles = $data['roles'] ?? [];
+        unset($data['roles']);
+        
         $updated = $this->userRepository->update($id, $data);
+        
+        // Rolleri güncelle
+        if ($updated && !empty($roles)) {
+            $user->syncRoles($roles);
+        }
         
         if ($updated && isset($data['email']) && $data['email'] !== $user->email) {
             // Email değişikliği varsa bilgilendirme maili gönder
@@ -101,6 +120,42 @@ class UserService
     public function searchUsers(string $query, int $perPage = 15): LengthAwarePaginator
     {
         return $this->userRepository->search($query, $perPage);
+    }
+
+    /**
+     * Kullanıcının rollerini getir
+     */
+    public function getUserRoles(int $userId): Collection
+    {
+        $user = $this->userRepository->findById($userId);
+        
+        return $user ? $user->roles : collect();
+    }
+
+    /**
+     * Kullanıcının yetkilerini getir
+     */
+    public function getUserPermissions(int $userId): Collection
+    {
+        $user = $this->userRepository->findById($userId);
+        
+        return $user ? $user->getAllPermissions() : collect();
+    }
+
+    /**
+     * Role sahip kullanıcıları getir
+     */
+    public function getUsersByRole(string $roleName): Collection
+    {
+        return $this->userRepository->getModel()->role($roleName)->get();
+    }
+
+    /**
+     * Yetkiye sahip kullanıcıları getir
+     */
+    public function getUsersByPermission(string $permissionName): Collection
+    {
+        return $this->userRepository->getModel()->permission($permissionName)->get();
     }
 
     /**
