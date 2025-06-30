@@ -1,13 +1,13 @@
 <template>
   <button
     @click="toggleDarkMode"
-    class="p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
-    :title="isDark ? 'Light mode\'a geç' : 'Dark mode\'a geç'"
+    class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border border-gray-200 dark:border-gray-700"
+    :title="isDark ? 'Light moda geç' : 'Dark moda geç'"
   >
-    <!-- Sun icon (light mode) -->
+    <!-- Sun icon for light mode -->
     <svg
       v-if="isDark"
-      class="w-5 h-5"
+      class="w-4 h-4 text-gray-600 dark:text-gray-400"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -20,10 +20,10 @@
       />
     </svg>
     
-    <!-- Moon icon (dark mode) -->
+    <!-- Moon icon for dark mode -->
     <svg
       v-else
-      class="w-5 h-5"
+      class="w-4 h-4 text-gray-600 dark:text-gray-400"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -39,79 +39,63 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 
 const isDark = ref(false)
 
-// Dark mode durumunu kontrol et
-const checkDarkMode = () => {
-  isDark.value = document.documentElement.classList.contains('dark')
-}
-
 // Dark mode'u toggle et
 const toggleDarkMode = () => {
-  if (isDark.value) {
-    document.documentElement.classList.remove('dark')
-    localStorage.setItem('darkMode', 'light')
-  } else {
-    document.documentElement.classList.add('dark')
-    localStorage.setItem('darkMode', 'dark')
-  }
   isDark.value = !isDark.value
+  updateDarkMode()
 }
 
-// Sayfa yüklendiğinde dark mode durumunu ayarla
-onMounted(() => {
-  // LocalStorage'dan dark mode tercihini al
+// DOM'u ve localStorage'ı güncelle
+const updateDarkMode = () => {
+  const html = document.documentElement
+  
+  if (isDark.value) {
+    html.classList.add('dark')
+    localStorage.setItem('darkMode', 'true')
+  } else {
+    html.classList.remove('dark')
+    localStorage.setItem('darkMode', 'false')
+  }
+}
+
+// Sayfa yüklendiğinde mevcut tercihi kontrol et
+const initializeDarkMode = () => {
   const savedMode = localStorage.getItem('darkMode')
   
-  if (savedMode === 'dark') {
-    document.documentElement.classList.add('dark')
-    isDark.value = true
-  } else if (savedMode === 'light') {
-    document.documentElement.classList.remove('dark')
-    isDark.value = false
+  if (savedMode !== null) {
+    // Kullanıcının kaydettiği tercih varsa onu kullan
+    isDark.value = savedMode === 'true'
   } else {
-    // Sistem tercihini kontrol et
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    if (prefersDark) {
-      document.documentElement.classList.add('dark')
-      isDark.value = true
-      localStorage.setItem('darkMode', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      isDark.value = false
-      localStorage.setItem('darkMode', 'light')
-    }
+    // Yoksa sistem tercihini kontrol et
+    isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches
   }
   
-  // Sistem tercihi değişikliklerini dinle
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (!localStorage.getItem('darkMode')) {
-      if (e.matches) {
-        document.documentElement.classList.add('dark')
-        isDark.value = true
-      } else {
-        document.documentElement.classList.remove('dark')
-        isDark.value = false
-      }
-    }
-  })
-})
+  updateDarkMode()
+}
 
-// DOM değişikliklerini izle (MutationObserver)
+// Sistem tercihi değiştiğinde dinle (sadece kullanıcı tercihi yoksa)
+const handleSystemThemeChange = (e) => {
+  const savedMode = localStorage.getItem('darkMode')
+  if (savedMode === null) {
+    isDark.value = e.matches
+    updateDarkMode()
+  }
+}
+
 onMounted(() => {
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-        checkDarkMode()
-      }
-    })
-  })
+  initializeDarkMode()
   
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['class']
-  })
+  // Sistem tema değişikliklerini dinle
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  mediaQuery.addEventListener('change', handleSystemThemeChange)
+  
+  // Component unmount olduğunda listener'ı temizle
+  return () => {
+    mediaQuery.removeEventListener('change', handleSystemThemeChange)
+  }
 })
 </script> 
