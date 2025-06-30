@@ -68,14 +68,14 @@
 
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3'
-import AuthenticationCard from '@/Components/AuthenticationCard.vue'
-import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue'
-import Checkbox from '@/Components/Checkbox.vue'
-import InputError from '@/Components/InputError.vue'
-import InputLabel from '@/Components/InputLabel.vue'
-import PrimaryButton from '@/Components/PrimaryButton.vue'
-import TextInput from '@/Components/TextInput.vue'
-import ValidationErrors from '@/Components/ValidationErrors.vue'
+import AuthenticationCard from '@/Components/Shared/AuthenticationCard.vue'
+import AuthenticationCardLogo from '@/Components/Shared/AuthenticationCardLogo.vue'
+import Checkbox from '@/Components/Shared/Checkbox.vue'
+import InputError from '@/Components/Shared/InputError.vue'
+import InputLabel from '@/Components/Shared/InputLabel.vue'
+import PrimaryButton from '@/Components/Legacy/PrimaryButton.vue'
+import TextInput from '@/Components/Shared/TextInput.vue'
+import ValidationErrors from '@/Components/Shared/ValidationErrors.vue'
 import GuestLayout from '@/Layouts/GuestLayout.vue'
 
 defineProps({

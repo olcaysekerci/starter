@@ -129,9 +129,9 @@ import TextInput from '@/Components/Shared/TextInput.vue'
 import Button from '@/Components/Shared/Button.vue'
 import DataTable from '@/Components/Panel/DataTable.vue'
 import Pagination from '@/Components/Shared/Pagination.vue'
-import SecondaryButton from '@/Components/SecondaryButton.vue'
-import PrimaryButton from '@/Components/PrimaryButton.vue'
-import DangerButton from '@/Components/DangerButton.vue'
+import SecondaryButton from '@/Components/Legacy/SecondaryButton.vue'
+import PrimaryButton from '@/Components/Legacy/PrimaryButton.vue'
+import DangerButton from '@/Components/Legacy/DangerButton.vue'
 
 const props = defineProps({
   users: {

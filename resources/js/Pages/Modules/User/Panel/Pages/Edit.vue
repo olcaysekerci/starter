@@ -93,11 +93,11 @@
 import { defineProps } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import InputLabel from '@/Components/InputLabel.vue'
-import TextInput from '@/Components/TextInput.vue'
-import InputError from '@/Components/InputError.vue'
-import PrimaryButton from '@/Components/PrimaryButton.vue'
-import SecondaryButton from '@/Components/SecondaryButton.vue'
+import InputLabel from '@/Components/Shared/InputLabel.vue'
+import TextInput from '@/Components/Shared/TextInput.vue'
+import InputError from '@/Components/Shared/InputError.vue'
+import PrimaryButton from '@/Components/Legacy/PrimaryButton.vue'
+import SecondaryButton from '@/Components/Legacy/SecondaryButton.vue'
 
 const props = defineProps({
   user: {
