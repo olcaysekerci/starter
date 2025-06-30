@@ -4,7 +4,7 @@
 
     <!-- Mobile overlay (sadece sidebar açık ve mobilde göster) -->
     <div 
-        v-if="!sidebarCollapsed && isMobile"
+        v-if="!isCollapsed && isMobile"
         class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
         @click="closeSidebar"
     ></div>

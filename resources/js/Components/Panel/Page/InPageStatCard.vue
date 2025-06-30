@@ -47,7 +47,7 @@ const props = defineProps({
     required: true
   },
   icon: {
-    type: String,
+    type: [String, Function],
     default: 'ChartBarIcon'
   },
   color: {
@@ -57,6 +57,12 @@ const props = defineProps({
 })
 
 const iconComponent = computed(() => {
+  // Eğer icon bir Function ise, direkt kullan
+  if (typeof props.icon === 'function') {
+    return props.icon
+  }
+  
+  // Eğer icon bir String ise, map'ten bul
   const iconMap = {
     'EnvelopeIcon': EnvelopeIcon,
     'CheckCircleIcon': CheckCircleIcon,

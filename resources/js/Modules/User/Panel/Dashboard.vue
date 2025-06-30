@@ -83,6 +83,7 @@
     <FilterCard 
       :show="showFilters"
       :filters="filters"
+      :filter-config="filterConfig"
       @update-filter="updateFilter"
       @apply-filters="applyFilters"
       @clear-filters="clearFilters"
@@ -160,6 +161,37 @@ const filters = ref({
   emailDomain: ''
 })
 
+// Filter configuration
+const filterConfig = [
+  {
+    key: 'status',
+    label: 'Durum',
+    type: 'select',
+    placeholder: 'Tümü',
+    options: [
+      { value: 'active', label: 'Aktif' },
+      { value: 'inactive', label: 'Pasif' },
+      { value: 'pending', label: 'Bekleyen' }
+    ]
+  },
+  {
+    key: 'dateFrom',
+    label: 'Başlangıç Tarihi',
+    type: 'date'
+  },
+  {
+    key: 'dateTo',
+    label: 'Bitiş Tarihi',
+    type: 'date'
+  },
+  {
+    key: 'emailDomain',
+    label: 'E-posta Domain',
+    type: 'text',
+    placeholder: 'Örn: gmail.com'
+  }
+]
+
 // Computed
 const filteredUsers = computed(() => {
   let filtered = props.users.data || []
@@ -208,7 +240,7 @@ const exportExcel = () => {
   console.log('Excel export')
 }
 
-const updateFilter = ({ key, value }) => {
+const updateFilter = (key, value) => {
   filters.value[key] = value
 }
 

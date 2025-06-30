@@ -31,7 +31,10 @@
               <component :is="item.icon" class="w-5 h-5" />
             </span>
             <span v-if="!props.isCollapsed">{{ item.label }}</span>
-            <svg v-if="!props.isCollapsed" class="ml-auto w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-if="!props.isCollapsed" :class="[
+              'ml-auto w-4 h-4 text-gray-400 transition-transform duration-200',
+              dropdownOpen === item.name ? 'rotate-180' : ''
+            ]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
@@ -70,7 +73,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { usePage, Link } from '@inertiajs/vue3'
 import { HomeIcon, UsersIcon, DocumentTextIcon, EnvelopeIcon, Cog6ToothIcon } from '@heroicons/vue/24/outline'
 
@@ -80,7 +83,6 @@ const props = defineProps({
   isCollapsed: { type: Boolean, default: false }
 })
 const page = usePage()
-const dropdownOpen = ref(null)
 const menuItems = [
   { name: 'dashboard', label: 'Dashboard', href: route('panel.dashboard'), icon: HomeIcon },
   { name: 'users', label: 'Kullanıcılar', href: route('panel.users.index'), icon: UsersIcon },
@@ -94,14 +96,38 @@ const menuItems = [
   }
 ]
 
+
+
 const isActive = (item) => {
+  // page.url'den path'i güvenli bir şekilde çıkar
+  const currentPath = page.url?.startsWith('http') 
+    ? new URL(page.url).pathname 
+    : page.url || ''
+  
   if (item.children) {
-    return item.children.some(child => page.url.startsWith(child.href))
+    return item.children.some(child => currentPath === child.href)
   }
-  return page.url.startsWith(item.href)
+  return currentPath === item.href
 }
 
+// Basit dropdown kontrolü
+const dropdownOpen = ref(null)
+
+// Sayfa yüklendiğinde ve değiştiğinde dropdown'ı kontrol et
+const checkAndOpenDropdown = () => {
+  if (page.url && page.url.includes('/settings/')) {
+    dropdownOpen.value = 'settings'
+  }
+}
+
+// Sayfa değiştiğinde kontrol et
+watch(() => page.url, checkAndOpenDropdown, { immediate: true })
+
 const toggleDropdown = (name) => {
-  dropdownOpen.value = dropdownOpen.value === name ? null : name
+  if (dropdownOpen.value === name) {
+    dropdownOpen.value = null
+  } else {
+    dropdownOpen.value = name
+  }
 }
 </script> 

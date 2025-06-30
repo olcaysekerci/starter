@@ -7,10 +7,10 @@
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ formatDateTime(user.last_login) }}</td>
     <td class="px-4 py-3 whitespace-nowrap text-right">
       <div class="flex items-center space-x-2">
-        <TableActionButton variant="primary" @click="$emit('edit', user)">
+        <TableActionButton variant="info" @click="$emit('edit', user)">
           Düzenle
         </TableActionButton>
-        <TableActionButton variant="danger" @click="$emit('delete', user)">
+        <TableActionButton variant="destructive" @click="$emit('delete', user)">
           Sil
         </TableActionButton>
       </div>
