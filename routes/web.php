@@ -28,4 +28,7 @@ Route::middleware([
     
     // ActivityLog modülü route'larını yükle
     require __DIR__ . '/../app/Modules/ActivityLog/routes.php';
+    
+    // MailNotification modülü route'larını yükle
+    require __DIR__ . '/../app/Modules/MailNotification/routes.php';
 });
