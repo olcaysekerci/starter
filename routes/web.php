@@ -18,17 +18,6 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
-    
-    // User modülü route'larını yükle
-    require __DIR__ . '/../app/Modules/User/Web/routes.php';
-    require __DIR__ . '/../app/Modules/User/Panel/routes.php';
-    
-    // ActivityLog modülü route'larını yükle
-    require __DIR__ . '/../app/Modules/ActivityLog/routes.php';
-    
-    // MailNotification modülü route'larını yükle
-    require __DIR__ . '/../app/Modules/MailNotification/routes.php';
+    // Tüm modülleri otomatik yükle
+    \App\Helpers\ModuleLoader::loadAllModules();
 });

@@ -36,7 +36,7 @@
             </svg>
           </button>
           <div v-if="dropdownOpen === item.name && !props.isCollapsed" class="ml-8 mt-1 space-y-1">
-            <a
+            <Link
               v-for="child in item.children"
               :key="child.name"
               :href="child.href"
@@ -46,10 +46,10 @@
               ]"
             >
               {{ child.label }}
-            </a>
+            </Link>
           </div>
         </div>
-        <a
+        <Link
           v-else
           :href="item.href"
           :class="[
@@ -61,7 +61,7 @@
             <component :is="item.icon" class="w-5 h-5" />
           </span>
           <span v-if="!props.isCollapsed">{{ item.label }}</span>
-        </a>
+        </Link>
       </template>
     </nav>
   </aside>
@@ -71,7 +71,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { usePage } from '@inertiajs/vue3'
+import { usePage, Link } from '@inertiajs/vue3'
 import { HomeIcon, UsersIcon, DocumentTextIcon, EnvelopeIcon, Cog6ToothIcon } from '@heroicons/vue/24/outline'
 
 const emit = defineEmits(['close'])
@@ -82,14 +82,14 @@ const props = defineProps({
 const page = usePage()
 const dropdownOpen = ref(null)
 const menuItems = [
-  { name: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'users', label: 'Kullanıcılar', href: '/panel/users', icon: UsersIcon },
-  { name: 'logs', label: 'Aktivite Logları', href: '/panel/activity-logs', icon: DocumentTextIcon },
-  { name: 'mails', label: 'Mail Bildirimleri', href: '/panel/mail-notifications', icon: EnvelopeIcon },
+  { name: 'dashboard', label: 'Dashboard', href: route('panel.dashboard'), icon: HomeIcon },
+  { name: 'users', label: 'Kullanıcılar', href: route('panel.users.index'), icon: UsersIcon },
+  { name: 'logs', label: 'Aktivite Logları', href: route('panel.activity-logs.index'), icon: DocumentTextIcon },
+  { name: 'mails', label: 'Mail Bildirimleri', href: route('panel.mail-notifications.index'), icon: EnvelopeIcon },
   {
     name: 'settings', label: 'Ayarlar', icon: Cog6ToothIcon, children: [
-      { name: 'profile', label: 'Profil Ayarları', href: '/panel/settings/profile' },
-      { name: 'security', label: 'Güvenlik', href: '/panel/settings/security' }
+      { name: 'profile', label: 'Profil Ayarları', href: route('panel.settings.profile') },
+      { name: 'security', label: 'Güvenlik', href: route('panel.settings.security') }
     ]
   }
 ]

@@ -5,13 +5,15 @@ namespace App\Modules\User\Services;
 use App\Modules\User\Models\User;
 use App\Modules\User\Repositories\UserRepository;
 use App\Modules\User\DTOs\UserDTO;
+use App\Modules\MailNotification\Services\MailDispatcherService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class UserService
 {
     public function __construct(
-        private UserRepository $userRepository
+        private UserRepository $userRepository,
+        private MailDispatcherService $mailDispatcher
     ) {}
 
     /**
@@ -53,7 +55,12 @@ class UserService
      */
     public function createUser(array $data): User
     {
-        return $this->userRepository->create($data);
+        $user = $this->userRepository->create($data);
+        
+        // Hoş geldin maili gönder
+        $this->sendWelcomeEmail($user);
+        
+        return $user;
     }
 
     /**
@@ -61,7 +68,15 @@ class UserService
      */
     public function updateUser(int $id, array $data): bool
     {
-        return $this->userRepository->update($id, $data);
+        $user = $this->userRepository->findById($id);
+        $updated = $this->userRepository->update($id, $data);
+        
+        if ($updated && isset($data['email']) && $data['email'] !== $user->email) {
+            // Email değişikliği varsa bilgilendirme maili gönder
+            $this->sendEmailChangeNotification($user, $data['email']);
+        }
+        
+        return $updated;
     }
 
     /**
@@ -69,7 +84,15 @@ class UserService
      */
     public function deleteUser(int $id): bool
     {
-        return $this->userRepository->delete($id);
+        $user = $this->userRepository->findById($id);
+        $deleted = $this->userRepository->delete($id);
+        
+        if ($deleted) {
+            // Hesap silme bildirimi gönder
+            $this->sendAccountDeletionNotification($user);
+        }
+        
+        return $deleted;
     }
 
     /**
@@ -78,5 +101,73 @@ class UserService
     public function searchUsers(string $query, int $perPage = 15): LengthAwarePaginator
     {
         return $this->userRepository->search($query, $perPage);
+    }
+
+    /**
+     * Hoş geldin maili gönder
+     */
+    private function sendWelcomeEmail(User $user): void
+    {
+        $this->mailDispatcher->send([
+            'to' => $user->email,
+            'subject' => 'Hoş Geldiniz - ' . config('app.name'),
+            'content' => "Merhaba {$user->name},\n\n" .
+                        "Sitemize hoş geldiniz! Hesabınız başarıyla oluşturuldu.\n\n" .
+                        "Hesabınızla ilgili herhangi bir sorunuz olursa bizimle iletişime geçebilirsiniz.\n\n" .
+                        "Saygılarımızla,\n" . config('app.name') . " Ekibi",
+            'type' => 'welcome',
+            'metadata' => [
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'action' => 'user_created'
+            ]
+        ]);
+    }
+
+    /**
+     * Email değişikliği bildirimi gönder
+     */
+    private function sendEmailChangeNotification(User $user, string $newEmail): void
+    {
+        $this->mailDispatcher->send([
+            'to' => $newEmail,
+            'subject' => 'Email Adresiniz Güncellendi - ' . config('app.name'),
+            'content' => "Merhaba {$user->name},\n\n" .
+                        "Hesabınızın email adresi başarıyla güncellendi.\n\n" .
+                        "Yeni email adresiniz: {$newEmail}\n\n" .
+                        "Bu değişikliği siz yapmadıysanız, lütfen bizimle iletişime geçin.\n\n" .
+                        "Saygılarımızla,\n" . config('app.name') . " Ekibi",
+            'type' => 'email_change',
+            'metadata' => [
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'old_email' => $user->email,
+                'new_email' => $newEmail,
+                'action' => 'email_updated'
+            ]
+        ]);
+    }
+
+    /**
+     * Hesap silme bildirimi gönder
+     */
+    private function sendAccountDeletionNotification(User $user): void
+    {
+        $this->mailDispatcher->send([
+            'to' => $user->email,
+            'subject' => 'Hesabınız Silindi - ' . config('app.name'),
+            'content' => "Merhaba {$user->name},\n\n" .
+                        "Hesabınız sistemden silinmiştir.\n\n" .
+                        "Bu işlem geri alınamaz. Hesabınızla ilgili tüm veriler kalıcı olarak silinmiştir.\n\n" .
+                        "Eğer bu işlemi siz yapmadıysanız veya bir hata olduğunu düşünüyorsanız, lütfen bizimle iletişime geçin.\n\n" .
+                        "Saygılarımızla,\n" . config('app.name') . " Ekibi",
+            'type' => 'account_deletion',
+            'metadata' => [
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'user_email' => $user->email,
+                'action' => 'user_deleted'
+            ]
+        ]);
     }
 } 

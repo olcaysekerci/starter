@@ -1,12 +1,8 @@
 <template>
     <button
-        :type="type"
-        :disabled="disabled"
-        :class="[
-            'inline-flex items-center px-2 py-1 text-xs font-medium transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed',
-            variantClasses
-        ]"
-        @click="$emit('click', $event)"
+        @click="$emit('click')"
+        :class="buttonClasses"
+        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none"
     >
         <slot />
     </button>
@@ -16,35 +12,42 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-    type: {
-        type: String,
-        default: 'button'
-    },
     variant: {
         type: String,
-        default: 'primary',
-        validator: (value) => [
-            'primary', 'secondary', 'success', 'warning', 'danger', 'info', 'ghost'
-        ].includes(value)
+        default: 'default',
+        validator: (value) => ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'info', 'warning', 'success'].includes(value)
     },
-    disabled: {
-        type: Boolean,
-        default: false
+    size: {
+        type: String,
+        default: 'default',
+        validator: (value) => ['default', 'sm', 'lg', 'icon'].includes(value)
     }
 })
 
-defineEmits(['click'])
+const emit = defineEmits(['click'])
 
-const variantClasses = computed(() => {
-    const variants = {
-        primary: 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 border border-indigo-200 dark:border-indigo-700 rounded hover:bg-indigo-50 dark:hover:bg-indigo-900/20',
-        secondary: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 border border-gray-200 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-800',
-        success: 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300 border border-emerald-200 dark:border-emerald-700 rounded hover:bg-emerald-50 dark:hover:bg-emerald-900/20',
-        warning: 'text-amber-600 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 border border-amber-200 dark:border-amber-700 rounded hover:bg-amber-50 dark:hover:bg-amber-900/20',
-        danger: 'text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 border border-red-200 dark:border-red-700 rounded hover:bg-red-50 dark:hover:bg-red-900/20',
-        info: 'text-cyan-600 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-300 border border-cyan-200 dark:border-cyan-700 rounded hover:bg-cyan-50 dark:hover:bg-cyan-900/20',
-        ghost: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 border border-gray-200 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-800'
+const buttonClasses = computed(() => {
+    const baseClasses = 'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none'
+    
+    const variantClasses = {
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        ghost: 'hover:bg-accent hover:text-accent-foreground',
+        link: 'text-primary underline-offset-4 hover:underline',
+        info: 'bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800',
+        warning: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:hover:bg-yellow-800',
+        success: 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800'
     }
-    return variants[props.variant]
+    
+    const sizeClasses = {
+        default: 'h-10 px-4 py-2',
+        sm: 'h-9 rounded-md px-3',
+        lg: 'h-11 rounded-md px-8',
+        icon: 'h-10 w-10'
+    }
+    
+    return `${baseClasses} ${variantClasses[props.variant]} ${sizeClasses[props.size]}`
 })
 </script> 

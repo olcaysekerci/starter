@@ -31,7 +31,7 @@ class ActivityLogController extends Controller
         $logs = $this->activityLogService->getLogs($filters, 15);
         $stats = $this->activityLogService->getStats();
 
-        return Inertia::render('ActivityLog/Index', [
+        return Inertia::render('ActivityLog/Panel/Index', [
             'logs' => $logs,
             'stats' => $stats,
             'filters' => $filters,
@@ -49,7 +49,7 @@ class ActivityLogController extends Controller
             abort(404);
         }
 
-        return Inertia::render('Modules/ActivityLog/Panel/Show', [
+        return Inertia::render('ActivityLog/Panel/Show', [
             'log' => $log,
         ]);
     }

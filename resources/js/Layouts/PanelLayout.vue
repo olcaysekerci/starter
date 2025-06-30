@@ -58,7 +58,7 @@
                   <div class="p-3">
                       <div class="grid grid-cols-2 gap-2">
                           <Link 
-                              href="/panel/users"
+                              :href="route('panel.users.index')"
                               class="flex flex-col items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group"
                           >
                               <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 mb-1">

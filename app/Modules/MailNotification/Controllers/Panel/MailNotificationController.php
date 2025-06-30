@@ -74,7 +74,7 @@ class MailNotificationController extends Controller
                 ];
             });
 
-        return Inertia::render('MailNotification/Index', [
+        return Inertia::render('MailNotification/Panel/Index', [
             'mailLogs' => $mailLogs,
             'stats' => $stats,
             'filters' => [
@@ -99,7 +99,7 @@ class MailNotificationController extends Controller
     {
         $mailLog = MailLog::findOrFail($id);
 
-        return Inertia::render('MailNotification/Show', [
+        return Inertia::render('MailNotification/Panel/Show', [
             'mailLog' => $mailLog,
         ]);
     }

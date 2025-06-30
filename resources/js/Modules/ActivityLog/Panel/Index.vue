@@ -86,6 +86,8 @@
     <FilterCard 
       :show="showFilters"
       :filters="filters"
+      title="Log Filtreleri"
+      :filter-config="filterConfig"
       @update-filter="updateFilter"
       @apply-filters="applyFilters"
       @clear-filters="clearFilters"
@@ -176,7 +178,7 @@ import SearchInput from '@/Components/Panel/Actions/SearchInput.vue'
 import InPageStatCard from '@/Components/Panel/InPageStatCard.vue'
 import FilterCard from '@/Components/Panel/FilterCard.vue'
 import Pagination from '@/Components/Panel/Shared/Pagination.vue'
-import Modal from '@/Components/Shared/Modal.vue'
+import Modal from '@/Components/Panel/Modal.vue'
 
 const props = defineProps({ 
   logs: Object,
@@ -203,6 +205,37 @@ const showCleanupModal = ref(false)
 const cleanupDays = ref(30)
 const cleanupLoading = ref(false)
 
+// Filter configuration
+const filterConfig = [
+  {
+    key: 'log_name',
+    label: 'Log Türü',
+    type: 'select',
+    placeholder: 'Tümü',
+    options: [
+      { value: 'user', label: 'Kullanıcı' },
+      { value: 'mail', label: 'Mail' },
+      { value: 'system', label: 'Sistem' }
+    ]
+  },
+  {
+    key: 'dateFrom',
+    label: 'Başlangıç Tarihi',
+    type: 'date'
+  },
+  {
+    key: 'dateTo',
+    label: 'Bitiş Tarihi',
+    type: 'date'
+  },
+  {
+    key: 'causer_id',
+    label: 'Kullanıcı ID',
+    type: 'text',
+    placeholder: 'Kullanıcı ID girin'
+  }
+]
+
 // Computed
 const activeFilterCount = computed(() => {
   return Object.values(props.filters).filter(value => value !== '').length
@@ -221,9 +254,8 @@ const exportExcel = () => {
   console.log('Excel export')
 }
 
-const updateFilter = ({ key, value }) => {
-  const newFilters = { ...props.filters, [key]: value }
-  router.get('/panel/activity-logs', newFilters, { preserveState: true })
+const updateFilter = (key, value) => {
+  props.filters[key] = value
 }
 
 const applyFilters = () => {
