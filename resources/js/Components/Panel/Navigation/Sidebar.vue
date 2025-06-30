@@ -84,7 +84,7 @@ const dropdownOpen = ref(null)
 const menuItems = [
   { name: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'users', label: 'Kullanıcılar', href: '/panel/users', icon: UsersIcon },
-  { name: 'logs', label: 'Aktivite Logları', href: '/panel/logs', icon: DocumentTextIcon },
+  { name: 'logs', label: 'Aktivite Logları', href: '/panel/activity-logs', icon: DocumentTextIcon },
   { name: 'mails', label: 'Mail Bildirimleri', href: '/panel/mails', icon: EnvelopeIcon },
   {
     name: 'settings', label: 'Ayarlar', icon: Cog6ToothIcon, children: [

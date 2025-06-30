@@ -1,16 +1,16 @@
 <template>
   <PanelLayout 
-    title="Kullanıcı Yönetimi" 
-    page-title="Kullanıcı Yönetimi"
+    title="Aktivite Logları" 
+    page-title="Aktivite Logları"
     :breadcrumbs="[
       { title: 'Dashboard', url: '/dashboard' },
-      { title: 'Kullanıcı Yönetimi' }
+      { title: 'Aktivite Logları' }
     ]"
   >
     <!-- Page Header -->
     <PageHeader
-      title="Kullanıcı Yönetimi"
-      description="Kullanıcı hesaplarını görüntüleyin, düzenleyin ve yönetin. Yeni kullanıcı ekleyebilir, mevcut kullanıcıları güncelleyebilirsiniz."
+      title="Aktivite Logları"
+      description="Sistemdeki tüm kullanıcı aktivitelerini, model değişikliklerini ve sistem olaylarını görüntüleyin."
     >
       <template #actions>
         <ActionButton 
@@ -39,43 +39,46 @@
           </span>
         </ActionButton>
         <ActionButton 
-          @click="addUser" 
-          variant="primary" 
+          @click="showCleanupModal = true" 
+          variant="warning" 
           size="sm"
         >
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
           </svg>
-          Yeni Kullanıcı
+          Temizle
         </ActionButton>
       </template>
     </PageHeader>
 
     <!-- Stats Cards -->
-    <div v-if="showStats" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-      <StatItem
-        title="Toplam Kullanıcı"
-        :value="stats.totalUsers"
+    <div v-if="showStats" class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+      <InPageStatCard
+        title="Toplam Log"
+        :value="stats.total"
         color="blue"
-        :icon="UserIcon"
+        :icon="DocumentIcon"
       />
       
-      <StatItem
-        title="Aktif Kullanıcılar"
-        :value="stats.activeUsers"
-        color="emerald"
-        change="+8%"
-        changeType="increase"
-        :icon="CheckCircleIcon"
+      <InPageStatCard
+        title="Bugün"
+        :value="stats.today"
+        color="green"
+        :icon="CalendarIcon"
       />
       
-      <StatItem
-        title="Bekleyen Kullanıcılar"
-        :value="stats.pendingUsers"
-        color="orange"
-        change="+3%"
-        changeType="increase"
+      <InPageStatCard
+        title="Bu Hafta"
+        :value="stats.this_week"
+        color="purple"
         :icon="ClockIcon"
+      />
+      
+      <InPageStatCard
+        title="Bu Ay"
+        :value="stats.this_month"
+        color="orange"
+        :icon="ChartIcon"
       />
     </div>
 
@@ -89,15 +92,15 @@
       @close="showFilters = false"
     />
 
-    <!-- Search and Actions -->
+    <!-- Logs Table -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
       <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Kullanıcı Listesi</h3>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Log Listesi</h3>
           <div class="flex items-center space-x-3">
             <SearchInput
               v-model="searchQuery"
-              placeholder="Kullanıcı ara..."
+              placeholder="Log ara..."
               clearable
               class="w-full sm:w-64"
             />
@@ -111,11 +114,49 @@
         </div>
       </div>
       
-      <UserList :users="filteredUsers" @edit="editUser" @delete="deleteUser" />
+      <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+        <p>Log listesi bileşeni henüz oluşturulmadı.</p>
+        <p class="text-sm mt-2">Loglar: {{ logs.total }} adet</p>
+      </div>
     </div>
 
     <!-- Pagination -->
-    <Pagination :links="users.links" @navigate="goToPage" />
+    <Pagination :links="logs.links" @navigate="goToPage" />
+
+    <!-- Cleanup Modal -->
+    <Modal :show="showCleanupModal" @close="showCleanupModal = false">
+      <div class="p-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Eski Logları Temizle</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Belirtilen günden eski logları kalıcı olarak sileceksiniz. Bu işlem geri alınamaz.
+        </p>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Kaç günden eski loglar silinsin?
+            </label>
+            <input
+              v-model="cleanupDays"
+              type="number"
+              min="1"
+              max="365"
+              class="w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:border-blue-500"
+              placeholder="30"
+            >
+          </div>
+          
+          <div class="flex items-center justify-end space-x-3">
+            <ActionButton variant="secondary" @click="showCleanupModal = false">
+              İptal
+            </ActionButton>
+            <ActionButton variant="warning" @click="cleanupLogs" :loading="cleanupLoading">
+              Temizle
+            </ActionButton>
+          </div>
+        </div>
+      </div>
+    </Modal>
   </PanelLayout>
 </template>
 
@@ -123,61 +164,48 @@
 import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { 
-  UserIcon, 
-  CheckCircleIcon, 
-  ClockIcon 
+  DocumentIcon, 
+  CalendarIcon, 
+  ClockIcon, 
+  ChartBarIcon as ChartIcon 
 } from '@heroicons/vue/24/outline'
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
 import SearchInput from '@/Components/Panel/Actions/SearchInput.vue'
-import StatItem from '@/Components/Panel/InPageStatCard.vue'
+import InPageStatCard from '@/Components/Panel/InPageStatCard.vue'
 import FilterCard from '@/Components/Panel/FilterCard.vue'
-import UserList from '@/Components/Panel/User/UserList.vue'
 import Pagination from '@/Components/Panel/Shared/Pagination.vue'
+import Modal from '@/Components/Shared/Modal.vue'
 
 const props = defineProps({ 
-  users: Object,
+  logs: Object,
   stats: {
     type: Object,
     default: () => ({
-      totalUsers: 1234,
-      activeUsers: 1189,
-      pendingUsers: 45,
-      newUsersThisMonth: 156
+      total: 0,
+      today: 0,
+      this_week: 0,
+      this_month: 0
     })
+  },
+  filters: {
+    type: Object,
+    default: () => ({})
   }
 })
 
 // Reactive data
 const searchQuery = ref('')
 const showFilters = ref(false)
-const showStats = ref(false) // Default olarak kapalı
-const filters = ref({
-  status: '',
-  dateFrom: '',
-  dateTo: '',
-  emailDomain: ''
-})
+const showStats = ref(false)
+const showCleanupModal = ref(false)
+const cleanupDays = ref(30)
+const cleanupLoading = ref(false)
 
 // Computed
-const filteredUsers = computed(() => {
-  let filtered = props.users.data || []
-  
-  // Search filter
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(user => 
-      user.name.toLowerCase().includes(query) ||
-      user.email.toLowerCase().includes(query)
-    )
-  }
-  
-  return filtered
-})
-
 const activeFilterCount = computed(() => {
-  return Object.values(filters.value).filter(value => value !== '').length
+  return Object.values(props.filters).filter(value => value !== '').length
 })
 
 const hasActiveFilters = computed(() => {
@@ -189,40 +217,33 @@ const goToPage = (url) => {
   router.visit(url) 
 }
 
-const editUser = (user) => { 
-  router.visit(`/panel/users/${user.id}/edit`) 
-}
-
-const deleteUser = (user) => {
-  if (confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')) {
-    router.delete(`/panel/users/${user.id}`)
-  }
-}
-
-const addUser = () => { 
-  router.visit('/panel/users/create') 
-}
-
 const exportExcel = () => { 
-  // Excel export işlemi
   console.log('Excel export')
 }
 
 const updateFilter = ({ key, value }) => {
-  filters.value[key] = value
+  const newFilters = { ...props.filters, [key]: value }
+  router.get('/panel/activity-logs', newFilters, { preserveState: true })
 }
 
 const applyFilters = () => {
-  // Filter uygulama işlemi
-  console.log('Filters applied:', filters.value)
+  router.get('/panel/activity-logs', props.filters, { preserveState: true })
 }
 
 const clearFilters = () => {
-  filters.value = {
-    status: '',
-    dateFrom: '',
-    dateTo: '',
-    emailDomain: ''
+  router.get('/panel/activity-logs', {}, { preserveState: true })
+}
+
+const cleanupLogs = async () => {
+  cleanupLoading.value = true
+  
+  try {
+    await router.post('/panel/activity-logs/cleanup', { days: cleanupDays.value })
+    showCleanupModal.value = false
+  } catch (error) {
+    console.error('Cleanup error:', error)
+  } finally {
+    cleanupLoading.value = false
   }
 }
 </script> 

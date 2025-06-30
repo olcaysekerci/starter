@@ -4,15 +4,33 @@
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ user.name }}</td>
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ user.email }}</td>
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ formatDate(user.created_at) }}</td>
-    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ user.last_login || '-' }}</td>
+    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ formatDateTime(user.last_login) }}</td>
     <td class="px-4 py-3 whitespace-nowrap text-right">
-      <ActionButton variant="secondary" @click="$emit('edit', user)">Düzenle</ActionButton>
-      <ActionButton variant="danger" @click="$emit('delete', user)">Sil</ActionButton>
+      <div class="flex items-center space-x-2">
+        <TableActionButton variant="primary" @click="$emit('edit', user)">
+          Düzenle
+        </TableActionButton>
+        <TableActionButton variant="danger" @click="$emit('delete', user)">
+          Sil
+        </TableActionButton>
+      </div>
     </td>
   </tr>
 </template>
+
 <script setup>
-import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
+import TableActionButton from '@/Components/Panel/Actions/TableActionButton.vue'
+
 const props = defineProps({ user: Object })
-const formatDate = (date) => date ? new Date(date).toLocaleDateString('tr-TR') : '-'
+
+const formatDate = (date) => {
+  if (!date) return '-'
+  return new Date(date).toLocaleDateString('tr-TR')
+}
+
+const formatDateTime = (date) => {
+  if (!date) return '-'
+  const d = new Date(date)
+  return d.toLocaleDateString('tr-TR') + ' ' + d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+}
 </script> 

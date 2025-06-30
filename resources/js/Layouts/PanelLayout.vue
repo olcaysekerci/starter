@@ -216,14 +216,6 @@
       <!-- Sayfa İçeriği -->
       <main class="flex-1 overflow-auto">
         <div class="p-3 sm:p-4 lg:p-6">
-          <div class="mb-6">
-            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
-              {{ pageTitle }}
-            </h1>
-            <p v-if="pageDescription" class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-              {{ pageDescription }}
-            </p>
-          </div>
           <slot />
         </div>
       </main>

@@ -25,4 +25,7 @@ Route::middleware([
     // User modülü route'larını yükle
     require __DIR__ . '/../app/Modules/User/Web/routes.php';
     require __DIR__ . '/../app/Modules/User/Panel/routes.php';
+    
+    // ActivityLog modülü route'larını yükle
+    require __DIR__ . '/../app/Modules/ActivityLog/routes.php';
 });
