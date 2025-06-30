@@ -121,9 +121,9 @@ import { ref, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import TextInput from '@/Components/Shared/TextInput.vue'
-import PrimaryButton from '@/Components/Legacy/PrimaryButton.vue'
-import SecondaryButton from '@/Components/Legacy/SecondaryButton.vue'
-import DangerButton from '@/Components/Legacy/DangerButton.vue'
+import PrimaryButton from '@/Components/Shared/PrimaryButton.vue'
+import SecondaryButton from '@/Components/Shared/SecondaryButton.vue'
+import DangerButton from '@/Components/Shared/DangerButton.vue'
 import Pagination from '@/Components/Shared/Pagination.vue'
 
 const props = defineProps({

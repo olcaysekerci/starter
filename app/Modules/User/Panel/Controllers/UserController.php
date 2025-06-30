@@ -22,7 +22,7 @@ class UserController extends Controller
     {
         $users = $this->userService->getAllUsersWithPagination();
         
-        return Inertia::render('Modules/User/Panel/Pages/Dashboard', [
+        return Inertia::render('User/Panel/Dashboard', [
             'users' => $users
         ]);
     }
@@ -34,7 +34,7 @@ class UserController extends Controller
     {
         $user = $this->userService->getUserById($id);
         
-        return Inertia::render('Modules/User/Panel/Pages/Show', [
+        return Inertia::render('User/Panel/Show', [
             'user' => $user
         ]);
     }
@@ -46,7 +46,7 @@ class UserController extends Controller
     {
         $user = $this->userService->getUserById($id);
         
-        return Inertia::render('Modules/User/Panel/Pages/Edit', [
+        return Inertia::render('User/Panel/Edit', [
             'user' => $user
         ]);
     }

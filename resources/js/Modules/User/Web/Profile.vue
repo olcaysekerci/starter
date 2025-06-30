@@ -80,7 +80,7 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 import InputLabel from '@/Components/Shared/InputLabel.vue'
 import TextInput from '@/Components/Shared/TextInput.vue'
 import InputError from '@/Components/Shared/InputError.vue'
-import PrimaryButton from '@/Components/Legacy/PrimaryButton.vue'
+import PrimaryButton from '@/Components/Shared/PrimaryButton.vue'
 
 const props = defineProps({
   user: {

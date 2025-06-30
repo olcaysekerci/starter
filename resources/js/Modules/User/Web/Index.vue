@@ -29,7 +29,7 @@
 import { defineProps } from 'vue'
 import { router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import UserCard from '../Components/UserCard.vue'
+import UserCard from './Components/UserCard.vue'
 
 const props = defineProps({
   users: {

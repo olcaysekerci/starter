@@ -115,9 +115,9 @@
 import { defineProps } from 'vue'
 import { router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import PrimaryButton from '@/Components/Legacy/PrimaryButton.vue'
-import SecondaryButton from '@/Components/Legacy/SecondaryButton.vue'
-import DangerButton from '@/Components/Legacy/DangerButton.vue'
+import PrimaryButton from '@/Components/Shared/PrimaryButton.vue'
+import SecondaryButton from '@/Components/Shared/SecondaryButton.vue'
+import DangerButton from '@/Components/Shared/DangerButton.vue'
 
 const props = defineProps({
   user: {

@@ -4,18 +4,18 @@ const routes = [
   {
     path: '/panel/users',
     name: 'panel.users.index',
-    component: () => import('./Pages/Dashboard.vue')
+    component: () => import('./Dashboard.vue')
   },
   {
     path: '/panel/users/:id',
     name: 'panel.users.show',
-    component: () => import('./Pages/Show.vue'),
+    component: () => import('./Show.vue'),
     props: true
   },
   {
     path: '/panel/users/:id/edit',
     name: 'panel.users.edit',
-    component: () => import('./Pages/Edit.vue'),
+    component: () => import('./Edit.vue'),
     props: true
   }
 ]

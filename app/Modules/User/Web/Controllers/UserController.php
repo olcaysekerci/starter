@@ -21,7 +21,7 @@ class UserController extends Controller
     {
         $users = $this->userService->getAllUsers();
         
-        return Inertia::render('Modules/User/Web/Pages/Index', [
+        return Inertia::render('User/Web/Index', [
             'users' => $users
         ]);
     }
@@ -33,7 +33,7 @@ class UserController extends Controller
     {
         $user = $this->userService->getUserById($id);
         
-        return Inertia::render('Modules/User/Web/Pages/Show', [
+        return Inertia::render('User/Web/Show', [
             'user' => $user
         ]);
     }
@@ -42,7 +42,7 @@ class UserController extends Controller
     {
         $user = auth()->user();
         
-        return Inertia::render('Modules/User/Web/Pages/Profile', [
+        return Inertia::render('User/Web/Profile', [
             'user' => $user
         ]);
     }

@@ -4,18 +4,18 @@ const routes = [
   {
     path: '/users',
     name: 'users.index',
-    component: () => import('./Pages/Index.vue')
+    component: () => import('./Index.vue')
   },
   {
     path: '/users/:id',
     name: 'users.show',
-    component: () => import('./Pages/Show.vue'),
+    component: () => import('./Show.vue'),
     props: true
   },
   {
     path: '/profile',
     name: 'users.profile',
-    component: () => import('./Pages/Profile.vue')
+    component: () => import('./Profile.vue')
   }
 ]
 
