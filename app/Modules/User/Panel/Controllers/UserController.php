@@ -7,6 +7,7 @@ use App\Modules\User\Services\UserService;
 use App\Modules\User\Requests\CreateUserRequest;
 use App\Modules\User\Requests\UpdateUserRequest;
 use App\Modules\User\Services\RoleService;
+use App\Modules\User\Exceptions\UserException;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
@@ -99,12 +100,12 @@ class UserController extends Controller
         try {
             $user = $this->userService->getUserDTOById($id);
         
-        return Inertia::render('User/Panel/Show', [
-            'user' => $user
-        ]);
-        } catch (ModelNotFoundException $e) {
+            return Inertia::render('User/Panel/Show', [
+                'user' => $user
+            ]);
+        } catch (UserException $e) {
             return redirect()->route('panel.users.index')
-                ->with('error', 'Kullanıcı bulunamadı.');
+                ->with('error', $e->getMessage());
         }
     }
 

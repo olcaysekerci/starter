@@ -237,7 +237,7 @@ const deleteUser = () => {
 }
 
 const sendEmail = () => {
-  // E-posta gönderme işlemi
-  alert('E-posta gönderme özelliği henüz implement edilmedi.')
+  // E-posta gönderme işlemi - yeni sayfa açabilir veya modal gösterebilir
+  router.visit(`/panel/users/${props.user.id}/send-email`)
 }
 </script> 

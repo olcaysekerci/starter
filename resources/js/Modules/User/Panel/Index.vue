@@ -208,7 +208,38 @@ const filteredUsers = computed(() => {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(user => 
       user.name.toLowerCase().includes(query) ||
-      user.email.toLowerCase().includes(query)
+      user.email.toLowerCase().includes(query) ||
+      (user.phone && user.phone.toLowerCase().includes(query))
+    )
+  }
+  
+  // Status filter
+  if (filters.value.status) {
+    filtered = filtered.filter(user => {
+      if (filters.value.status === 'active') return user.is_active
+      if (filters.value.status === 'inactive') return !user.is_active
+      return true
+    })
+  }
+  
+  // Date range filter
+  if (filters.value.dateFrom || filters.value.dateTo) {
+    filtered = filtered.filter(user => {
+      const userDate = new Date(user.created_at)
+      const fromDate = filters.value.dateFrom ? new Date(filters.value.dateFrom) : null
+      const toDate = filters.value.dateTo ? new Date(filters.value.dateTo) : null
+      
+      if (fromDate && userDate < fromDate) return false
+      if (toDate && userDate > toDate) return false
+      return true
+    })
+  }
+  
+  // Email domain filter
+  if (filters.value.emailDomain) {
+    const domain = filters.value.emailDomain.toLowerCase()
+    filtered = filtered.filter(user => 
+      user.email.toLowerCase().includes(domain)
     )
   }
   

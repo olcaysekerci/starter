@@ -8,6 +8,7 @@ use App\Modules\User\DTOs\UserDTO;
 use App\Modules\User\Actions\CreateUserAction;
 use App\Modules\User\Actions\UpdateUserAction;
 use App\Modules\MailNotification\Services\MailDispatcherService;
+use App\Modules\User\Exceptions\UserException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -51,7 +52,7 @@ class UserService
         $user = $this->userRepository->findById($id);
         
         if (!$user) {
-            throw new ModelNotFoundException('Kullanıcı bulunamadı.');
+            throw UserException::userNotFound($id);
         }
         
         return $user;
@@ -65,7 +66,7 @@ class UserService
         $user = $this->userRepository->findById($id);
         
         if (!$user) {
-            throw new ModelNotFoundException('Kullanıcı bulunamadı.');
+            throw UserException::userNotFound($id);
         }
         
         return UserDTO::fromModel($user);
@@ -85,23 +86,27 @@ class UserService
                     Validator::make([], []),
                     'Bu e-posta adresi zaten kullanılıyor.'
                 );
-        }
+            }
         
             $user = $this->createUserAction->execute($data);
             
             DB::commit();
         
-        return $user;
+            return $user;
             
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
             
             Log::error('Kullanıcı oluşturma hatası', [
                 'error' => $e->getMessage(),
-                'data' => Arr::except($data, ['password'])
+                'data' => Arr::except($data, ['password']),
+                'trace' => $e->getTraceAsString()
             ]);
             
-            throw $e;
+            throw new \Exception('Kullanıcı oluşturulurken beklenmeyen bir hata oluştu.');
         }
     }
 
@@ -119,16 +124,23 @@ class UserService
             
             return $result;
             
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
             
             Log::error('Kullanıcı güncelleme hatası', [
                 'user_id' => $id,
                 'error' => $e->getMessage(),
-                'data' => Arr::except($data, ['password'])
+                'data' => Arr::except($data, ['password']),
+                'trace' => $e->getTraceAsString()
             ]);
             
-            throw $e;
+            throw new \Exception('Kullanıcı güncellenirken beklenmeyen bir hata oluştu.');
         }
     }
 
@@ -140,7 +152,7 @@ class UserService
         try {
             DB::beginTransaction();
             
-        $user = $this->userRepository->findById($id);
+            $user = $this->userRepository->findById($id);
             
             if (!$user) {
                 throw new ModelNotFoundException('Kullanıcı bulunamadı.');
@@ -154,7 +166,7 @@ class UserService
                 );
             }
             
-        $deleted = $this->userRepository->delete($id);
+            $deleted = $this->userRepository->delete($id);
         
             if (!$deleted) {
                 throw new \Exception('Kullanıcı silinirken bir hata oluştu.');
@@ -172,15 +184,22 @@ class UserService
             
             return true;
             
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
             
             Log::error('Kullanıcı silme hatası', [
                 'user_id' => $id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             
-            throw $e;
+            throw new \Exception('Kullanıcı silinirken beklenmeyen bir hata oluştu.');
         }
     }
 

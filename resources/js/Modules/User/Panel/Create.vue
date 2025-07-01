@@ -184,12 +184,34 @@ const form = useForm({
 
 // Methods
 const saveUser = () => {
+  // Client-side validation
+  if (!form.name.trim()) {
+    form.setError('name', 'Ad alanı zorunludur.')
+    return
+  }
+  
+  if (!form.email.trim()) {
+    form.setError('email', 'E-posta alanı zorunludur.')
+    return
+  }
+  
+  if (!form.password) {
+    form.setError('password', 'Şifre alanı zorunludur.')
+    return
+  }
+  
+  if (form.password !== form.password_confirmation) {
+    form.setError('password_confirmation', 'Şifre tekrarı eşleşmiyor.')
+    return
+  }
+  
   form.post('/panel/users', {
     onSuccess: () => {
       // Başarılı olduğunda yapılacak işlemler
     },
-    onError: () => {
+    onError: (errors) => {
       // Hata durumunda yapılacak işlemler
+      console.error('Form errors:', errors)
     }
   })
 }

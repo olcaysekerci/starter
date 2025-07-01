@@ -5,7 +5,6 @@ namespace App\Modules\User\Repositories;
 use App\Modules\User\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\DB;
 
 class UserRepository
 {
@@ -59,7 +58,7 @@ class UserRepository
             ->with(['roles', 'permissions'])
             ->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
-            ->orWhere('email', 'like', "%{$query}%")
+                  ->orWhere('email', 'like', "%{$query}%")
                   ->orWhere('phone', 'like', "%{$query}%");
             })
             ->orderBy('created_at', 'desc')
@@ -71,9 +70,7 @@ class UserRepository
      */
     public function create(array $data): User
     {
-        return DB::transaction(function () use ($data) {
         return $this->model->create($data);
-        });
     }
 
     /**
@@ -81,7 +78,6 @@ class UserRepository
      */
     public function update(int $id, array $data): bool
     {
-        return DB::transaction(function () use ($id, $data) {
         $user = $this->findById($id);
         
         if (!$user) {
@@ -89,7 +85,6 @@ class UserRepository
         }
 
         return $user->update($data);
-        });
     }
 
     /**
@@ -97,7 +92,6 @@ class UserRepository
      */
     public function delete(int $id): bool
     {
-        return DB::transaction(function () use ($id) {
         $user = $this->findById($id);
         
         if (!$user) {
@@ -105,7 +99,32 @@ class UserRepository
         }
 
         return $user->delete();
-        });
+    }
+
+    /**
+     * Aktif kullanıcıları getir
+     */
+    public function getActiveUsers(): Collection
+    {
+        return $this->model
+            ->with(['roles', 'permissions'])
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * Belirli role sahip kullanıcıları getir
+     */
+    public function getUsersByRole(string $roleName): Collection
+    {
+        return $this->model
+            ->with(['roles', 'permissions'])
+            ->whereHas('roles', function ($query) use ($roleName) {
+                $query->where('name', $roleName);
+            })
+            ->orderBy('name')
+            ->get();
     }
 
     /**
