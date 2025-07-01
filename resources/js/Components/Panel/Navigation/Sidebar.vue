@@ -3,11 +3,11 @@
     v-show="props.isOpen"
     :class="[
       props.isCollapsed ? 'w-20' : 'w-64',
-      'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-300 overflow-hidden z-50 fixed lg:relative lg:z-auto h-screen lg:h-auto left-0 lg:left-auto'
+      'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-300 z-50 fixed lg:relative lg:z-auto h-screen lg:h-screen left-0 lg:left-auto'
     ]"
   >
     <!-- Logo ve Başlık -->
-    <div class="flex items-center h-16 px-6 border-b border-gray-200 dark:border-gray-800">
+    <div class="flex items-center h-16 px-6 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
       <span v-if="!props.isCollapsed" class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Admin Panel</span>
       <span v-else class="text-lg font-bold text-gray-900 dark:text-white tracking-tight"><HomeIcon class="w-7 h-7" /></span>
       <button @click="$emit('close')" class="ml-auto p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 lg:hidden">
@@ -17,7 +17,7 @@
       </button>
     </div>
     <!-- Menü -->
-    <nav class="flex-1 py-4 px-2 space-y-1">
+    <nav @click.stop class="flex-1 py-4 px-2 space-y-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
       <template v-for="item in menuItems" :key="item.name">
         <div v-if="item.children" class="relative">
           <button
@@ -86,9 +86,38 @@
         </Link>
       </template>
     </nav>
+
+    <!-- Sidebar Footer -->
+    <div @click.stop class="flex-shrink-0 border-t border-gray-200 dark:border-gray-800 p-4">
+      <div v-if="!props.isCollapsed" class="space-y-3">
+        <!-- Sistem Durumu -->
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Sistem Durumu</span>
+          <div class="flex items-center space-x-1">
+            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span class="text-green-600 dark:text-green-400 font-medium">Aktif</span>
+          </div>
+        </div>
+        
+        <!-- Versiyon Bilgisi -->
+        <div class="text-xs text-gray-500 dark:text-gray-400">
+          <div class="flex items-center justify-between">
+            <span>Versiyon</span>
+            <span class="font-medium">v2.1.0</span>
+          </div>
+        </div>
+        
+
+      </div>
+      
+      <!-- Collapsed durumda sadece sistem durumu -->
+      <div v-else class="flex flex-col items-center space-y-3">
+        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+      </div>
+    </div>
   </aside>
   <!-- Mobilde overlay -->
-  <div v-if="props.isOpen" @click="$emit('close')" class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"></div>
+  <div v-if="props.isOpen" @click="$emit('close')" class="fixed inset-0 z-30 bg-black bg-opacity-50 lg:hidden"></div>
 </template>
 
 <script setup>
