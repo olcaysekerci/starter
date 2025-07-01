@@ -47,13 +47,13 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          <div v-if="dropdownOpen === item.name && !props.isCollapsed" class="ml-8 mt-1 space-y-1">
+          <div v-if="dropdownOpen === item.name && !props.isCollapsed" class="ml-4 mt-1 space-y-1">
             <Link
               v-for="child in item.children"
               :key="child.name"
               :href="child.href"
               :class="[
-                'block px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative',
+                'block px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative',
                 isActive(child) 
                   ? 'bg-indigo-50/60 dark:bg-gray-700/60 text-indigo-700 dark:text-indigo-300 font-medium' 
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50/60 dark:hover:bg-gray-700/60 hover:text-indigo-700 dark:hover:text-indigo-300'
