@@ -2,26 +2,19 @@
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
     <Head :title="title" />
 
-    <!-- Mobile overlay (sadece sidebar açık ve mobilde göster) -->
-    <div 
-        v-if="!isCollapsed && isMobile"
-        class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-        @click="closeSidebar"
-    ></div>
-
     <!-- Sidebar -->
     <Sidebar :is-open="sidebarOpen" :is-collapsed="isCollapsed" @close="sidebarOpen = false" />
     
     <!-- Sağ İçerik Alanı -->
     <div class="flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-gray-900 w-full">
       <!-- Top Navigation -->
-      <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 h-16 flex items-center justify-between px-3 sm:px-4 lg:px-6">
+      <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
         <!-- Left side -->
-        <div class="flex items-center space-x-2 sm:space-x-4">
+        <div class="flex items-center space-x-3 sm:space-x-4">
           <!-- Toggle Button -->
           <button
               @click="toggleSidebar"
-              class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              class="p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-600"
           >
               <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -35,7 +28,7 @@
         </div>
 
         <!-- Right side -->
-        <div class="flex items-center space-x-1 sm:space-x-3">
+        <div class="flex items-center space-x-2 sm:space-x-3">
           <!-- Dark Mode Toggle -->
           <DarkModeToggle />
           
@@ -215,7 +208,7 @@
 
       <!-- Sayfa İçeriği -->
       <main class="flex-1 overflow-auto">
-        <div class="p-3 sm:p-4 lg:p-6">
+        <div class="p-4 sm:p-6 lg:p-8">
           <slot />
         </div>
       </main>
@@ -274,13 +267,10 @@ const checkMobile = () => {
 
 // Toggle sidebar
 const toggleSidebar = () => {
-    isCollapsed.value = !isCollapsed.value
-}
-
-// Close sidebar (for mobile overlay)
-const closeSidebar = () => {
     if (isMobile.value) {
-        sidebarOpen.value = false
+        sidebarOpen.value = !sidebarOpen.value
+    } else {
+        isCollapsed.value = !isCollapsed.value
     }
 }
 

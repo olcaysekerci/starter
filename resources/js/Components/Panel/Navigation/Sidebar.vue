@@ -2,8 +2,8 @@
   <aside
     v-show="props.isOpen"
     :class="[
-      props.isCollapsed ? 'w-20' : 'w-56',
-      'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-300 overflow-hidden'
+      props.isCollapsed ? 'w-20' : 'w-64',
+      'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-300 overflow-hidden z-50 fixed lg:relative lg:z-auto h-screen lg:h-auto left-0 lg:left-auto'
     ]"
   >
     <!-- Logo ve Başlık -->
@@ -88,7 +88,7 @@
     </nav>
   </aside>
   <!-- Mobilde overlay -->
-  <div v-if="props.isOpen" @click="$emit('close')" class="fixed inset-0 z-30 bg-black bg-opacity-30 lg:hidden"></div>
+  <div v-if="props.isOpen" @click="$emit('close')" class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"></div>
 </template>
 
 <script setup>
