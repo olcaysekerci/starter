@@ -164,22 +164,24 @@
                 {{ formatDate(mailLog.created_at) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div class="flex space-x-2">
-                  <ActionButton
+                <div class="flex items-center justify-end space-x-1">
+                  <TableActionButton
                     @click="viewMail(mailLog.id)"
                     variant="info"
                     size="sm"
+                    title="Görüntüle"
                   >
                     <EyeIcon class="w-4 h-4" />
-                  </ActionButton>
-                  <ActionButton
+                  </TableActionButton>
+                  <TableActionButton
                     v-if="mailLog.status === 'failed' && mailLog.can_retry"
                     @click="retrySingleMail(mailLog.id)"
                     variant="warning"
                     size="sm"
+                    title="Yeniden Dene"
                   >
                     <ArrowPathIcon class="w-4 h-4" />
-                  </ActionButton>
+                  </TableActionButton>
                 </div>
               </td>
             </tr>
@@ -252,6 +254,7 @@ import {
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
+import TableActionButton from '@/Components/Panel/Actions/TableActionButton.vue'
 import SearchInput from '@/Components/Panel/Actions/SearchInput.vue'
 import InPageStatCard from '@/Components/Panel/InPageStatCard.vue'
 import FilterCard from '@/Components/Panel/FilterCard.vue'

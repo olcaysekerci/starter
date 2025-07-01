@@ -112,7 +112,7 @@
         </div>
       </div>
       
-      <UserList :users="filteredUsers" @edit="editUser" @delete="deleteUser" />
+      <UserList :users="filteredUsers" @view="viewUser" @edit="editUser" @delete="deleteUser" />
     </div>
 
     <!-- Pagination -->
@@ -257,6 +257,10 @@ const hasActiveFilters = computed(() => {
 // Methods
 const goToPage = (url) => { 
   router.visit(url) 
+}
+
+const viewUser = (user) => { 
+  router.visit(route('panel.users.show', user.id)) 
 }
 
 const editUser = (user) => { 

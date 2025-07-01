@@ -16,6 +16,7 @@
           v-for="user in users"
           :key="user.id"
           :user="user"
+          @view="$emit('view', $event)"
           @edit="$emit('edit', $event)"
           @delete="$emit('delete', $event)"
         />
