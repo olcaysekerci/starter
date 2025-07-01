@@ -259,18 +259,18 @@ const updateFilter = (key, value) => {
 }
 
 const applyFilters = () => {
-  router.get('/panel/activity-logs', props.filters, { preserveState: true })
+  router.get(route('panel.activity-logs.index'), props.filters, { preserveState: true })
 }
 
 const clearFilters = () => {
-  router.get('/panel/activity-logs', {}, { preserveState: true })
+  router.get(route('panel.activity-logs.index'), {}, { preserveState: true })
 }
 
 const cleanupLogs = async () => {
   cleanupLoading.value = true
   
   try {
-    await router.post('/panel/activity-logs/cleanup', { days: cleanupDays.value })
+    await router.post(route('panel.activity-logs.cleanup'), { days: cleanupDays.value })
     showCleanupModal.value = false
   } catch (error) {
     console.error('Cleanup error:', error)

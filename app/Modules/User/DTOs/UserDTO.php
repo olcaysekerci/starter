@@ -60,6 +60,24 @@ class UserDTO
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'is_active' => $this->is_active,
+            'email_verified_at' => $this->email_verified_at,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'roles' => $this->roles?->toArray(),
+            'permissions' => $this->permissions?->toArray(),
+        ];
+    }
+
+    /**
+     * Admin paneli için tüm verileri döndür
+     */
+    public function toAdminArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
             'phone' => $this->phone,
             'address' => $this->address,
             'is_active' => $this->is_active,

@@ -227,6 +227,26 @@ class MailDispatcherService
     }
 
     /**
+     * Mail yeniden gönder
+     */
+    public function resendMail(MailLog $mailLog): bool
+    {
+        $mailData = [
+            'to' => $mailLog->recipient,
+            'subject' => $mailLog->subject,
+            'content' => $mailLog->content,
+            'type' => $mailLog->type,
+        ];
+
+        if ($this->sendMail($mailData)) {
+            $mailLog->markAsSent();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Eski logları temizle
      */
     public function cleanupOldLogs(int $days = 90): int

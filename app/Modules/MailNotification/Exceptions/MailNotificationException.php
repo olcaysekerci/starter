@@ -79,4 +79,9 @@ class MailNotificationException extends Exception
     {
         return new self("Mail alıcısı zorunludur.");
     }
+
+    public static function resendFailed(int $id): self
+    {
+        return new self("Mail yeniden gönderimi başarısız. ID: {$id}");
+    }
 } 

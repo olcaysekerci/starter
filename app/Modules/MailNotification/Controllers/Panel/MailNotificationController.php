@@ -204,6 +204,37 @@ class MailNotificationController extends Controller
     }
 
     /**
+     * Mail yeniden gönder
+     */
+    public function resend($id)
+    {
+        try {
+            $mailLog = $this->mailNotificationRepository->findById($id);
+            
+            if (!$mailLog) {
+                throw MailNotificationException::mailLogNotFound($id);
+            }
+
+            $sent = $this->mailDispatcher->resendMail($mailLog);
+
+            if ($sent) {
+                return back()->with('success', 'Mail başarıyla yeniden gönderildi.');
+            } else {
+                throw MailNotificationException::resendFailed($id);
+            }
+        } catch (MailNotificationException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('Mail yeniden gönderimi hatası', [
+                'id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return back()->with('error', 'Mail yeniden gönderimi sırasında hata oluştu: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Eski logları temizle
      */
     public function cleanup(CleanupLogsRequest $request)

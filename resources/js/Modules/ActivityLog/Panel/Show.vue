@@ -250,6 +250,6 @@ const getEventBadgeClass = (event) => {
 }
 
 const goBack = () => {
-  router.visit('/panel/activity-logs')
+  router.visit(route('panel.activity-logs.index'))
 }
 </script> 

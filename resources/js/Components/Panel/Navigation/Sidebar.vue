@@ -93,7 +93,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { usePage, Link } from '@inertiajs/vue3'
+import { usePage, Link, router } from '@inertiajs/vue3'
 import { HomeIcon, UsersIcon, DocumentTextIcon, EnvelopeIcon, Cog6ToothIcon, ShieldCheckIcon, KeyIcon } from '@heroicons/vue/24/outline'
 
 const emit = defineEmits(['close'])
@@ -103,22 +103,22 @@ const props = defineProps({
 })
 const page = usePage()
 const menuItems = [
-  { name: 'dashboard', label: 'Dashboard', href: '/panel/dashboard', icon: HomeIcon },
+  { name: 'Dashboard', label: 'Dashboard', href: route('panel.dashboard'), icon: HomeIcon },
   {
-    name: 'users', label: 'Kullanıcı Yönetimi', icon: UsersIcon, children: [
-      { name: 'users-list', label: 'Kullanıcılar', href: '/panel/users' },
-      { name: 'roles', label: 'Roller', href: '/panel/roles' },
-      { name: 'permissions', label: 'Yetkiler', href: '/panel/permissions' }
+    name: 'User', label: 'Kullanıcı Yönetimi', icon: UsersIcon, children: [
+      { name: 'User/Panel/Index', label: 'Kullanıcılar', href: route('panel.users.index') },
+      { name: 'User/Panel/Roles/Index', label: 'Roller', href: route('panel.roles.index') },
+      { name: 'User/Panel/Permissions/Index', label: 'Yetkiler', href: route('panel.permissions.index') }
     ]
   },
-  { name: 'logs', label: 'Aktivite Logları', href: '/panel/activity-logs', icon: DocumentTextIcon },
-  { name: 'mails', label: 'Mail Bildirimleri', href: '/panel/mail-notifications', icon: EnvelopeIcon },
+  { name: 'ActivityLog/Panel/Index', label: 'Aktivite Logları', href: route('panel.activity-logs.index'), icon: DocumentTextIcon },
+  { name: 'MailNotification/Panel/Index', label: 'Mail Bildirimleri', href: route('panel.mail-notifications.index'), icon: EnvelopeIcon },
   {
-    name: 'settings', label: 'Ayarlar', icon: Cog6ToothIcon, children: [
-      { name: 'app-settings', label: 'Uygulama Ayarları', href: '/panel/settings/app' },
-      { name: 'mail-settings', label: 'Mail Ayarları', href: '/panel/settings/mail' },
-      { name: 'profile', label: 'Profil Ayarları', href: '/panel/settings/profile' },
-      { name: 'security', label: 'Güvenlik', href: '/panel/settings/security' }
+    name: 'Settings', label: 'Ayarlar', icon: Cog6ToothIcon, children: [
+      { name: 'Settings/Panel/App/Index', label: 'Uygulama Ayarları', href: route('panel.settings.app.index') },
+      { name: 'Settings/Panel/Mail/Index', label: 'Mail Ayarları', href: route('panel.settings.mail.index') },
+      { name: 'Settings/Panel/Profile/Index', label: 'Profil Ayarları', href: route('panel.settings.profile') },
+      { name: 'Settings/Panel/Security/Index', label: 'Güvenlik', href: route('panel.settings.security') }
     ]
   }
 ]
@@ -130,26 +130,25 @@ const menuItems = [
 
 
 const isActive = (item) => {
-  // En basit haliyle window.location.pathname kullan
-  const currentPath = window.location.pathname
+  // Basit component name karşılaştırması
+  const currentComponent = page.component
   
   if (item.children) {
     return item.children.some(child => {
-      return currentPath === child.href || currentPath.startsWith(child.href + '/')
+      return currentComponent === child.name || currentComponent.startsWith(child.name + '/')
     })
   }
   
-  // Tam eşleşme veya başlangıç eşleşmesi
-  return currentPath === item.href || currentPath.startsWith(item.href + '/')
+  return currentComponent === item.name || currentComponent.startsWith(item.name + '/')
 }
 
 const isParentActive = (item) => {
   if (!item.children) return false
   
-  const currentPath = window.location.pathname
+  const currentComponent = page.component
   
   return item.children.some(child => {
-    return currentPath === child.href || currentPath.startsWith(child.href + '/')
+    return currentComponent === child.name || currentComponent.startsWith(child.name + '/')
   })
 }
 

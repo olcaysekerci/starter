@@ -223,21 +223,21 @@ const getAccountAge = (createdAt) => {
 }
 
 const goBack = () => {
-  router.visit('/panel/users')
+  router.visit(route('panel.users.index'))
 }
 
 const editUser = () => {
-  router.visit(`/panel/users/${props.user.id}/edit`)
+  router.visit(route('panel.users.edit', props.user.id))
 }
 
 const deleteUser = () => {
   if (confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')) {
-    router.delete(`/panel/users/${props.user.id}`)
+    router.delete(route('panel.users.destroy', props.user.id))
   }
 }
 
 const sendEmail = () => {
   // E-posta gönderme işlemi - yeni sayfa açabilir veya modal gösterebilir
-  router.visit(`/panel/users/${props.user.id}/send-email`)
+  router.visit(route('panel.users.send-email', props.user.id))
 }
 </script> 

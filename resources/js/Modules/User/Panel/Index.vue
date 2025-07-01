@@ -260,17 +260,24 @@ const goToPage = (url) => {
 }
 
 const editUser = (user) => { 
-  router.visit(`/panel/users/${user.id}/edit`) 
+  router.visit(route('panel.users.edit', user.id)) 
 }
 
 const deleteUser = (user) => {
   if (confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')) {
-    router.delete(`/panel/users/${user.id}`)
+    router.delete(route('panel.users.destroy', user.id), {
+      onSuccess: () => {
+        // Başarılı silme işlemi
+      },
+      onError: (errors) => {
+        console.error('Kullanıcı silinirken hata oluştu:', errors)
+      }
+    })
   }
 }
 
 const addUser = () => { 
-  router.visit('/panel/users/create') 
+  router.visit(route('panel.users.create')) 
 }
 
 const exportExcel = () => { 

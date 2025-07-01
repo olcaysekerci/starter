@@ -10,6 +10,7 @@ Route::prefix('panel')->name('panel.')->middleware(['auth', 'verified'])->group(
         Route::post('/test', [MailNotificationController::class, 'test'])->name('test');
         Route::post('/retry', [MailNotificationController::class, 'retry'])->name('retry');
         Route::post('/retry/{id}', [MailNotificationController::class, 'retrySingle'])->name('retry-single');
+        Route::post('/resend/{id}', [MailNotificationController::class, 'resend'])->name('resend');
         Route::post('/cleanup', [MailNotificationController::class, 'cleanup'])->name('cleanup');
     });
 }); 

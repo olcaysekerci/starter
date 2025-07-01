@@ -10,6 +10,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // User routes
         Route::resource('users', UserController::class);
         Route::get('users/search', [UserController::class, 'search'])->name('users.search');
+        Route::get('users/{user}/send-email', [UserController::class, 'sendEmail'])->name('users.send-email');
         
         // Role routes
         Route::resource('roles', RoleController::class);

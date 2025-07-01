@@ -23,6 +23,11 @@ class User extends Authenticatable
     use HasRoles;
 
     /**
+     * The guard name for the permissions
+     */
+    protected $guard_name = 'web';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -30,10 +35,19 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
         'phone',
         'address',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be mass assignable only by admins.
+     *
+     * @var array<int, string>
+     */
+    protected $adminFillable = [
         'is_active',
+        'email_verified_at',
     ];
 
     /**
@@ -46,6 +60,8 @@ class User extends Authenticatable
         'remember_token',
         'two_factor_recovery_codes',
         'two_factor_secret',
+        'phone',
+        'address',
     ];
 
     /**
