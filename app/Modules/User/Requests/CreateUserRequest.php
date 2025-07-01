@@ -5,7 +5,7 @@ namespace App\Modules\User\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
-class UpdateUserRequest extends FormRequest
+class CreateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,12 +20,10 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userId = $this->route('user');
-        
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', "unique:users,email,{$userId}"],
-            'password' => ['nullable', 'confirmed', Password::defaults()],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'confirmed', Password::defaults()],
             'phone' => ['nullable', 'string', 'max:20', 'regex:/^[\+]?[0-9\s\-\(\)]+$/'],
             'address' => ['nullable', 'string', 'max:500'],
             'roles' => ['nullable', 'array'],
@@ -50,6 +48,7 @@ class UpdateUserRequest extends FormRequest
             'email.max' => 'E-posta en fazla 255 karakter olabilir.',
             'email.unique' => 'Bu e-posta adresi zaten kullanılıyor.',
             
+            'password.required' => 'Şifre alanı zorunludur.',
             'password.confirmed' => 'Şifre tekrarı eşleşmiyor.',
             'password.min' => 'Şifre en az 8 karakter olmalıdır.',
             

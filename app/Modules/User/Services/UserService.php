@@ -5,15 +5,26 @@ namespace App\Modules\User\Services;
 use App\Modules\User\Models\User;
 use App\Modules\User\Repositories\UserRepository;
 use App\Modules\User\DTOs\UserDTO;
+use App\Modules\User\Actions\CreateUserAction;
+use App\Modules\User\Actions\UpdateUserAction;
 use App\Modules\MailNotification\Services\MailDispatcherService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Validator;
 
 class UserService
 {
     public function __construct(
         private UserRepository $userRepository,
-        private MailDispatcherService $mailDispatcher
+        private MailDispatcherService $mailDispatcher,
+        private CreateUserAction $createUserAction,
+        private UpdateUserAction $updateUserAction
     ) {}
 
     /**
@@ -37,7 +48,13 @@ class UserService
      */
     public function getUserById(int $id): ?User
     {
-        return $this->userRepository->findById($id);
+        $user = $this->userRepository->findById($id);
+        
+        if (!$user) {
+            throw new ModelNotFoundException('Kullanıcı bulunamadı.');
+        }
+        
+        return $user;
     }
 
     /**
@@ -47,7 +64,11 @@ class UserService
     {
         $user = $this->userRepository->findById($id);
         
-        return $user ? UserDTO::fromArray($user->toArray()) : null;
+        if (!$user) {
+            throw new ModelNotFoundException('Kullanıcı bulunamadı.');
+        }
+        
+        return UserDTO::fromModel($user);
     }
 
     /**
@@ -55,21 +76,33 @@ class UserService
      */
     public function createUser(array $data): User
     {
-        // Rolleri ayır
-        $roles = $data['roles'] ?? [];
-        unset($data['roles']);
-        
-        $user = $this->userRepository->create($data);
-        
-        // Rolleri ata
-        if (!empty($roles)) {
-            $user->assignRole($roles);
+        try {
+            DB::beginTransaction();
+            
+            // Email kontrolü
+            if ($this->userRepository->findByEmail($data['email'])) {
+                throw new ValidationException(
+                    Validator::make([], []),
+                    'Bu e-posta adresi zaten kullanılıyor.'
+                );
+            }
+            
+            $user = $this->createUserAction->execute($data);
+            
+            DB::commit();
+            
+            return $user;
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Kullanıcı oluşturma hatası', [
+                'error' => $e->getMessage(),
+                'data' => Arr::except($data, ['password'])
+            ]);
+            
+            throw $e;
         }
-        
-        // Hoş geldin maili gönder
-        $this->sendWelcomeEmail($user);
-        
-        return $user;
     }
 
     /**
@@ -77,25 +110,26 @@ class UserService
      */
     public function updateUser(int $id, array $data): bool
     {
-        $user = $this->userRepository->findById($id);
-        
-        // Rolleri ayır
-        $roles = $data['roles'] ?? [];
-        unset($data['roles']);
-        
-        $updated = $this->userRepository->update($id, $data);
-        
-        // Rolleri güncelle
-        if ($updated && !empty($roles)) {
-            $user->syncRoles($roles);
+        try {
+            DB::beginTransaction();
+            
+            $result = $this->updateUserAction->execute($id, $data);
+            
+            DB::commit();
+            
+            return $result;
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Kullanıcı güncelleme hatası', [
+                'user_id' => $id,
+                'error' => $e->getMessage(),
+                'data' => Arr::except($data, ['password'])
+            ]);
+            
+            throw $e;
         }
-        
-        if ($updated && isset($data['email']) && $data['email'] !== $user->email) {
-            // Email değişikliği varsa bilgilendirme maili gönder
-            $this->sendEmailChangeNotification($user, $data['email']);
-        }
-        
-        return $updated;
     }
 
     /**
@@ -103,15 +137,51 @@ class UserService
      */
     public function deleteUser(int $id): bool
     {
-        $user = $this->userRepository->findById($id);
-        $deleted = $this->userRepository->delete($id);
-        
-        if ($deleted) {
+        try {
+            DB::beginTransaction();
+            
+            $user = $this->userRepository->findById($id);
+            
+            if (!$user) {
+                throw new ModelNotFoundException('Kullanıcı bulunamadı.');
+            }
+            
+            // Kendini silmeye çalışıyorsa engelle
+            if ($user->id === auth()->id()) {
+                throw new ValidationException(
+                    Validator::make([], []),
+                    'Kendi hesabınızı silemezsiniz.'
+                );
+            }
+            
+            $deleted = $this->userRepository->delete($id);
+            
+            if (!$deleted) {
+                throw new \Exception('Kullanıcı silinirken bir hata oluştu.');
+            }
+            
             // Hesap silme bildirimi gönder
             $this->sendAccountDeletionNotification($user);
+            
+            DB::commit();
+            
+            Log::info('Kullanıcı silindi', [
+                'user_id' => $id,
+                'deleted_by' => auth()->id()
+            ]);
+            
+            return true;
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Kullanıcı silme hatası', [
+                'user_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            
+            throw $e;
         }
-        
-        return $deleted;
     }
 
     /**

@@ -1,17 +1,17 @@
 <template>
   <PanelLayout 
-    title="Kullanıcı Düzenle" 
-    page-title="Kullanıcı Düzenle"
+    title="Yeni Kullanıcı" 
+    page-title="Yeni Kullanıcı Oluştur"
     :breadcrumbs="[
       { title: 'Dashboard', url: '/dashboard' },
       { title: 'Kullanıcı Yönetimi', url: '/panel/users' },
-      { title: user.name }
+      { title: 'Yeni Kullanıcı' }
     ]"
   >
     <!-- Page Header -->
     <PageHeader
-      title="Kullanıcı Düzenle"
-      :description="`${user.name} kullanıcısının bilgilerini güncelleyin.`"
+      title="Yeni Kullanıcı Oluştur"
+      description="Sisteme yeni bir kullanıcı hesabı ekleyin. Kullanıcı bilgilerini ve rollerini belirleyin."
     >
       <template #actions>
         <ActionButton 
@@ -33,7 +33,7 @@
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
           </svg>
-          Değişiklikleri Kaydet
+          Kullanıcı Oluştur
         </ActionButton>
       </template>
     </PageHeader>
@@ -66,21 +66,23 @@
             />
           </FormGroup>
 
-          <FormGroup label="Yeni Şifre">
+          <FormGroup label="Şifre" required>
             <TextInput
               v-model="form.password"
               type="password"
               :error="form.errors.password"
-              placeholder="Değiştirmek istiyorsanız yeni şifre girin"
+              placeholder="Güçlü bir şifre girin"
+              required
             />
           </FormGroup>
 
-          <FormGroup label="Şifre Tekrarı">
+          <FormGroup label="Şifre Tekrarı" required>
             <TextInput
               v-model="form.password_confirmation"
               type="password"
               :error="form.errors.password_confirmation"
-              placeholder="Yeni şifreyi tekrar girin"
+              placeholder="Şifreyi tekrar girin"
+              required
             />
           </FormGroup>
 
@@ -143,7 +145,7 @@
             variant="primary"
             :loading="form.processing"
           >
-            Değişiklikleri Kaydet
+            Kullanıcı Oluştur
           </ActionButton>
         </div>
       </form>
@@ -162,10 +164,6 @@ import TextArea from '@/Components/Panel/Forms/TextArea.vue'
 import Checkbox from '@/Components/Panel/Forms/Checkbox.vue'
 
 const props = defineProps({
-  user: {
-    type: Object,
-    required: true
-  },
   roles: {
     type: Array,
     default: () => []
@@ -174,19 +172,19 @@ const props = defineProps({
 
 // Form
 const form = useForm({
-  name: props.user.name,
-  email: props.user.email,
+  name: '',
+  email: '',
   password: '',
   password_confirmation: '',
-  phone: props.user.phone || '',
-  address: props.user.address || '',
-  is_active: props.user.is_active ?? true,
-  roles: props.user.roles?.map(role => role.name) || []
+  phone: '',
+  address: '',
+  is_active: true,
+  roles: []
 })
 
 // Methods
 const saveUser = () => {
-  form.put(`/panel/users/${props.user.id}`, {
+  form.post('/panel/users', {
     onSuccess: () => {
       // Başarılı olduğunda yapılacak işlemler
     },

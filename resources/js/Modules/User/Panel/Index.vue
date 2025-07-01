@@ -53,14 +53,14 @@
 
     <!-- Stats Cards -->
     <div v-if="showStats" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-      <StatItem
+      <InPageStatCard
         title="Toplam Kullanıcı"
         :value="stats.totalUsers"
         color="blue"
         :icon="UserIcon"
       />
       
-      <StatItem
+      <InPageStatCard
         title="Aktif Kullanıcılar"
         :value="stats.activeUsers"
         color="emerald"
@@ -69,7 +69,7 @@
         :icon="CheckCircleIcon"
       />
       
-      <StatItem
+      <InPageStatCard
         title="Bekleyen Kullanıcılar"
         :value="stats.pendingUsers"
         color="orange"
@@ -132,13 +132,20 @@ import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
 import SearchInput from '@/Components/Panel/Actions/SearchInput.vue'
-import StatItem from '@/Components/Panel/InPageStatCard.vue'
+import InPageStatCard from '@/Components/Panel/InPageStatCard.vue'
 import FilterCard from '@/Components/Panel/FilterCard.vue'
 import UserList from '@/Components/Panel/User/UserList.vue'
 import Pagination from '@/Components/Panel/Shared/Pagination.vue'
 
 const props = defineProps({ 
   users: Object,
+  filters: {
+    type: Object,
+    default: () => ({
+      search: '',
+      per_page: 15
+    })
+  },
   stats: {
     type: Object,
     default: () => ({
@@ -151,7 +158,7 @@ const props = defineProps({
 })
 
 // Reactive data
-const searchQuery = ref('')
+const searchQuery = ref(props.filters.search || '')
 const showFilters = ref(false)
 const showStats = ref(false) // Default olarak kapalı
 const filters = ref({

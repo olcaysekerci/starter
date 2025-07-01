@@ -7,6 +7,7 @@ use App\Modules\User\Services\PermissionService;
 use App\Modules\User\Requests\CreatePermissionRequest;
 use App\Modules\User\Requests\UpdatePermissionRequest;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,7 +26,7 @@ class PermissionController extends Controller
         $stats = $this->permissionService->getStats();
         $modules = $this->permissionService->getModules();
         
-        return Inertia::render('User/Panel/Permissions/Dashboard', [
+        return Inertia::render('User/Panel/Permissions/Index', [
             'permissions' => $permissions,
             'stats' => $stats,
             'modules' => $modules
@@ -47,7 +48,7 @@ class PermissionController extends Controller
     /**
      * Yetki oluşturma
      */
-    public function store(CreatePermissionRequest $request): Response
+    public function store(CreatePermissionRequest $request): Response|RedirectResponse
     {
         $this->permissionService->createPermission($request->validated());
         
@@ -58,7 +59,7 @@ class PermissionController extends Controller
     /**
      * Admin paneli yetki detayı
      */
-    public function show(int $id): Response
+    public function show(int $id): Response|RedirectResponse
     {
         $permission = $this->permissionService->getPermissionById($id);
         $users = $this->permissionService->getUsersByPermission($id);
@@ -74,7 +75,7 @@ class PermissionController extends Controller
     /**
      * Yetki düzenleme sayfası
      */
-    public function edit(int $id): Response
+    public function edit(int $id): Response|RedirectResponse
     {
         $permission = $this->permissionService->getPermissionById($id);
         $modules = $this->permissionService->getModules();
@@ -88,7 +89,7 @@ class PermissionController extends Controller
     /**
      * Yetki güncelleme
      */
-    public function update(UpdatePermissionRequest $request, int $id): Response
+    public function update(UpdatePermissionRequest $request, int $id): Response|RedirectResponse
     {
         $this->permissionService->updatePermission($id, $request->validated());
         
@@ -99,7 +100,7 @@ class PermissionController extends Controller
     /**
      * Yetki silme
      */
-    public function destroy(int $id): Response
+    public function destroy(int $id): Response|RedirectResponse
     {
         $deleted = $this->permissionService->deletePermission($id);
         
@@ -120,7 +121,7 @@ class PermissionController extends Controller
         $query = $request->get('query', '');
         $permissions = $this->permissionService->searchPermissions($query);
         
-        return Inertia::render('User/Panel/Permissions/Dashboard', [
+        return Inertia::render('User/Panel/Permissions/Index', [
             'permissions' => $permissions,
             'searchQuery' => $query
         ]);
@@ -133,7 +134,7 @@ class PermissionController extends Controller
     {
         $permissions = $this->permissionService->getPermissionsByModule($module);
         
-        return Inertia::render('User/Panel/Permissions/Dashboard', [
+        return Inertia::render('User/Panel/Permissions/Index', [
             'permissions' => $permissions,
             'selectedModule' => $module
         ]);

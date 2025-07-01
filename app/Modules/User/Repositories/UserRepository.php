@@ -5,6 +5,7 @@ namespace App\Modules\User\Repositories;
 use App\Modules\User\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class UserRepository
 {
@@ -25,7 +26,10 @@ class UserRepository
      */
     public function getAllPaginated(int $perPage = 15): LengthAwarePaginator
     {
-        return $this->model->paginate($perPage);
+        return $this->model
+            ->with(['roles', 'permissions'])
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
     }
 
     /**
@@ -33,7 +37,9 @@ class UserRepository
      */
     public function findById(int $id): ?User
     {
-        return $this->model->find($id);
+        return $this->model
+            ->with(['roles', 'permissions'])
+            ->find($id);
     }
 
     /**
@@ -50,8 +56,13 @@ class UserRepository
     public function search(string $query, int $perPage = 15): LengthAwarePaginator
     {
         return $this->model
-            ->where('name', 'like', "%{$query}%")
-            ->orWhere('email', 'like', "%{$query}%")
+            ->with(['roles', 'permissions'])
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('email', 'like', "%{$query}%")
+                  ->orWhere('phone', 'like', "%{$query}%");
+            })
+            ->orderBy('created_at', 'desc')
             ->paginate($perPage);
     }
 
@@ -60,7 +71,9 @@ class UserRepository
      */
     public function create(array $data): User
     {
-        return $this->model->create($data);
+        return DB::transaction(function () use ($data) {
+            return $this->model->create($data);
+        });
     }
 
     /**
@@ -68,13 +81,15 @@ class UserRepository
      */
     public function update(int $id, array $data): bool
     {
-        $user = $this->findById($id);
-        
-        if (!$user) {
-            return false;
-        }
+        return DB::transaction(function () use ($id, $data) {
+            $user = $this->findById($id);
+            
+            if (!$user) {
+                return false;
+            }
 
-        return $user->update($data);
+            return $user->update($data);
+        });
     }
 
     /**
@@ -82,13 +97,15 @@ class UserRepository
      */
     public function delete(int $id): bool
     {
-        $user = $this->findById($id);
-        
-        if (!$user) {
-            return false;
-        }
+        return DB::transaction(function () use ($id) {
+            $user = $this->findById($id);
+            
+            if (!$user) {
+                return false;
+            }
 
-        return $user->delete();
+            return $user->delete();
+        });
     }
 
     /**

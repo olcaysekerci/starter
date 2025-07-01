@@ -21,6 +21,10 @@ class UserServiceProvider extends ServiceProvider
         $this->app->bind(\App\Modules\User\Repositories\RoleRepository::class);
         $this->app->bind(\App\Modules\User\Repositories\PermissionRepository::class);
         
+        // User modülü action'larını kaydet
+        $this->app->bind(\App\Modules\User\Actions\CreateUserAction::class);
+        $this->app->bind(\App\Modules\User\Actions\UpdateUserAction::class);
+        
         // User modülü model'lerini kaydet
         $this->app->bind(\App\Modules\User\Models\User::class, function ($app) {
             return new \App\Modules\User\Models\User();

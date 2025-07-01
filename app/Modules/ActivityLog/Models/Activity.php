@@ -4,6 +4,7 @@ namespace App\Modules\ActivityLog\Models;
 
 use Spatie\Activitylog\Models\Activity as SpatieActivity;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Arr;
 
 class Activity extends SpatieActivity
 {
@@ -183,14 +184,14 @@ class Activity extends SpatieActivity
 
         $changes = $this->properties['changes'] ?? [];
         $changeCount = count($changes);
-        $fields = array_keys($changes);
+        $fields = Arr::keys($changes);
         
         if ($changeCount === 1) {
             $fieldName = $changes[$fields[0]]['field_name'] ?? $fields[0];
             return "{$fieldName} alanını değiştirdi";
         }
 
-        return "{$changeCount} alanı değiştirdi: " . implode(', ', array_slice($fields, 0, 3)) . 
+        return "{$changeCount} alanı değiştirdi: " . implode(', ', Arr::slice($fields, 0, 3)) . 
                ($changeCount > 3 ? ' ve diğerleri' : '');
     }
 } 

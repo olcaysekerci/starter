@@ -7,6 +7,7 @@ use App\Modules\User\Services\RoleService;
 use App\Modules\User\Requests\CreateRoleRequest;
 use App\Modules\User\Requests\UpdateRoleRequest;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,7 +25,7 @@ class RoleController extends Controller
         $roles = $this->roleService->getAllRolesWithPagination();
         $stats = $this->roleService->getStats();
         
-        return Inertia::render('User/Panel/Roles/Dashboard', [
+        return Inertia::render('User/Panel/Roles/Index', [
             'roles' => $roles,
             'stats' => $stats
         ]);
@@ -45,7 +46,7 @@ class RoleController extends Controller
     /**
      * Rol oluşturma
      */
-    public function store(CreateRoleRequest $request): Response
+    public function store(CreateRoleRequest $request): Response|RedirectResponse
     {
         $this->roleService->createRole($request->validated());
         
@@ -56,7 +57,7 @@ class RoleController extends Controller
     /**
      * Admin paneli rol detayı
      */
-    public function show(int $id): Response
+    public function show(int $id): Response|RedirectResponse
     {
         $role = $this->roleService->getRoleById($id);
         $users = $this->roleService->getUsersByRole($id);
@@ -70,7 +71,7 @@ class RoleController extends Controller
     /**
      * Rol düzenleme sayfası
      */
-    public function edit(int $id): Response
+    public function edit(int $id): Response|RedirectResponse
     {
         $role = $this->roleService->getRoleById($id);
         $permissions = $this->roleService->getPermissionsByModules();
@@ -84,7 +85,7 @@ class RoleController extends Controller
     /**
      * Rol güncelleme
      */
-    public function update(UpdateRoleRequest $request, int $id): Response
+    public function update(UpdateRoleRequest $request, int $id): Response|RedirectResponse
     {
         $this->roleService->updateRole($id, $request->validated());
         
@@ -95,7 +96,7 @@ class RoleController extends Controller
     /**
      * Rol silme
      */
-    public function destroy(int $id): Response
+    public function destroy(int $id): Response|RedirectResponse
     {
         $deleted = $this->roleService->deleteRole($id);
         
@@ -116,7 +117,7 @@ class RoleController extends Controller
         $query = $request->get('query', '');
         $roles = $this->roleService->searchRoles($query);
         
-        return Inertia::render('User/Panel/Roles/Dashboard', [
+        return Inertia::render('User/Panel/Roles/Index', [
             'roles' => $roles,
             'searchQuery' => $query
         ]);
