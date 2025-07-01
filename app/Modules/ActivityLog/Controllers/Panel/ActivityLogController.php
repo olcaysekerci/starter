@@ -4,7 +4,10 @@ namespace App\Modules\ActivityLog\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Modules\ActivityLog\Services\ActivityLogService;
+use App\Modules\ActivityLog\Exceptions\ActivityLogException;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -41,31 +44,38 @@ class ActivityLogController extends Controller
     /**
      * Log detayı
      */
-    public function show(int $id): Response
+    public function show(int $id): Response|RedirectResponse
     {
-        $log = $this->activityLogService->getLog($id);
+        try {
+            $log = $this->activityLogService->getLogDTOById($id);
 
-        if (!$log) {
-            abort(404);
+            return Inertia::render('ActivityLog/Panel/Show', [
+                'log' => $log,
+            ]);
+        } catch (ActivityLogException $e) {
+            return redirect()->route('panel.activity-logs.index')
+                ->with('error', $e->getMessage());
         }
-
-        return Inertia::render('ActivityLog/Panel/Show', [
-            'log' => $log,
-        ]);
     }
 
     /**
      * Eski logları temizle
      */
-    public function cleanup(Request $request)
+    public function cleanup(Request $request): RedirectResponse
     {
-        $request->validate([
-            'days' => 'required|integer|min:1|max:365',
-        ]);
+        try {
+            $request->validate([
+                'days' => 'required|integer|min:1|max:365',
+            ]);
 
-        $deletedCount = $this->activityLogService->cleanupOldLogs($request->days);
+            $deletedCount = $this->activityLogService->cleanupOldLogs($request->days);
 
-        return back()->with('success', "{$deletedCount} adet eski log başarıyla temizlendi.");
+            return back()->with('success', "{$deletedCount} adet eski log başarıyla temizlendi.");
+        } catch (ActivityLogException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Exception $e) {
+            return back()->with('error', 'Log temizleme işlemi başarısız oldu.');
+        }
     }
 
     /**

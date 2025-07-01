@@ -3,6 +3,7 @@
 namespace App\Modules\Settings\Services;
 
 use App\Modules\Settings\Repositories\SettingsRepository;
+use App\Modules\Settings\Exceptions\SettingsException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
 
@@ -55,16 +56,26 @@ class SettingsService
                 ['category' => 'app', 'key' => 'contact_address', 'value' => $data['contact_address'] ?? '', 'type' => 'string'],
             ];
 
-            $this->settingsRepository->setMultiple($settings);
+            $success = $this->settingsRepository->setMultiple($settings);
+            
+            if (!$success) {
+                throw SettingsException::appSettingsUpdateFailed();
+            }
             
             Log::info('Uygulama ayarları güncellendi', $data);
             return true;
-        } catch (\Exception $e) {
+        } catch (SettingsException $e) {
             Log::error('Uygulama ayarları güncellenirken hata oluştu', [
                 'error' => $e->getMessage(),
                 'data' => $data
             ]);
-            return false;
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Uygulama ayarları güncellenirken beklenmeyen hata oluştu', [
+                'error' => $e->getMessage(),
+                'data' => $data
+            ]);
+            throw SettingsException::appSettingsUpdateFailed();
         }
     }
 
@@ -86,20 +97,37 @@ class SettingsService
                 ['category' => 'mail', 'key' => 'enabled', 'value' => (bool) ($data['enabled'] ?? true), 'type' => 'boolean'],
             ];
 
-            $this->settingsRepository->setMultiple($settings);
+            $success = $this->settingsRepository->setMultiple($settings);
+            
+            if (!$success) {
+                throw SettingsException::mailSettingsUpdateFailed();
+            }
             
             // Config cache'ini temizle
-            Artisan::call('config:clear');
-            Artisan::call('config:cache');
+            try {
+                Artisan::call('config:clear');
+                Artisan::call('config:cache');
+            } catch (\Exception $e) {
+                Log::warning('Config cache temizlenirken hata oluştu', [
+                    'error' => $e->getMessage()
+                ]);
+                throw SettingsException::configCacheFailed();
+            }
             
             Log::info('Mail ayarları güncellendi', array_except($data, ['password']));
             return true;
-        } catch (\Exception $e) {
+        } catch (SettingsException $e) {
             Log::error('Mail ayarları güncellenirken hata oluştu', [
                 'error' => $e->getMessage(),
                 'data' => array_except($data, ['password'])
             ]);
-            return false;
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Mail ayarları güncellenirken beklenmeyen hata oluştu', [
+                'error' => $e->getMessage(),
+                'data' => array_except($data, ['password'])
+            ]);
+            throw SettingsException::mailSettingsUpdateFailed();
         }
     }
 
@@ -110,6 +138,10 @@ class SettingsService
     {
         try {
             $mailSettings = $this->getMailSettings();
+            
+            if (empty($mailSettings['host']) || empty($mailSettings['username'])) {
+                throw SettingsException::mailConfigurationError();
+            }
             
             // Mail ayarlarını geçici olarak güncelle
             config([
@@ -131,12 +163,18 @@ class SettingsService
 
             Log::info('Mail test başarılı', ['to' => $to]);
             return true;
+        } catch (SettingsException $e) {
+            Log::error('Mail test başarısız', [
+                'error' => $e->getMessage(),
+                'to' => $to
+            ]);
+            throw $e;
         } catch (\Exception $e) {
             Log::error('Mail test başarısız', [
                 'error' => $e->getMessage(),
                 'to' => $to
             ]);
-            return false;
+            throw SettingsException::mailTestFailed($to);
         }
     }
 

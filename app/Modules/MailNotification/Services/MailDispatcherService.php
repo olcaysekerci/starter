@@ -6,10 +6,16 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use App\Modules\MailNotification\Models\MailLog;
 use App\Modules\MailNotification\Enums\MailStatus;
+use App\Modules\MailNotification\Repositories\MailNotificationRepository;
+use App\Modules\MailNotification\Exceptions\MailNotificationException;
 use Illuminate\Mail\Message;
 
 class MailDispatcherService
 {
+    public function __construct(
+        private MailNotificationRepository $mailNotificationRepository
+    ) {}
+
     /**
      * Mail gönder ve logla
      */
@@ -26,7 +32,17 @@ class MailDispatcherService
         ]);
         
         // Mail log kaydı oluştur
-        $mailLog = $this->createMailLog($mailData);
+        $mailLog = $this->mailNotificationRepository->create([
+            'recipient' => $mailData['to'],
+            'subject' => $mailData['subject'],
+            'content' => $mailData['content'],
+            'type' => $mailData['type'],
+            'status' => MailStatus::PENDING,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'metadata' => $mailData['metadata'],
+            'retry_count' => 0,
+        ]);
         
         Log::info('MailDispatcherService::send - mail log oluşturuldu', [
             'log_id' => $mailLog->id,
@@ -112,23 +128,7 @@ class MailDispatcherService
         ];
     }
 
-    /**
-     * Mail log kaydı oluştur
-     */
-    private function createMailLog(array $mailData): MailLog
-    {
-        return MailLog::create([
-            'recipient' => $mailData['to'],
-            'subject' => $mailData['subject'],
-            'content' => $mailData['content'],
-            'type' => $mailData['type'],
-            'status' => MailStatus::PENDING,
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-            'metadata' => $mailData['metadata'],
-            'retry_count' => 0,
-        ]);
-    }
+
 
     /**
      * Mail gönder
@@ -167,9 +167,7 @@ class MailDispatcherService
      */
     public function retryFailedMails(): int
     {
-        $failedMails = MailLog::failed()
-            ->where('retry_count', '<', config('modules.MailNotification.settings.mail_notification.max_retry_attempts', 3))
-            ->get();
+        $failedMails = $this->mailNotificationRepository->getFailedMails();
 
         $retriedCount = 0;
 
@@ -225,15 +223,7 @@ class MailDispatcherService
      */
     public function getStats(): array
     {
-        return [
-            'total' => MailLog::count(),
-            'sent' => MailLog::sent()->count(),
-            'failed' => MailLog::failed()->count(),
-            'pending' => MailLog::pending()->count(),
-            'today' => MailLog::whereDate('created_at', today())->count(),
-            'this_week' => MailLog::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
-            'this_month' => MailLog::whereMonth('created_at', now()->month)->count(),
-        ];
+        return $this->mailNotificationRepository->getStats();
     }
 
     /**
@@ -241,7 +231,6 @@ class MailDispatcherService
      */
     public function cleanupOldLogs(int $days = 90): int
     {
-        $cutoffDate = now()->subDays($days);
-        return MailLog::where('created_at', '<', $cutoffDate)->delete();
+        return $this->mailNotificationRepository->cleanupOldLogs($days);
     }
 } 

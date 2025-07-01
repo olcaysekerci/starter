@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Modules\Settings\Services\SettingsService;
 use App\Modules\Settings\Requests\UpdateAppSettingsRequest;
 use App\Modules\Settings\Requests\UpdateMailSettingsRequest;
+use App\Modules\Settings\Requests\TestMailRequest;
+use App\Modules\Settings\Exceptions\SettingsException;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Log;
 
 class SettingsController extends Controller
 {
@@ -46,11 +49,16 @@ class SettingsController extends Controller
      */
     public function updateApp(UpdateAppSettingsRequest $request): RedirectResponse
     {
-        $success = $this->settingsService->updateAppSettings($request->validated());
-        
-        if ($success) {
+        try {
+            $this->settingsService->updateAppSettings($request->validated());
             return back()->with('success', 'Uygulama ayarları başarıyla güncellendi.');
-        } else {
+        } catch (SettingsException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('Uygulama ayarları güncellenirken beklenmeyen hata oluştu', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return back()->with('error', 'Uygulama ayarları güncellenirken bir hata oluştu.');
         }
     }
@@ -72,11 +80,16 @@ class SettingsController extends Controller
      */
     public function updateMail(UpdateMailSettingsRequest $request): RedirectResponse
     {
-        $success = $this->settingsService->updateMailSettings($request->validated());
-        
-        if ($success) {
+        try {
+            $this->settingsService->updateMailSettings($request->validated());
             return back()->with('success', 'Mail ayarları başarıyla güncellendi.');
-        } else {
+        } catch (SettingsException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('Mail ayarları güncellenirken beklenmeyen hata oluştu', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return back()->with('error', 'Mail ayarları güncellenirken bir hata oluştu.');
         }
     }
@@ -84,17 +97,19 @@ class SettingsController extends Controller
     /**
      * Mail test gönder
      */
-    public function testMail(Request $request): RedirectResponse
+    public function testMail(TestMailRequest $request): RedirectResponse
     {
-        $request->validate([
-            'email' => 'required|email'
-        ]);
 
-        $success = $this->settingsService->testMail($request->email);
-        
-        if ($success) {
+        try {
+            $this->settingsService->testMail($request->email);
             return back()->with('success', 'Test mail başarıyla gönderildi.');
-        } else {
+        } catch (SettingsException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('Test mail gönderilirken beklenmeyen hata oluştu', [
+                'email' => $request->email,
+                'error' => $e->getMessage()
+            ]);
             return back()->with('error', 'Test mail gönderilirken bir hata oluştu. Mail ayarlarınızı kontrol edin.');
         }
     }

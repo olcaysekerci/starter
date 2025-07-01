@@ -3,24 +3,37 @@
 namespace App\Modules\ActivityLog\Services;
 
 use App\Modules\ActivityLog\Models\Activity;
+use App\Modules\ActivityLog\Repositories\ActivityLogRepository;
+use App\Modules\ActivityLog\DTOs\ActivityLogDTO;
+use App\Modules\ActivityLog\Exceptions\ActivityLogException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Arr;
 
 class ActivityLogService
 {
+    public function __construct(
+        private ActivityLogRepository $activityLogRepository
+    ) {}
+
+    /**
+     * Tüm logları getir (sayfalama olmadan)
+     */
+    public function getAllLogs(): Collection
+    {
+        return $this->activityLogRepository->getAll();
+    }
+
     /**
      * Logları listele
      */
     public function getLogs(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = Activity::with(['causer', 'subject'])
-            ->orderBy('created_at', 'desc');
-
-        // Filtreleri uygula
-        $this->applyFilters($query, $filters);
-
-        return $query->paginate($perPage);
+        return $this->activityLogRepository->getWithFilters($filters, $perPage);
     }
 
     /**
@@ -28,8 +41,27 @@ class ActivityLogService
      */
     public function getLog(int $id): ?Activity
     {
-        return Activity::with(['causer', 'subject'])
-            ->find($id);
+        $log = $this->activityLogRepository->findById($id);
+        
+        if (!$log) {
+            throw ActivityLogException::logNotFound($id);
+        }
+        
+        return $log;
+    }
+
+    /**
+     * Log detayını DTO olarak getir
+     */
+    public function getLogDTOById(int $id): ?ActivityLogDTO
+    {
+        $log = $this->activityLogRepository->findById($id);
+        
+        if (!$log) {
+            throw ActivityLogException::logNotFound($id);
+        }
+        
+        return ActivityLogDTO::fromModel($log);
     }
 
     /**
@@ -37,12 +69,7 @@ class ActivityLogService
      */
     public function getStats(): array
     {
-        return [
-            'total' => Activity::count(),
-            'today' => Activity::whereDate('created_at', today())->count(),
-            'this_week' => Activity::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
-            'this_month' => Activity::whereMonth('created_at', now()->month)->count(),
-        ];
+        return $this->activityLogRepository->getStats();
     }
 
     /**
@@ -88,9 +115,23 @@ class ActivityLogService
      */
     public function cleanupOldLogs(int $days = 30): int
     {
-        $cutoffDate = now()->subDays($days);
-        
-        return Activity::where('created_at', '<', $cutoffDate)->delete();
+        try {
+            $deletedCount = $this->activityLogRepository->cleanupOldLogs($days);
+            
+            Log::info('Eski loglar temizlendi', [
+                'days' => $days,
+                'deleted_count' => $deletedCount
+            ]);
+            
+            return $deletedCount;
+        } catch (\Exception $e) {
+            Log::error('Log temizleme hatası', [
+                'days' => $days,
+                'error' => $e->getMessage()
+            ]);
+            
+            throw ActivityLogException::cleanupFailed($days);
+        }
     }
 
     /**
