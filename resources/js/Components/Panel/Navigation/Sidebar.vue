@@ -23,16 +23,25 @@
           <button
             @click="toggleDropdown(item.name)"
             :class="[
-              'w-full group flex items-center px-4 py-2 rounded-md font-medium text-sm transition-colors',
-              isActive(item) ? 'bg-indigo-50 dark:bg-gray-800 text-indigo-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-indigo-700 dark:hover:text-indigo-300'
+              'w-full group flex items-center px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 relative',
+              isParentActive(item) 
+                ? 'bg-gradient-to-r from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 text-indigo-700 dark:text-indigo-200 shadow-sm' 
+                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-indigo-700 dark:hover:text-indigo-300'
             ]"
+            :title="props.isCollapsed ? item.label : ''"
           >
-            <span class="mr-3 flex-shrink-0">
-              <component :is="item.icon" class="w-5 h-5" />
+            <span class="mr-3 flex-shrink-0 relative">
+              <component :is="item.icon" :class="[
+                'w-5 h-5 transition-all duration-200',
+                isParentActive(item) ? 'text-indigo-600 dark:text-indigo-300 drop-shadow-sm' : 'text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+              ]" />
+              <!-- Collapsed durumda aktif göstergesi -->
+              <div v-if="isParentActive(item) && props.isCollapsed" class="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full border-2 border-white dark:border-gray-900 shadow-sm"></div>
             </span>
             <span v-if="!props.isCollapsed">{{ item.label }}</span>
             <svg v-if="!props.isCollapsed" :class="[
-              'ml-auto w-4 h-4 text-gray-400 transition-transform duration-200',
+              'ml-auto w-4 h-4 transition-all duration-200',
+              isParentActive(item) ? 'text-indigo-600 dark:text-indigo-300 drop-shadow-sm' : 'text-gray-400',
               dropdownOpen === item.name ? 'rotate-180' : ''
             ]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -44,8 +53,10 @@
               :key="child.name"
               :href="child.href"
               :class="[
-                'block px-4 py-2 rounded-md text-sm font-medium transition-colors',
-                isActive(child) ? 'bg-indigo-50 dark:bg-gray-800 text-indigo-700 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-indigo-700 dark:hover:text-indigo-300'
+                'block px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative',
+                isActive(child) 
+                  ? 'bg-indigo-50/60 dark:bg-gray-700/60 text-indigo-700 dark:text-indigo-300 font-medium' 
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50/60 dark:hover:bg-gray-700/60 hover:text-indigo-700 dark:hover:text-indigo-300'
               ]"
             >
               {{ child.label }}
@@ -56,12 +67,20 @@
           v-else
           :href="item.href"
           :class="[
-            'group flex items-center px-4 py-2 rounded-md font-medium text-sm transition-colors',
-            isActive(item) ? 'bg-indigo-50 dark:bg-gray-800 text-indigo-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-indigo-700 dark:hover:text-indigo-300'
+            'group flex items-center px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 relative',
+            isActive(item) 
+              ? 'bg-gradient-to-r from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 text-indigo-700 dark:text-indigo-200 font-semibold shadow-sm' 
+              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-indigo-700 dark:hover:text-indigo-300'
           ]"
+          :title="props.isCollapsed ? item.label : ''"
         >
-          <span class="mr-3 flex-shrink-0">
-            <component :is="item.icon" class="w-5 h-5" />
+          <span class="mr-3 flex-shrink-0 relative">
+            <component :is="item.icon" :class="[
+              'w-5 h-5 transition-all duration-200',
+              isActive(item) ? 'text-indigo-600 dark:text-indigo-300 drop-shadow-sm' : 'text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+            ]" />
+            <!-- Collapsed durumda aktif göstergesi -->
+            <div v-if="isActive(item) && props.isCollapsed" class="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full border-2 border-white dark:border-gray-900 shadow-sm"></div>
           </span>
           <span v-if="!props.isCollapsed">{{ item.label }}</span>
         </Link>
@@ -84,36 +103,52 @@ const props = defineProps({
 })
 const page = usePage()
 const menuItems = [
-  { name: 'dashboard', label: 'Dashboard', href: route('panel.dashboard'), icon: HomeIcon },
+  { name: 'dashboard', label: 'Dashboard', href: '/panel/dashboard', icon: HomeIcon },
   {
     name: 'users', label: 'Kullanıcı Yönetimi', icon: UsersIcon, children: [
-      { name: 'users-list', label: 'Kullanıcılar', href: route('panel.users.index') },
-      { name: 'roles', label: 'Roller', href: route('panel.roles.index') },
-      { name: 'permissions', label: 'Yetkiler', href: route('panel.permissions.index') }
+      { name: 'users-list', label: 'Kullanıcılar', href: '/panel/users' },
+      { name: 'roles', label: 'Roller', href: '/panel/roles' },
+      { name: 'permissions', label: 'Yetkiler', href: '/panel/permissions' }
     ]
   },
-  { name: 'logs', label: 'Aktivite Logları', href: route('panel.activity-logs.index'), icon: DocumentTextIcon },
-  { name: 'mails', label: 'Mail Bildirimleri', href: route('panel.mail-notifications.index'), icon: EnvelopeIcon },
+  { name: 'logs', label: 'Aktivite Logları', href: '/panel/activity-logs', icon: DocumentTextIcon },
+  { name: 'mails', label: 'Mail Bildirimleri', href: '/panel/mail-notifications', icon: EnvelopeIcon },
   {
     name: 'settings', label: 'Ayarlar', icon: Cog6ToothIcon, children: [
-      { name: 'profile', label: 'Profil Ayarları', href: route('panel.settings.profile') },
-      { name: 'security', label: 'Güvenlik', href: route('panel.settings.security') }
+      { name: 'profile', label: 'Profil Ayarları', href: '/panel/settings/profile' },
+      { name: 'security', label: 'Güvenlik', href: '/panel/settings/security' }
     ]
   }
 ]
 
 
 
+
+
+
+
 const isActive = (item) => {
-  // page.url'den path'i güvenli bir şekilde çıkar
-  const currentPath = page.url?.startsWith('http') 
-    ? new URL(page.url).pathname 
-    : page.url || ''
+  // En basit haliyle window.location.pathname kullan
+  const currentPath = window.location.pathname
   
   if (item.children) {
-    return item.children.some(child => currentPath === child.href)
+    return item.children.some(child => {
+      return currentPath === child.href || currentPath.startsWith(child.href + '/')
+    })
   }
-  return currentPath === item.href
+  
+  // Tam eşleşme veya başlangıç eşleşmesi
+  return currentPath === item.href || currentPath.startsWith(item.href + '/')
+}
+
+const isParentActive = (item) => {
+  if (!item.children) return false
+  
+  const currentPath = window.location.pathname
+  
+  return item.children.some(child => {
+    return currentPath === child.href || currentPath.startsWith(child.href + '/')
+  })
 }
 
 // Basit dropdown kontrolü
@@ -121,10 +156,16 @@ const dropdownOpen = ref(null)
 
 // Sayfa yüklendiğinde ve değiştiğinde dropdown'ı kontrol et
 const checkAndOpenDropdown = () => {
-  if (page.url && page.url.includes('/settings/')) {
-    dropdownOpen.value = 'settings'
-  } else if (page.url && (page.url.includes('/users/') || page.url.includes('/roles/') || page.url.includes('/permissions/'))) {
-    dropdownOpen.value = 'users'
+  // Her menü öğesini kontrol et
+  menuItems.forEach(item => {
+    if (item.children && isParentActive(item)) {
+      dropdownOpen.value = item.name
+    }
+  })
+  
+  // Eğer hiçbir parent aktif değilse dropdown'ı kapat
+  if (!menuItems.some(item => item.children && isParentActive(item))) {
+    dropdownOpen.value = null
   }
 }
 

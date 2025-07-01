@@ -253,7 +253,7 @@
 </template>
 
 <script setup>
-import { computed } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'

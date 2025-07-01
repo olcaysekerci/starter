@@ -173,7 +173,8 @@
 </template>
 
 <script setup>
-import { useForm, computed } from '@inertiajs/vue3'
+import { useForm } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
