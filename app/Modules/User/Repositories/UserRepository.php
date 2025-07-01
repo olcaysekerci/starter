@@ -59,7 +59,7 @@ class UserRepository
             ->with(['roles', 'permissions'])
             ->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
-                  ->orWhere('email', 'like', "%{$query}%")
+            ->orWhere('email', 'like', "%{$query}%")
                   ->orWhere('phone', 'like', "%{$query}%");
             })
             ->orderBy('created_at', 'desc')
@@ -72,7 +72,7 @@ class UserRepository
     public function create(array $data): User
     {
         return DB::transaction(function () use ($data) {
-            return $this->model->create($data);
+        return $this->model->create($data);
         });
     }
 
@@ -82,13 +82,13 @@ class UserRepository
     public function update(int $id, array $data): bool
     {
         return DB::transaction(function () use ($id, $data) {
-            $user = $this->findById($id);
-            
-            if (!$user) {
-                return false;
-            }
+        $user = $this->findById($id);
+        
+        if (!$user) {
+            return false;
+        }
 
-            return $user->update($data);
+        return $user->update($data);
         });
     }
 
@@ -98,13 +98,13 @@ class UserRepository
     public function delete(int $id): bool
     {
         return DB::transaction(function () use ($id) {
-            $user = $this->findById($id);
-            
-            if (!$user) {
-                return false;
-            }
+        $user = $this->findById($id);
+        
+        if (!$user) {
+            return false;
+        }
 
-            return $user->delete();
+        return $user->delete();
         });
     }
 

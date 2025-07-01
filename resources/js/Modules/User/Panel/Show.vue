@@ -34,7 +34,7 @@
           </svg>
           Düzenle
         </ActionButton>
-      </template>
+    </template>
     </PageHeader>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -47,25 +47,25 @@
           </div>
           <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+                    <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ad Soyad</label>
                 <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ user.name }}</p>
-              </div>
-              <div>
+                    </div>
+                    <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">E-posta</label>
                 <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ user.email }}</p>
-              </div>
-              <div v-if="user.phone">
+                    </div>
+                    <div v-if="user.phone">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Telefon</label>
                 <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ user.phone }}</p>
-              </div>
-              <div v-if="user.address">
+                    </div>
+                    <div v-if="user.address">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Adres</label>
                 <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ user.address }}</p>
               </div>
-            </div>
-          </div>
-        </div>
+                    </div>
+                  </div>
+                </div>
 
         <!-- Account Information -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
@@ -78,7 +78,7 @@
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kullanıcı ID</label>
                 <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ user.id }}</p>
               </div>
-              <div>
+                    <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">E-posta Doğrulandı</label>
                 <p class="mt-1 text-sm">
                   <span v-if="user.email_verified_at" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -94,8 +94,8 @@
                     Doğrulanmadı
                   </span>
                 </p>
-              </div>
-              <div>
+                    </div>
+                    <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Durum</label>
                 <p class="mt-1 text-sm">
                   <span v-if="user.is_active" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -104,35 +104,35 @@
                   <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                     Pasif
                   </span>
-                </p>
-              </div>
-              <div>
+                      </p>
+                    </div>
+                    <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kayıt Tarihi</label>
                 <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ formatDate(user.created_at) }}</p>
-              </div>
-              <div>
+                    </div>
+                    <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Son Güncelleme</label>
                 <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ formatDate(user.updated_at) }}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
 
         <!-- Roles and Permissions -->
         <div v-if="user.roles && user.roles.length > 0" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Roller ve Yetkiler</h3>
-          </div>
+                  </div>
           <div class="p-6">
             <div class="space-y-4">
               <div v-for="role in user.roles" :key="role.id">
                 <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ role.name }}</h4>
                 <p v-if="role.description" class="text-sm text-gray-600 dark:text-gray-400">{{ role.description }}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
       <!-- Sidebar -->
       <div class="lg:col-span-1 space-y-6">
@@ -146,7 +146,7 @@
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
               </svg>
-              Düzenle
+                Düzenle
             </ActionButton>
             <ActionButton @click="sendEmail" variant="secondary" class="w-full">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -85,13 +85,13 @@ class UserService
                     Validator::make([], []),
                     'Bu e-posta adresi zaten kullanılıyor.'
                 );
-            }
-            
+        }
+        
             $user = $this->createUserAction->execute($data);
             
             DB::commit();
-            
-            return $user;
+        
+        return $user;
             
         } catch (\Exception $e) {
             DB::rollBack();
@@ -112,7 +112,7 @@ class UserService
     {
         try {
             DB::beginTransaction();
-            
+        
             $result = $this->updateUserAction->execute($id, $data);
             
             DB::commit();
@@ -140,7 +140,7 @@ class UserService
         try {
             DB::beginTransaction();
             
-            $user = $this->userRepository->findById($id);
+        $user = $this->userRepository->findById($id);
             
             if (!$user) {
                 throw new ModelNotFoundException('Kullanıcı bulunamadı.');
@@ -154,8 +154,8 @@ class UserService
                 );
             }
             
-            $deleted = $this->userRepository->delete($id);
-            
+        $deleted = $this->userRepository->delete($id);
+        
             if (!$deleted) {
                 throw new \Exception('Kullanıcı silinirken bir hata oluştu.');
             }

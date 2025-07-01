@@ -35,7 +35,7 @@
           </svg>
           Değişiklikleri Kaydet
         </ActionButton>
-      </template>
+    </template>
     </PageHeader>
 
     <!-- Form Card -->
@@ -46,24 +46,24 @@
       
       <form @submit.prevent="saveUser" class="p-6 space-y-6">
         <!-- Basic Information -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormGroup label="Ad Soyad" required>
-            <TextInput
-              v-model="form.name"
+                  <TextInput
+                    v-model="form.name"
               :error="form.errors.name"
               placeholder="Kullanıcının adı ve soyadı"
-              required
-            />
+                    required
+                  />
           </FormGroup>
 
           <FormGroup label="E-posta Adresi" required>
-            <TextInput
-              v-model="form.email"
-              type="email"
+                  <TextInput
+                    v-model="form.email"
+                    type="email"
               :error="form.errors.email"
               placeholder="ornek@email.com"
-              required
-            />
+                    required
+                  />
           </FormGroup>
 
           <FormGroup label="Yeni Şifre">
@@ -85,8 +85,8 @@
           </FormGroup>
 
           <FormGroup label="Telefon">
-            <TextInput
-              v-model="form.phone"
+                  <TextInput
+                    v-model="form.phone"
               :error="form.errors.phone"
               placeholder="+90 555 123 45 67"
             />
@@ -99,15 +99,15 @@
               label="Kullanıcı aktif"
             />
           </FormGroup>
-        </div>
+                </div>
 
         <!-- Address -->
         <FormGroup label="Adres">
           <TextArea
-            v-model="form.address"
+                    v-model="form.address"
             :error="form.errors.address"
             placeholder="Kullanıcının adres bilgileri"
-            rows="3"
+                    rows="3"
           />
         </FormGroup>
 
@@ -122,10 +122,10 @@
                 :label="role.name"
                 :description="role.description"
               />
-            </div>
+                </div>
             <div v-if="form.errors.roles" class="text-sm text-red-600 dark:text-red-400">
               {{ form.errors.roles }}
-            </div>
+              </div>
           </div>
         </FormGroup>
 

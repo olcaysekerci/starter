@@ -98,10 +98,10 @@ class UserController extends Controller
     {
         try {
             $user = $this->userService->getUserDTOById($id);
-            
-            return Inertia::render('User/Panel/Show', [
-                'user' => $user
-            ]);
+        
+        return Inertia::render('User/Panel/Show', [
+            'user' => $user
+        ]);
         } catch (ModelNotFoundException $e) {
             return redirect()->route('panel.users.index')
                 ->with('error', 'Kullanıcı bulunamadı.');
@@ -116,11 +116,11 @@ class UserController extends Controller
         try {
             $user = $this->userService->getUserDTOById($id);
             $roles = $this->roleService->getAllRoles();
-            
-            return Inertia::render('User/Panel/Edit', [
+        
+        return Inertia::render('User/Panel/Edit', [
                 'user' => $user,
                 'roles' => $roles
-            ]);
+        ]);
         } catch (ModelNotFoundException $e) {
             return redirect()->route('panel.users.index')
                 ->with('error', 'Kullanıcı bulunamadı.');
@@ -133,10 +133,10 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, int $id): Response|RedirectResponse
     {
         try {
-            $this->userService->updateUser($id, $request->validated());
-            
-            return redirect()->route('panel.users.index')
-                ->with('success', 'Kullanıcı başarıyla güncellendi.');
+        $this->userService->updateUser($id, $request->validated());
+        
+        return redirect()->route('panel.users.index')
+            ->with('success', 'Kullanıcı başarıyla güncellendi.');
                 
         } catch (ModelNotFoundException $e) {
             return redirect()->route('panel.users.index')
@@ -154,10 +154,10 @@ class UserController extends Controller
     public function destroy(int $id): Response|RedirectResponse
     {
         try {
-            $this->userService->deleteUser($id);
-            
-            return redirect()->route('panel.users.index')
-                ->with('success', 'Kullanıcı başarıyla silindi.');
+        $this->userService->deleteUser($id);
+        
+        return redirect()->route('panel.users.index')
+            ->with('success', 'Kullanıcı başarıyla silindi.');
                 
         } catch (ModelNotFoundException $e) {
             return redirect()->route('panel.users.index')
