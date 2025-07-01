@@ -115,6 +115,8 @@ const menuItems = [
   { name: 'mails', label: 'Mail Bildirimleri', href: '/panel/mail-notifications', icon: EnvelopeIcon },
   {
     name: 'settings', label: 'Ayarlar', icon: Cog6ToothIcon, children: [
+      { name: 'app-settings', label: 'Uygulama Ayarları', href: '/panel/settings/app' },
+      { name: 'mail-settings', label: 'Mail Ayarları', href: '/panel/settings/mail' },
       { name: 'profile', label: 'Profil Ayarları', href: '/panel/settings/profile' },
       { name: 'security', label: 'Güvenlik', href: '/panel/settings/security' }
     ]
