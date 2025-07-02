@@ -39,31 +39,34 @@
     </PageHeader>
 
     <!-- Form Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Kullanıcı Bilgileri</h3>
-      </div>
-      
-      <form @submit.prevent="saveUser" class="p-6 space-y-6">
+    <FormCard
+      title="Kullanıcı Bilgileri"
+      :description="`${user.name} kullanıcısının bilgilerini güncelleyin.`"
+      submit-text="Değişiklikleri Kaydet"
+      :processing="form.processing"
+      @submit="saveUser"
+      @cancel="goBack"
+    >
+      <div class="space-y-6">
         <!-- Basic Information -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormGroup label="Ad Soyad" required>
-                  <TextInput
-                    v-model="form.name"
+            <TextInput
+              v-model="form.name"
               :error="form.errors.name"
               placeholder="Kullanıcının adı ve soyadı"
-                    required
-                  />
+              required
+            />
           </FormGroup>
 
           <FormGroup label="E-posta Adresi" required>
-                  <TextInput
-                    v-model="form.email"
-                    type="email"
+            <TextInput
+              v-model="form.email"
+              type="email"
               :error="form.errors.email"
               placeholder="ornek@email.com"
-                    required
-                  />
+              required
+            />
           </FormGroup>
 
           <FormGroup label="Yeni Şifre">
@@ -85,8 +88,8 @@
           </FormGroup>
 
           <FormGroup label="Telefon">
-                  <TextInput
-                    v-model="form.phone"
+            <TextInput
+              v-model="form.phone"
               :error="form.errors.phone"
               placeholder="+90 555 123 45 67"
             />
@@ -99,15 +102,15 @@
               label="Kullanıcı aktif"
             />
           </FormGroup>
-                </div>
+        </div>
 
         <!-- Address -->
         <FormGroup label="Adres">
           <TextArea
-                    v-model="form.address"
+            v-model="form.address"
             :error="form.errors.address"
             placeholder="Kullanıcının adres bilgileri"
-                    rows="3"
+            rows="3"
           />
         </FormGroup>
 
@@ -122,32 +125,14 @@
                 :label="role.name"
                 :description="role.description"
               />
-                </div>
+            </div>
             <div v-if="form.errors.roles" class="text-sm text-red-600 dark:text-red-400">
               {{ form.errors.roles }}
-              </div>
+            </div>
           </div>
         </FormGroup>
-
-        <!-- Form Actions -->
-        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <ActionButton 
-            @click="goBack" 
-            variant="secondary"
-            :disabled="form.processing"
-          >
-            İptal
-          </ActionButton>
-          <ActionButton 
-            @click="saveUser" 
-            variant="primary"
-            :loading="form.processing"
-          >
-            Değişiklikleri Kaydet
-          </ActionButton>
-        </div>
-      </form>
-    </div>
+      </div>
+    </FormCard>
   </PanelLayout>
 </template>
 
@@ -160,6 +145,7 @@ import FormGroup from '@/Components/Panel/Forms/FormGroup.vue'
 import TextInput from '@/Components/Panel/Forms/TextInput.vue'
 import TextArea from '@/Components/Panel/Forms/TextArea.vue'
 import Checkbox from '@/Components/Panel/Forms/Checkbox.vue'
+import FormCard from '@/Components/Panel/Forms/FormCard.vue'
 
 const props = defineProps({
   user: {
