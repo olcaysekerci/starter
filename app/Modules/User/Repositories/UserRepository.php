@@ -108,7 +108,7 @@ class UserRepository
     {
         return $this->model
             ->with(['roles', 'permissions'])
-            ->where('is_active', true)
+            ->where('status', 'active')
             ->orderBy('name')
             ->get();
     }

@@ -248,6 +248,50 @@ class UserService
     }
 
     /**
+     * Status'e göre kullanıcıları getir
+     */
+    public function getUsersByStatus(string $status): Collection
+    {
+        return $this->userRepository->getModel()->where('status', $status)->get();
+    }
+
+    /**
+     * Type'a göre kullanıcıları getir
+     */
+    public function getUsersByType(string $type): Collection
+    {
+        return $this->userRepository->getModel()->where('type', $type)->get();
+    }
+
+    /**
+     * Kullanıcı status'ünü güncelle
+     */
+    public function updateUserStatus(int $userId, string $status): bool
+    {
+        $user = $this->userRepository->findById($userId);
+        
+        if (!$user) {
+            return false;
+        }
+
+        return $user->update(['status' => $status]);
+    }
+
+    /**
+     * Kullanıcı type'ını güncelle
+     */
+    public function updateUserType(int $userId, string $type): bool
+    {
+        $user = $this->userRepository->findById($userId);
+        
+        if (!$user) {
+            return false;
+        }
+
+        return $user->update(['type' => $type]);
+    }
+
+    /**
      * Hoş geldin maili gönder
      */
     private function sendWelcomeEmail(User $user): void
