@@ -42,7 +42,7 @@ class Handler extends ExceptionHandler
                 ], 404);
             }
 
-            if ($request->is('panel/*')) {
+            if ($request->is('panel/*') && \Route::has('panel.dashboard')) {
                 return redirect()->route('panel.dashboard')
                     ->with('error', 'Aradığınız kayıt bulunamadı.');
             }

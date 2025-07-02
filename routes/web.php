@@ -4,6 +4,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// Modül route'larını en başta yükle
+\App\Helpers\ModuleLoader::loadAllModules();
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -19,5 +22,4 @@ Route::middleware([
     'verified',
 ])->group(function () {
     // Tüm modülleri otomatik yükle
-    \App\Helpers\ModuleLoader::loadAllModules();
 });

@@ -3,7 +3,7 @@
     v-show="props.isOpen"
     :class="[
       props.isCollapsed ? 'w-20' : 'w-64',
-      'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-300 z-50 fixed lg:relative lg:z-auto h-screen lg:h-screen left-0 lg:left-auto'
+      'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-300 z-50 fixed left-0 top-0 h-screen'
     ]"
   >
     <!-- Logo ve Başlık -->
@@ -131,54 +131,36 @@ const props = defineProps({
   isCollapsed: { type: Boolean, default: false }
 })
 const page = usePage()
+const route = window.route
 const menuItems = [
-  { name: 'Dashboard', label: 'Dashboard', href: route('panel.dashboard'), icon: HomeIcon },
+  { name: 'Dashboard', label: 'Dashboard', href: route('panel.dashboard'), icon: HomeIcon, routeName: 'panel.dashboard' },
   {
-    name: 'User', label: 'Kullanıcı Yönetimi', icon: UsersIcon, children: [
-      { name: 'User/Panel/Index', label: 'Kullanıcılar', href: route('panel.users.index') },
-      { name: 'User/Panel/Roles/Index', label: 'Roller', href: route('panel.roles.index') },
-      { name: 'User/Panel/Permissions/Index', label: 'Yetkiler', href: route('panel.permissions.index') }
+    name: 'User/Panel', label: 'Kullanıcı Yönetimi', icon: UsersIcon, children: [
+      { name: 'User/Panel', label: 'Kullanıcılar', href: route('panel.users.index'), routeName: 'panel.users.' },
+      { name: 'User/Panel/Roles', label: 'Roller', href: route('panel.roles.index'), routeName: 'panel.roles.' },
+      { name: 'User/Panel/Permissions', label: 'Yetkiler', href: route('panel.permissions.index'), routeName: 'panel.permissions.' }
     ]
   },
-  { name: 'ActivityLog/Panel/Index', label: 'Aktivite Logları', href: route('panel.activity-logs.index'), icon: DocumentTextIcon },
-  { name: 'MailNotification/Panel/Index', label: 'Mail Bildirimleri', href: route('panel.mail-notifications.index'), icon: EnvelopeIcon },
+  { name: 'ActivityLog/Panel', label: 'Aktivite Logları', href: route('panel.activity-logs.index'), icon: DocumentTextIcon, routeName: 'panel.activity-logs.' },
+  { name: 'MailNotification/Panel', label: 'Mail Bildirimleri', href: route('panel.mail-notifications.index'), icon: EnvelopeIcon, routeName: 'panel.mail-notifications.' },
   {
     name: 'Settings', label: 'Ayarlar', icon: Cog6ToothIcon, children: [
-      { name: 'Settings/Panel/App/Index', label: 'Uygulama Ayarları', href: route('panel.settings.app.index') },
-      { name: 'Settings/Panel/Mail/Index', label: 'Mail Ayarları', href: route('panel.settings.mail.index') },
-      { name: 'Settings/Panel/Profile/Index', label: 'Profil Ayarları', href: route('panel.settings.profile') },
-      { name: 'Settings/Panel/Security/Index', label: 'Güvenlik', href: route('panel.settings.security') }
+      { name: 'Settings/Panel/App', label: 'Uygulama Ayarları', href: route('panel.settings.app.index'), routeName: 'panel.settings.app.' },
+      { name: 'Settings/Panel/Mail', label: 'Mail Ayarları', href: route('panel.settings.mail.index'), routeName: 'panel.settings.mail.' },
+      { name: 'Settings/Panel/Profile', label: 'Profil Ayarları', href: route('panel.settings.profile'), routeName: 'panel.settings.profile' },
+      { name: 'Settings/Panel/Security', label: 'Güvenlik', href: route('panel.settings.security'), routeName: 'panel.settings.security' }
     ]
   }
 ]
 
-
-
-
-
-
-
 const isActive = (item) => {
-  // Basit component name karşılaştırması
-  const currentComponent = page.component
-  
-  if (item.children) {
-    return item.children.some(child => {
-      return currentComponent === child.name || currentComponent.startsWith(child.name + '/')
-    })
-  }
-  
-  return currentComponent === item.name || currentComponent.startsWith(item.name + '/')
+  if (!item.routeName) return false
+  return route().current(item.routeName + '*')
 }
 
 const isParentActive = (item) => {
   if (!item.children) return false
-  
-  const currentComponent = page.component
-  
-  return item.children.some(child => {
-    return currentComponent === child.name || currentComponent.startsWith(child.name + '/')
-  })
+  return item.children.some(child => isActive(child))
 }
 
 // Basit dropdown kontrolü
