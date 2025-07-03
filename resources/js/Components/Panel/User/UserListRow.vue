@@ -3,6 +3,7 @@
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">#{{ user.id }}</td>
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ user.full_name }}</td>
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ user.email }}</td>
+    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ user.formatted_phone || '-' }}</td>
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ formatDate(user.created_at) }}</td>
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ formatDateTime(user.last_login) }}</td>
     <td class="px-4 py-3 whitespace-nowrap text-right">

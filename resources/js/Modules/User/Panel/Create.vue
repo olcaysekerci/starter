@@ -100,8 +100,10 @@
           <FormGroup label="Telefon">
             <TextInput
               v-model="form.phone"
+              type="tel"
               :error="errors.phone"
-              placeholder="+90 555 123 45 67"
+              placeholder="0555 123 45 67"
+              @input="formatPhone"
             />
           </FormGroup>
 
@@ -190,6 +192,7 @@ const { form, errors, processing, submit, validate, reset } = useForm({
     first_name: ['required'],
     last_name: ['required'],
     email: ['required', 'email'],
+    phone: ['nullable', 'phone'],
     password: ['required', 'min:6'],
     password_confirmation: ['required']
   },
@@ -218,6 +221,38 @@ const roleOptions = computed(() => {
 })
 
 // Methods
+const formatPhone = (event) => {
+  let value = event.target.value
+  
+  // Sadece rakamları al
+  value = value.replace(/[^0-9]/g, '')
+  
+  // Türkiye telefon numarası formatı
+  if (value.length > 0) {
+    // +90 ile başlıyorsa, 90'ı kaldır
+    if (value.startsWith('90') && value.length > 10) {
+      value = value.substring(2)
+    }
+    // Başında 0 varsa kaldır
+    else if (value.startsWith('0')) {
+      value = value.substring(1)
+    }
+    
+    // 10 haneli format
+    if (value.length <= 3) {
+      value = value
+    } else if (value.length <= 6) {
+      value = value.substring(0, 3) + ' ' + value.substring(3)
+    } else if (value.length <= 8) {
+      value = value.substring(0, 3) + ' ' + value.substring(3, 6) + ' ' + value.substring(6)
+    } else {
+      value = value.substring(0, 3) + ' ' + value.substring(3, 6) + ' ' + value.substring(6, 8) + ' ' + value.substring(8, 10)
+    }
+  }
+  
+  form.phone = value
+}
+
 const saveUser = async () => {
   // Custom validation for password confirmation
   if (form.password !== form.password_confirmation) {

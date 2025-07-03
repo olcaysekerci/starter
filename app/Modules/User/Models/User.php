@@ -75,6 +75,7 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
         'full_name',
+        'formatted_phone',
     ];
 
     /**
@@ -284,5 +285,24 @@ class User extends Authenticatable
         }
         
         return substr($initials, 0, 2);
+    }
+
+    /**
+     * Get formatted phone number
+     */
+    public function getFormattedPhoneAttribute(): ?string
+    {
+        if (!$this->phone) {
+            return null;
+        }
+
+        $phone = $this->phone;
+        
+        // 10 haneli telefon numarasını formatla
+        if (strlen($phone) === 10) {
+            return substr($phone, 0, 3) . ' ' . substr($phone, 3, 3) . ' ' . substr($phone, 6, 2) . ' ' . substr($phone, 8, 2);
+        }
+        
+        return $phone;
     }
 } 
