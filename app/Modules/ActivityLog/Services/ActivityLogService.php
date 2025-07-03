@@ -116,7 +116,11 @@ class ActivityLogService
     public function cleanupOldLogs(int $days = 30): int
     {
         try {
+            DB::beginTransaction();
+            
             $deletedCount = $this->activityLogRepository->cleanupOldLogs($days);
+            
+            DB::commit();
             
             Log::info('Eski loglar temizlendi', [
                 'days' => $days,
@@ -125,6 +129,7 @@ class ActivityLogService
             
             return $deletedCount;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Log temizleme hatası', [
                 'days' => $days,
                 'error' => $e->getMessage()

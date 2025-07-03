@@ -9,6 +9,7 @@ use App\Modules\User\Actions\CreateUserAction;
 use App\Modules\User\Actions\UpdateUserAction;
 use App\Modules\MailNotification\Services\MailDispatcherService;
 use App\Modules\User\Exceptions\UserException;
+use App\Traits\TransactionTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -21,6 +22,8 @@ use Illuminate\Support\Facades\Validator;
 
 class UserService
 {
+    use TransactionTrait;
+
     public function __construct(
         private UserRepository $userRepository,
         private MailDispatcherService $mailDispatcher,
@@ -73,75 +76,41 @@ class UserService
     }
 
     /**
-     * Yeni kullanıcı oluştur
+     * Kullanıcı oluştur
      */
-    public function createUser(array $data): User
+    public function create(array $data): User
     {
-        try {
-            DB::beginTransaction();
+        return $this->transaction(function () use ($data) {
+            $user = $this->userRepository->create($data);
             
-            // Email kontrolü
-            if ($this->userRepository->findByEmail($data['email'])) {
-                throw new ValidationException(
-                    Validator::make([], []),
-                    'Bu e-posta adresi zaten kullanılıyor.'
-                );
-            }
-        
-            $user = $this->createUserAction->execute($data);
-            
-            DB::commit();
-        
-            return $user;
-            
-        } catch (ValidationException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            Log::error('Kullanıcı oluşturma hatası', [
-                'error' => $e->getMessage(),
-                'data' => Arr::except($data, ['password']),
-                'trace' => $e->getTraceAsString()
+            Log::info('Kullanıcı oluşturuldu', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
             ]);
             
-            throw new \Exception('Kullanıcı oluşturulurken beklenmeyen bir hata oluştu.');
-        }
+            return $user;
+        });
     }
 
     /**
      * Kullanıcı güncelle
      */
-    public function updateUser(int $id, array $data): bool
+    public function update(User $user, array $data): User
     {
-        try {
-            DB::beginTransaction();
-        
-            $result = $this->updateUserAction->execute($id, $data);
+        return $this->transaction(function () use ($user, $data) {
+            $user = $this->userRepository->update($user->id, $data);
             
-            DB::commit();
-            
-            return $result;
-            
-        } catch (ModelNotFoundException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (ValidationException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            Log::error('Kullanıcı güncelleme hatası', [
-                'user_id' => $id,
-                'error' => $e->getMessage(),
-                'data' => Arr::except($data, ['password']),
-                'trace' => $e->getTraceAsString()
+            Log::info('Kullanıcı güncellendi', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
             ]);
             
-            throw new \Exception('Kullanıcı güncellenirken beklenmeyen bir hata oluştu.');
-        }
+            return $user;
+        });
     }
 
     /**
@@ -149,9 +118,7 @@ class UserService
      */
     public function deleteUser(int $id): bool
     {
-        try {
-            DB::beginTransaction();
-            
+        return $this->deleteInTransaction(function() use ($id) {
             $user = $this->userRepository->findById($id);
             
             if (!$user) {
@@ -175,32 +142,13 @@ class UserService
             // Hesap silme bildirimi gönder
             $this->sendAccountDeletionNotification($user);
             
-            DB::commit();
-            
             Log::info('Kullanıcı silindi', [
                 'user_id' => $id,
                 'deleted_by' => auth()->id()
             ]);
             
             return true;
-            
-        } catch (ModelNotFoundException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (ValidationException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            Log::error('Kullanıcı silme hatası', [
-                'user_id' => $id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            throw new \Exception('Kullanıcı silinirken beklenmeyen bir hata oluştu.');
-        }
+        }, 'kullanıcı silme');
     }
 
     /**

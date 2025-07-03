@@ -33,7 +33,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'phone',
         'address',
@@ -73,6 +74,7 @@ class User extends Authenticatable
      */
     protected $appends = [
         'profile_photo_url',
+        'full_name',
     ];
 
     /**
@@ -246,11 +248,27 @@ class User extends Authenticatable
     }
 
     /**
-     * Get user's full name
+     * Get the user's full name.
      */
     public function getFullNameAttribute(): string
     {
-        return $this->name;
+        return trim($this->first_name . ' ' . $this->last_name);
+    }
+
+    /**
+     * Get the user's first name.
+     */
+    public function getFirstNameAttribute($value): string
+    {
+        return $value ?? '';
+    }
+
+    /**
+     * Get the user's last name.
+     */
+    public function getLastNameAttribute($value): string
+    {
+        return $value ?? '';
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Modules\Settings\Repositories\SettingsRepository;
 use App\Modules\Settings\Exceptions\SettingsException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 class SettingsService
 {
@@ -46,6 +47,8 @@ class SettingsService
     public function updateAppSettings(array $data): bool
     {
         try {
+            DB::beginTransaction();
+            
             $settings = [
                 ['category' => 'app', 'key' => 'site_name', 'value' => $data['site_name'] ?? '', 'type' => 'string'],
                 ['category' => 'app', 'key' => 'site_description', 'value' => $data['site_description'] ?? '', 'type' => 'string'],
@@ -62,15 +65,19 @@ class SettingsService
                 throw SettingsException::appSettingsUpdateFailed();
             }
             
+            DB::commit();
+            
             Log::info('Uygulama ayarları güncellendi', $data);
             return true;
         } catch (SettingsException $e) {
+            DB::rollBack();
             Log::error('Uygulama ayarları güncellenirken hata oluştu', [
                 'error' => $e->getMessage(),
                 'data' => $data
             ]);
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Uygulama ayarları güncellenirken beklenmeyen hata oluştu', [
                 'error' => $e->getMessage(),
                 'data' => $data
@@ -85,6 +92,8 @@ class SettingsService
     public function updateMailSettings(array $data): bool
     {
         try {
+            DB::beginTransaction();
+            
             $settings = [
                 ['category' => 'mail', 'key' => 'driver', 'value' => $data['driver'] ?? 'smtp', 'type' => 'string'],
                 ['category' => 'mail', 'key' => 'host', 'value' => $data['host'] ?? '', 'type' => 'string'],
@@ -114,15 +123,19 @@ class SettingsService
                 throw SettingsException::configCacheFailed();
             }
             
+            DB::commit();
+            
             Log::info('Mail ayarları güncellendi', array_except($data, ['password']));
             return true;
         } catch (SettingsException $e) {
+            DB::rollBack();
             Log::error('Mail ayarları güncellenirken hata oluştu', [
                 'error' => $e->getMessage(),
                 'data' => array_except($data, ['password'])
             ]);
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Mail ayarları güncellenirken beklenmeyen hata oluştu', [
                 'error' => $e->getMessage(),
                 'data' => array_except($data, ['password'])

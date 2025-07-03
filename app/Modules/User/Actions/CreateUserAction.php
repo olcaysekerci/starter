@@ -7,6 +7,8 @@ use App\Modules\User\Repositories\UserRepository;
 use App\Modules\MailNotification\Services\MailDispatcherService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
 
 class CreateUserAction
 {
@@ -20,36 +22,30 @@ class CreateUserAction
      */
     public function execute(array $data): User
     {
-        // Şifreyi hash'le
-        if (isset($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        }
+        return $this->transaction(function () use ($data) {
+            $userData = [
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'] ?? null,
+                'address' => $data['address'] ?? null,
+                'password' => Hash::make($data['password']),
+            ];
 
-        // Rolleri ayır
-        $roles = $data['roles'] ?? [];
-        unset($data['roles']);
+            $user = $this->userService->create($userData);
 
-        // Varsayılan değerleri ayarla
-        $data['is_active'] = $data['is_active'] ?? true;
+            // Rolleri ata
+            if (isset($data['roles']) && is_array($data['roles'])) {
+                $user->roles()->sync($data['roles']);
+            }
 
-        // Kullanıcıyı oluştur
-        $user = $this->userRepository->create($data);
+            // İzinleri ata
+            if (isset($data['permissions']) && is_array($data['permissions'])) {
+                $user->permissions()->sync($data['permissions']);
+            }
 
-        // Rolleri ata
-        if (!empty($roles)) {
-            $user->assignRole($roles);
-        }
-
-        // Hoş geldin maili gönder
-        $this->sendWelcomeEmail($user);
-
-        Log::info('Yeni kullanıcı oluşturuldu', [
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'roles' => $roles
-        ]);
-
-        return $user;
+            return $user;
+        });
     }
 
     /**

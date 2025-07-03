@@ -5,11 +5,15 @@ namespace App\Modules\User\Services;
 use App\Modules\User\Models\Permission;
 use App\Modules\User\Repositories\PermissionRepository;
 use App\Modules\User\DTOs\PermissionDTO;
+use App\Traits\TransactionTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PermissionService
 {
+    use TransactionTrait;
     public function __construct(
         private PermissionRepository $permissionRepository
     ) {}
@@ -69,12 +73,22 @@ class PermissionService
      */
     public function createPermission(array $data): Permission
     {
-        // Guard name varsayılan olarak web
-        if (!isset($data['guard_name'])) {
-            $data['guard_name'] = 'web';
-        }
+        return $this->createInTransaction(function() use ($data) {
+            // Guard name varsayılan olarak web
+            if (!isset($data['guard_name'])) {
+                $data['guard_name'] = 'web';
+            }
 
-        return $this->permissionRepository->create($data);
+            $permission = $this->permissionRepository->create($data);
+            
+            Log::info('Yeni yetki oluşturuldu', [
+                'permission_id' => $permission->id,
+                'permission_name' => $permission->name,
+                'created_by' => auth()->id()
+            ]);
+            
+            return $permission;
+        }, 'yetki oluşturma');
     }
 
     /**
@@ -82,7 +96,18 @@ class PermissionService
      */
     public function updatePermission(int $id, array $data): bool
     {
-        return $this->permissionRepository->update($id, $data);
+        return $this->updateInTransaction(function() use ($id, $data) {
+            $result = $this->permissionRepository->update($id, $data);
+            
+            if ($result) {
+                Log::info('Yetki güncellendi', [
+                    'permission_id' => $id,
+                    'updated_by' => auth()->id()
+                ]);
+            }
+            
+            return $result;
+        }, 'yetki güncelleme');
     }
 
     /**
@@ -90,14 +115,26 @@ class PermissionService
      */
     public function deletePermission(int $id): bool
     {
-        $permission = $this->permissionRepository->findById($id);
-        
-        // Sistem yetkileri silinemez
-        if ($permission && in_array($permission->name, ['super-admin', 'admin'])) {
-            return false;
-        }
-        
-        return $this->permissionRepository->delete($id);
+        return $this->deleteInTransaction(function() use ($id) {
+            $permission = $this->permissionRepository->findById($id);
+            
+            // Sistem yetkileri silinemez
+            if ($permission && in_array($permission->name, ['super-admin', 'admin'])) {
+                return false;
+            }
+            
+            $result = $this->permissionRepository->delete($id);
+            
+            if ($result) {
+                Log::info('Yetki silindi', [
+                    'permission_id' => $id,
+                    'permission_name' => $permission->name ?? 'unknown',
+                    'deleted_by' => auth()->id()
+                ]);
+            }
+            
+            return $result;
+        }, 'yetki silme');
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Modules\MailNotification\Services;
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB; // Added DB facade
 use App\Modules\MailNotification\Models\MailLog;
 use App\Modules\MailNotification\Enums\MailStatus;
 use App\Modules\MailNotification\Repositories\MailNotificationRepository;
@@ -31,30 +32,33 @@ class MailDispatcherService
             'prepared_data' => $mailData
         ]);
         
-        // Mail log kaydı oluştur
-        $mailLog = $this->mailNotificationRepository->create([
-            'recipient' => $mailData['to'],
-            'subject' => $mailData['subject'],
-            'content' => $mailData['content'],
-            'type' => $mailData['type'],
-            'status' => MailStatus::PENDING,
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-            'metadata' => $mailData['metadata'],
-            'retry_count' => 0,
-        ]);
-        
-        Log::info('MailDispatcherService::send - mail log oluşturuldu', [
-            'log_id' => $mailLog->id,
-            'recipient' => $mailLog->recipient
-        ]);
-        
         try {
+            DB::beginTransaction();
+            
+            // Mail log kaydı oluştur
+            $mailLog = $this->mailNotificationRepository->create([
+                'recipient' => $mailData['to'],
+                'subject' => $mailData['subject'],
+                'content' => $mailData['content'],
+                'type' => $mailData['type'],
+                'status' => MailStatus::PENDING,
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'metadata' => $mailData['metadata'],
+                'retry_count' => 0,
+            ]);
+            
+            Log::info('MailDispatcherService::send - mail log oluşturuldu', [
+                'log_id' => $mailLog->id,
+                'recipient' => $mailLog->recipient
+            ]);
+            
             // Mail gönder
             $sent = $this->sendMail($mailData);
             
             if ($sent) {
                 $mailLog->markAsSent();
+                DB::commit();
                 Log::info('Mail başarıyla gönderildi', [
                     'recipient' => $mailData['to'],
                     'subject' => $mailData['subject'],
@@ -63,6 +67,7 @@ class MailDispatcherService
                 return true;
             } else {
                 $mailLog->markAsFailed('Mail gönderimi başarısız');
+                DB::commit();
                 Log::error('Mail gönderimi başarısız', [
                     'recipient' => $mailData['to'],
                     'subject' => $mailData['subject'],
@@ -71,12 +76,34 @@ class MailDispatcherService
                 return false;
             }
         } catch (\Exception $e) {
-            $mailLog->markAsFailed($e->getMessage());
+            DB::rollBack();
+            
+            // Hata durumunda log kaydı oluştur
+            try {
+                $mailLog = $this->mailNotificationRepository->create([
+                    'recipient' => $mailData['to'],
+                    'subject' => $mailData['subject'],
+                    'content' => $mailData['content'],
+                    'type' => $mailData['type'],
+                    'status' => MailStatus::FAILED,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'metadata' => $mailData['metadata'],
+                    'retry_count' => 0,
+                    'error_message' => $e->getMessage(),
+                ]);
+            } catch (\Exception $logError) {
+                Log::error('Mail log kaydı oluşturulamadı', [
+                    'error' => $logError->getMessage(),
+                    'original_error' => $e->getMessage()
+                ]);
+            }
+            
             Log::error('Mail gönderim hatası', [
                 'recipient' => $mailData['to'],
                 'subject' => $mailData['subject'],
                 'error' => $e->getMessage(),
-                'log_id' => $mailLog->id
+                'log_id' => $mailLog->id ?? null
             ]);
             return false;
         }

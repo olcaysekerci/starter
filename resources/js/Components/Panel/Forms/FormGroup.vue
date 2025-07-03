@@ -5,8 +5,7 @@
       <span v-if="required" class="text-red-500">*</span>
     </label>
     <slot />
-    <p v-if="error" class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
-    <p v-else-if="help" class="text-sm text-gray-500 dark:text-gray-400">{{ help }}</p>
+    <p v-if="help" class="text-sm text-gray-500 dark:text-gray-400">{{ help }}</p>
   </div>
 </template>
 
@@ -23,10 +22,6 @@ defineProps({
   required: {
     type: Boolean,
     default: false
-  },
-  error: {
-    type: String,
-    default: ''
   },
   help: {
     type: String,

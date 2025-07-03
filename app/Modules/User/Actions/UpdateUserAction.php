@@ -20,57 +20,36 @@ class UpdateUserAction
     /**
      * Execute the action.
      */
-    public function execute(int $id, array $data): bool
+    public function execute(User $user, array $data): User
     {
-        $user = $this->userRepository->findById($id);
+        return $this->transaction(function () use ($user, $data) {
+            $userData = [
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'] ?? null,
+                'address' => $data['address'] ?? null,
+            ];
 
-        if (!$user) {
-            throw new ModelNotFoundException('Kullanıcı bulunamadı.');
-        }
-
-        // Email değişikliği kontrolü
-        if (isset($data['email']) && $data['email'] !== $user->email) {
-            $existingUser = $this->userRepository->findByEmail($data['email']);
-            if ($existingUser && $existingUser->id !== $id) {
-                throw new \InvalidArgumentException('Bu e-posta adresi başka bir kullanıcı tarafından kullanılıyor.');
+            // Şifre güncelleniyorsa hash'le
+            if (isset($data['password']) && !empty($data['password'])) {
+                $userData['password'] = Hash::make($data['password']);
             }
-        }
 
-        // Şifre değişikliği kontrolü
-        if (isset($data['password']) && !empty($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        } else {
-            unset($data['password']);
-        }
+            $user = $this->userService->update($user, $userData);
 
-        // Rolleri ayır
-        $roles = $data['roles'] ?? [];
-        unset($data['roles']);
+            // Rolleri güncelle
+            if (isset($data['roles']) && is_array($data['roles'])) {
+                $user->roles()->sync($data['roles']);
+            }
 
-        // Kullanıcıyı güncelle
-        $updated = $this->userRepository->update($id, $data);
+            // İzinleri güncelle
+            if (isset($data['permissions']) && is_array($data['permissions'])) {
+                $user->permissions()->sync($data['permissions']);
+            }
 
-        if (!$updated) {
-            throw new \Exception('Kullanıcı güncellenirken bir hata oluştu.');
-        }
-
-        // Rolleri güncelle
-        if (!empty($roles)) {
-            $user->syncRoles($roles);
-        }
-
-        // Email değişikliği varsa bilgilendirme maili gönder
-        if (isset($data['email']) && $data['email'] !== $user->email) {
-            $this->sendEmailChangeNotification($user, $data['email']);
-        }
-
-        Log::info('Kullanıcı güncellendi', [
-            'user_id' => $id,
-            'updated_fields' => Arr::keys($data),
-            'roles' => $roles
-        ]);
-
-        return true;
+            return $user;
+        });
     }
 
     /**

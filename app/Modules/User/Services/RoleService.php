@@ -6,11 +6,15 @@ use App\Modules\User\Models\Role;
 use App\Modules\User\Repositories\RoleRepository;
 use App\Modules\User\Repositories\PermissionRepository;
 use App\Modules\User\DTOs\RoleDTO;
+use App\Traits\TransactionTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RoleService
 {
+    use TransactionTrait;
     public function __construct(
         private RoleRepository $roleRepository,
         private PermissionRepository $permissionRepository
@@ -63,12 +67,22 @@ class RoleService
      */
     public function createRole(array $data): Role
     {
-        // Guard name varsayılan olarak web
-        if (!isset($data['guard_name'])) {
-            $data['guard_name'] = 'web';
-        }
+        return $this->createInTransaction(function() use ($data) {
+            // Guard name varsayılan olarak web
+            if (!isset($data['guard_name'])) {
+                $data['guard_name'] = 'web';
+            }
 
-        return $this->roleRepository->create($data);
+            $role = $this->roleRepository->create($data);
+            
+            Log::info('Yeni rol oluşturuldu', [
+                'role_id' => $role->id,
+                'role_name' => $role->name,
+                'created_by' => auth()->id()
+            ]);
+            
+            return $role;
+        }, 'rol oluşturma');
     }
 
     /**
@@ -76,7 +90,18 @@ class RoleService
      */
     public function updateRole(int $id, array $data): bool
     {
-        return $this->roleRepository->update($id, $data);
+        return $this->updateInTransaction(function() use ($id, $data) {
+            $result = $this->roleRepository->update($id, $data);
+            
+            if ($result) {
+                Log::info('Rol güncellendi', [
+                    'role_id' => $id,
+                    'updated_by' => auth()->id()
+                ]);
+            }
+            
+            return $result;
+        }, 'rol güncelleme');
     }
 
     /**
@@ -84,14 +109,26 @@ class RoleService
      */
     public function deleteRole(int $id): bool
     {
-        $role = $this->roleRepository->findById($id);
-        
-        // Sistem rolleri silinemez
-        if ($role && in_array($role->name, ['super-admin', 'admin'])) {
-            return false;
-        }
-        
-        return $this->roleRepository->delete($id);
+        return $this->deleteInTransaction(function() use ($id) {
+            $role = $this->roleRepository->findById($id);
+            
+            // Sistem rolleri silinemez
+            if ($role && in_array($role->name, ['super-admin', 'admin'])) {
+                return false;
+            }
+            
+            $result = $this->roleRepository->delete($id);
+            
+            if ($result) {
+                Log::info('Rol silindi', [
+                    'role_id' => $id,
+                    'role_name' => $role->name ?? 'unknown',
+                    'deleted_by' => auth()->id()
+                ]);
+            }
+            
+            return $result;
+        }, 'rol silme');
     }
 
     /**

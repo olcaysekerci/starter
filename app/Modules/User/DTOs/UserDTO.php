@@ -8,7 +8,9 @@ class UserDTO
 {
     public function __construct(
         public readonly int $id,
-        public readonly string $name,
+        public readonly string $first_name,
+        public readonly string $last_name,
+        public readonly string $full_name,
         public readonly string $email,
         public readonly ?string $phone = null,
         public readonly ?string $address = null,
@@ -24,7 +26,9 @@ class UserDTO
     {
         return new self(
             id: $data['id'],
-            name: $data['name'],
+            first_name: $data['first_name'] ?? '',
+            last_name: $data['last_name'] ?? '',
+            full_name: $data['full_name'] ?? trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? '')),
             email: $data['email'],
             phone: $data['phone'] ?? null,
             address: $data['address'] ?? null,
@@ -41,7 +45,9 @@ class UserDTO
     {
         return new self(
             id: $user->id,
-            name: $user->name,
+            first_name: $user->first_name,
+            last_name: $user->last_name,
+            full_name: $user->full_name,
             email: $user->email,
             phone: $user->phone,
             address: $user->address,
@@ -58,7 +64,9 @@ class UserDTO
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'full_name' => $this->full_name,
             'email' => $this->email,
             'is_active' => $this->is_active,
             'email_verified_at' => $this->email_verified_at,
@@ -76,7 +84,9 @@ class UserDTO
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'full_name' => $this->full_name,
             'email' => $this->email,
             'phone' => $this->phone,
             'address' => $this->address,

@@ -207,7 +207,7 @@ const filteredUsers = computed(() => {
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(user => 
-      user.name.toLowerCase().includes(query) ||
+      user.full_name.toLowerCase().includes(query) ||
       user.email.toLowerCase().includes(query) ||
       (user.phone && user.phone.toLowerCase().includes(query))
     )

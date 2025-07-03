@@ -1,16 +1,19 @@
 <template>
-  <input
-    :id="id"
-    :type="type"
-    :value="modelValue"
-    :placeholder="placeholder"
-    :disabled="disabled"
-    :required="required"
-    :class="inputClasses"
-    @input="$emit('update:modelValue', $event.target.value)"
-    @blur="$emit('blur', $event)"
-    @focus="$emit('focus', $event)"
-  />
+  <div class="space-y-1">
+    <input
+      :id="id"
+      :type="type"
+      :value="modelValue"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :required="required"
+      :class="inputClasses"
+      @input="$emit('update:modelValue', $event.target.value)"
+      @blur="$emit('blur', $event)"
+      @focus="$emit('focus', $event)"
+    />
+    <p v-if="error" class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+  </div>
 </template>
 
 <script setup>
@@ -42,8 +45,8 @@ const props = defineProps({
     default: false
   },
   error: {
-    type: Boolean,
-    default: false
+    type: String,
+    default: ''
   }
 })
 

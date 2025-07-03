@@ -57,7 +57,8 @@ class UserRepository
         return $this->model
             ->with(['roles', 'permissions'])
             ->where(function ($q) use ($query) {
-                $q->where('name', 'like', "%{$query}%")
+                $q->where('first_name', 'like', "%{$query}%")
+                  ->orWhere('last_name', 'like', "%{$query}%")
                   ->orWhere('email', 'like', "%{$query}%")
                   ->orWhere('phone', 'like', "%{$query}%");
             })
