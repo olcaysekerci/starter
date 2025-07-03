@@ -14,10 +14,10 @@
     >
       <template #actions>
         <ActionButton 
-          @click="showStats = !showStats" 
+          @click="toggle('showStats')" 
           variant="ghost" 
           size="sm"
-          :class="{ 'bg-gray-100 dark:bg-gray-700': showStats }"
+          :class="{ 'bg-gray-100 dark:bg-gray-700': toggles.showStats }"
           title="İstatistikleri Göster/Gizle"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,10 +25,10 @@
           </svg>
         </ActionButton>
         <ActionButton 
-          @click="showFilters = !showFilters" 
+          @click="toggle('showFilters')" 
           variant="ghost" 
           size="sm"
-          :class="{ 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700': showFilters || hasActiveFilters }"
+          :class="{ 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700': toggles.showFilters || hasActiveFilters }"
           title="Filtreleri Göster/Gizle"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,7 +52,7 @@
     </PageHeader>
 
     <!-- Stats Cards -->
-    <div v-if="showStats" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+    <div v-if="toggles.showStats" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
       <InPageStatCard
         title="Toplam Kullanıcı"
         :value="stats.totalUsers"
@@ -81,13 +81,13 @@
 
     <!-- Filter Card -->
     <FilterCard 
-      :show="showFilters"
+      :show="toggles.showFilters"
       :filters="filters"
       :filter-config="filterConfig"
       @update-filter="updateFilter"
       @apply-filters="applyFilters"
       @clear-filters="clearFilters"
-      @close="showFilters = false"
+      @close="toggle('showFilters')"
     />
 
     <!-- Search and Actions -->
@@ -97,7 +97,8 @@
           <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Kullanıcı Listesi</h3>
           <div class="flex items-center space-x-3">
             <SearchInput
-              v-model="searchQuery"
+              :model-value="searchQuery"
+              @update:model-value="updateSearch"
               placeholder="Kullanıcı ara..."
               clearable
               class="w-full sm:w-64"
@@ -117,6 +118,17 @@
 
     <!-- Pagination -->
     <Pagination :links="users.links" @navigate="goToPage" />
+
+    <!-- Delete Modal -->
+    <DeleteModal
+      :show="showDeleteModal"
+      :title="deleteConfig.title"
+      :description="deleteConfig.description"
+      :additional-info="deleteConfig.additionalInfo"
+      :loading="deleteLoading"
+      @close="closeDeleteModal"
+      @confirm="confirmDelete"
+    />
   </PanelLayout>
 </template>
 
@@ -136,6 +148,15 @@ import InPageStatCard from '@/Components/Panel/InPageStatCard.vue'
 import FilterCard from '@/Components/Panel/FilterCard.vue'
 import UserList from '@/Components/Panel/User/UserList.vue'
 import Pagination from '@/Components/Panel/Shared/Pagination.vue'
+import DeleteModal from '@/Components/Panel/DeleteModal.vue'
+import { 
+  useSearch, 
+  useToggle, 
+  useNavigation, 
+  useExport, 
+  useNotification,
+  useDeleteModal 
+} from '@/Composables'
 
 const props = defineProps({ 
   users: Object,
@@ -157,18 +178,71 @@ const props = defineProps({
   }
 })
 
-// Reactive data
-const searchQuery = ref(props.filters.search || '')
-const showFilters = ref(false)
-const showStats = ref(false) // Default olarak kapalı
-const filters = ref({
-  status: '',
-  dateFrom: '',
-  dateTo: '',
-  emailDomain: ''
+// Composable'ları başlat
+const navigation = useNavigation('panel.users')
+const { showSuccess, showError } = useNotification()
+const { exportData } = useExport()
+
+// Toggle states
+const { toggles, toggle } = useToggle(['showFilters', 'showStats'])
+
+// Search functionality
+const { 
+  searchQuery, 
+  filters, 
+  showFilters, 
+  showStats, 
+  updateSearch, 
+  updateFilter, 
+  applyFilters, 
+  clearFilters,
+  activeFilterCount,
+  hasActiveFilters,
+  totalResults
+} = useSearch(props.users.data || [], {
+  searchFields: ['first_name', 'last_name', 'email', 'phone'],
+  filterConfig: [
+    {
+      key: 'status',
+      label: 'Durum',
+      type: 'select',
+      options: [
+        { value: '', label: 'Tümü' },
+        { value: 'active', label: 'Aktif' },
+        { value: 'inactive', label: 'Pasif' }
+      ]
+    },
+    {
+      key: 'dateFrom',
+      label: 'Başlangıç Tarihi',
+      type: 'date'
+    },
+    {
+      key: 'dateTo',
+      label: 'Bitiş Tarihi',
+      type: 'date'
+    },
+    {
+      key: 'emailDomain',
+      label: 'E-posta Domain',
+      type: 'text',
+      placeholder: 'örn: gmail.com'
+    }
+  ],
+  route: 'panel.users.index'
 })
 
-// Filter configuration
+// Delete modal
+const { 
+  showDeleteModal, 
+  deleteLoading, 
+  deleteConfig, 
+  openDeleteModal, 
+  closeDeleteModal, 
+  confirmDelete 
+} = useDeleteModal()
+
+// Filter configuration for FilterCard component
 const filterConfig = [
   {
     key: 'status',
@@ -201,109 +275,59 @@ const filterConfig = [
 
 // Computed
 const filteredUsers = computed(() => {
-  let filtered = props.users.data || []
-  
-  // Search filter
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(user => 
-      user.full_name.toLowerCase().includes(query) ||
-      user.email.toLowerCase().includes(query) ||
-      (user.phone && user.phone.toLowerCase().includes(query))
-    )
-  }
-  
-  // Status filter
-  if (filters.value.status) {
-    filtered = filtered.filter(user => {
-      if (filters.value.status === 'active') return user.is_active
-      if (filters.value.status === 'inactive') return !user.is_active
-      return true
-    })
-  }
-  
-  // Date range filter
-  if (filters.value.dateFrom || filters.value.dateTo) {
-    filtered = filtered.filter(user => {
-      const userDate = new Date(user.created_at)
-      const fromDate = filters.value.dateFrom ? new Date(filters.value.dateFrom) : null
-      const toDate = filters.value.dateTo ? new Date(filters.value.dateTo) : null
-      
-      if (fromDate && userDate < fromDate) return false
-      if (toDate && userDate > toDate) return false
-      return true
-    })
-  }
-  
-  // Email domain filter
-  if (filters.value.emailDomain) {
-    const domain = filters.value.emailDomain.toLowerCase()
-    filtered = filtered.filter(user => 
-      user.email.toLowerCase().includes(domain)
-    )
-  }
-  
-  return filtered
-})
-
-const activeFilterCount = computed(() => {
-  return Object.values(filters.value).filter(value => value !== '').length
-})
-
-const hasActiveFilters = computed(() => {
-  return activeFilterCount.value > 0
+  return props.users.data || []
 })
 
 // Methods
 const goToPage = (url) => { 
-  router.visit(url) 
+  navigation.goTo(url) 
 }
 
 const viewUser = (user) => { 
-  router.visit(route('panel.users.show', user.id)) 
-}
-
-const editUser = (user) => { 
-  router.visit(route('panel.users.edit', user.id)) 
-}
-
-const deleteUser = (user) => {
-  if (confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')) {
-    router.delete(route('panel.users.destroy', user.id), {
-      onSuccess: () => {
-        // Başarılı silme işlemi
-      },
-      onError: (errors) => {
-        console.error('Kullanıcı silinirken hata oluştu:', errors)
-      }
-    })
+  try {
+    navigation.goToShow(user.id) 
+  } catch (error) {
+    console.error('Navigation error:', error)
+    // Fallback to direct URL
+    router.visit(`/panel/users/${user.id}`)
   }
 }
 
+const editUser = (user) => { 
+  try {
+    navigation.goToEdit(user.id) 
+  } catch (error) {
+    console.error('Navigation error:', error)
+    // Fallback to direct URL
+    router.visit(`/panel/users/${user.id}/edit`)
+  }
+}
+
+const deleteUser = (user) => {
+  openDeleteModal(user, {
+    title: 'Kullanıcı Silme Onayı',
+    description: `"${user.full_name}" kullanıcısını silmek istediğinizden emin misiniz?`,
+    additionalInfo: 'Bu işlem geri alınamaz ve kullanıcının tüm verileri kalıcı olarak silinecektir.',
+    route: 'panel.users.destroy'
+  })
+}
+
 const addUser = () => { 
-  router.visit(route('panel.users.create')) 
+  try {
+    navigation.goToCreate() 
+  } catch (error) {
+    console.error('Navigation error:', error)
+    // Fallback to direct URL
+    router.visit('/panel/users/create')
+  }
 }
 
-const exportExcel = () => { 
-  // Excel export işlemi
-  console.log('Excel export')
-}
-
-const updateFilter = (key, value) => {
-  filters.value[key] = value
-}
-
-const applyFilters = () => {
-  // Filter uygulama işlemi
-  console.log('Filters applied:', filters.value)
-}
-
-const clearFilters = () => {
-  filters.value = {
-    status: '',
-    dateFrom: '',
-    dateTo: '',
-    emailDomain: ''
+const exportExcel = async () => { 
+  try {
+    await exportData(filteredUsers.value, 'excel', 'kullanicilar.xlsx')
+    showSuccess('Kullanıcı listesi başarıyla export edildi!')
+  } catch (error) {
+    showError('Export işlemi sırasında hata oluştu.')
   }
 }
 </script> 

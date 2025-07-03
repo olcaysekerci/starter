@@ -186,6 +186,17 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete Modal -->
+    <DeleteModal
+      :show="showDeleteModal"
+      :title="deleteConfig.title"
+      :description="deleteConfig.description"
+      :additional-info="deleteConfig.additionalInfo"
+      :loading="deleteLoading"
+      @close="closeDeleteModal"
+      @confirm="confirmDelete"
+    />
   </PanelLayout>
 </template>
 
@@ -194,6 +205,8 @@ import { router } from '@inertiajs/vue3'
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
+import DeleteModal from '@/Components/Panel/DeleteModal.vue'
+import { useDeleteModal } from '@/Composables/useDeleteModal'
 
 const props = defineProps({
   user: {
@@ -201,6 +214,16 @@ const props = defineProps({
     required: true
   }
 })
+
+// Delete modal
+const { 
+  showDeleteModal, 
+  deleteLoading, 
+  deleteConfig, 
+  openDeleteModal, 
+  closeDeleteModal, 
+  confirmDelete 
+} = useDeleteModal()
 
 const formatDate = (dateString) => {
   if (!dateString) return '-'
@@ -231,9 +254,12 @@ const editUser = () => {
 }
 
 const deleteUser = () => {
-  if (confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')) {
-    router.delete(route('panel.users.destroy', props.user.id))
-  }
+  openDeleteModal(props.user, {
+    title: 'Kullanıcı Silme Onayı',
+    description: `"${props.user.full_name}" kullanıcısını silmek istediğinizden emin misiniz?`,
+    additionalInfo: 'Bu işlem geri alınamaz ve kullanıcının tüm verileri kalıcı olarak silinecektir.',
+    route: 'panel.users.destroy'
+  })
 }
 
 const sendEmail = () => {

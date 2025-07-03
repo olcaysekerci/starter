@@ -249,6 +249,17 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete Modal -->
+    <DeleteModal
+      :show="showDeleteModal"
+      :title="deleteConfig.title"
+      :description="deleteConfig.description"
+      :additional-info="deleteConfig.additionalInfo"
+      :loading="deleteLoading"
+      @close="closeDeleteModal"
+      @confirm="confirmDelete"
+    />
   </PanelLayout>
 </template>
 
@@ -258,6 +269,8 @@ import { router } from '@inertiajs/vue3'
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
+import DeleteModal from '@/Components/Panel/DeleteModal.vue'
+import { useDeleteModal } from '@/Composables/useDeleteModal'
 
 const props = defineProps({
   permission: {
@@ -273,6 +286,16 @@ const props = defineProps({
     default: () => []
   }
 })
+
+// Delete modal
+const { 
+  showDeleteModal, 
+  deleteLoading, 
+  deleteConfig, 
+  openDeleteModal, 
+  closeDeleteModal, 
+  confirmDelete 
+} = useDeleteModal()
 
 const isSystemPermission = computed(() => {
   return ['super-admin', 'admin'].includes(props.permission.name)
@@ -293,8 +316,11 @@ const editPermission = () => {
 }
 
 const deletePermission = () => {
-  if (confirm(`"${props.permission.display_name}" yetkisini silmek istediğinizden emin misiniz?`)) {
-    router.delete(route('panel.permissions.destroy', props.permission.id))
-  }
+  openDeleteModal(props.permission, {
+    title: 'Yetki Silme Onayı',
+    description: `"${props.permission.display_name}" yetkisini silmek istediğinizden emin misiniz?`,
+    additionalInfo: 'Bu yetkiyi silmek, bu yetkiye sahip tüm kullanıcıları etkileyecektir.',
+    route: 'panel.permissions.destroy'
+  })
 }
 </script> 

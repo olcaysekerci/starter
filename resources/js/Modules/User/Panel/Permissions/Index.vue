@@ -95,6 +95,17 @@
 
     <!-- Pagination -->
     <Pagination :links="permissions.links" @navigate="goToPage" />
+
+    <!-- Delete Modal -->
+    <DeleteModal
+      :show="showDeleteModal"
+      :title="deleteConfig.title"
+      :description="deleteConfig.description"
+      :additional-info="deleteConfig.additionalInfo"
+      :loading="deleteLoading"
+      @close="closeDeleteModal"
+      @confirm="confirmDelete"
+    />
   </PanelLayout>
 </template>
 
@@ -114,6 +125,8 @@ import SearchInput from '@/Components/Panel/Actions/SearchInput.vue'
 import StatItem from '@/Components/Panel/InPageStatCard.vue'
 import PermissionList from '@/Components/Panel/Permission/PermissionList.vue'
 import Pagination from '@/Components/Panel/Shared/Pagination.vue'
+import DeleteModal from '@/Components/Panel/DeleteModal.vue'
+import { useDeleteModal } from '@/Composables/useDeleteModal'
 
 const props = defineProps({ 
   permissions: Object,
@@ -136,6 +149,16 @@ const props = defineProps({
 const searchQuery = ref(props.searchQuery || '')
 const showStats = ref(false)
 
+// Delete modal
+const { 
+  showDeleteModal, 
+  deleteLoading, 
+  deleteConfig, 
+  openDeleteModal, 
+  closeDeleteModal, 
+  confirmDelete 
+} = useDeleteModal()
+
 // Computed
 const filteredPermissions = computed(() => {
   return props.permissions.data || []
@@ -155,13 +178,12 @@ const viewPermission = (permission) => {
 }
 
 const deletePermission = (permission) => {
-  if (confirm(`"${permission.display_name}" yetkisini silmek istediğinizden emin misiniz?`)) {
-    router.delete(route('panel.permissions.destroy', permission.id), {
-      onSuccess: () => {
-        // Başarı mesajı göster
-      }
-    })
-  }
+  openDeleteModal(permission, {
+    title: 'Yetki Silme Onayı',
+    description: `"${permission.display_name}" yetkisini silmek istediğinizden emin misiniz?`,
+    additionalInfo: 'Bu yetkiyi silmek, bu yetkiye sahip tüm kullanıcıları etkileyecektir.',
+    route: 'panel.permissions.destroy'
+  })
 }
 
 const exportExcel = () => {

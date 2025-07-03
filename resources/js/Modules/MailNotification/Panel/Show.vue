@@ -168,6 +168,17 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete Modal -->
+    <DeleteModal
+      :show="showDeleteModal"
+      :title="deleteConfig.title"
+      :description="deleteConfig.description"
+      :additional-info="deleteConfig.additionalInfo"
+      :loading="deleteLoading"
+      @close="closeDeleteModal"
+      @confirm="confirmDelete"
+    />
   </PanelLayout>
 </template>
 
@@ -182,11 +193,23 @@ import {
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
+import DeleteModal from '@/Components/Panel/DeleteModal.vue'
+import { useDeleteModal } from '@/Composables/useDeleteModal'
 
 // Props
 const props = defineProps({
   mailLog: Object,
 })
+
+// Delete modal
+const { 
+  showDeleteModal, 
+  deleteLoading, 
+  deleteConfig, 
+  openDeleteModal, 
+  closeDeleteModal, 
+  confirmDelete 
+} = useDeleteModal()
 
 // Methods
 const goBack = () => {
@@ -202,9 +225,12 @@ const resendMail = async () => {
 }
 
 const deleteMail = async () => {
-  if (confirm('Bu mail logunu silmek istediğinizden emin misiniz?')) {
-    await router.delete(route('panel.mail-notifications.destroy', props.mailLog.id))
-  }
+  openDeleteModal(props.mailLog, {
+    title: 'Mail Log Silme Onayı',
+    description: `Bu mail logunu silmek istediğinizden emin misiniz?`,
+    additionalInfo: 'Bu işlem geri alınamaz ve mail gönderim geçmişi kalıcı olarak silinecektir.',
+    route: 'panel.mail-notifications.destroy'
+  })
 }
 
 const formatDate = (date) => {

@@ -39,7 +39,7 @@
     </PageHeader>
 
     <!-- Error Alert -->
-    <div v-if="form.errors.general" class="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+    <div v-if="errors && errors.general" class="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
       <div class="flex">
         <div class="flex-shrink-0">
           <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -51,7 +51,7 @@
             Hata
           </h3>
           <div class="mt-2 text-sm text-red-700">
-            {{ form.errors.general }}
+            {{ errors.general }}
           </div>
         </div>
       </div>
@@ -62,7 +62,7 @@
       title="Kullanıcı Bilgileri"
       description="Sisteme yeni bir kullanıcı hesabı ekleyin. Kullanıcı bilgilerini ve rollerini belirleyin."
       submit-text="Kullanıcı Oluştur"
-      :processing="form.processing"
+      :processing="processing"
       @submit="saveUser"
       @cancel="goBack"
     >
@@ -72,7 +72,7 @@
           <FormGroup label="Ad" required>
             <TextInput
               v-model="form.first_name"
-              :error="form.errors.first_name"
+              :error="errors.first_name"
               placeholder="Kullanıcının adı"
               required
             />
@@ -81,7 +81,7 @@
           <FormGroup label="Soyad" required>
             <TextInput
               v-model="form.last_name"
-              :error="form.errors.last_name"
+              :error="errors.last_name"
               placeholder="Kullanıcının soyadı"
               required
             />
@@ -91,7 +91,7 @@
             <TextInput
               v-model="form.email"
               type="email"
-              :error="form.errors.email"
+              :error="errors.email"
               placeholder="ornek@email.com"
               required
             />
@@ -100,7 +100,7 @@
           <FormGroup label="Telefon">
             <TextInput
               v-model="form.phone"
-              :error="form.errors.phone"
+              :error="errors.phone"
               placeholder="+90 555 123 45 67"
             />
           </FormGroup>
@@ -109,7 +109,7 @@
             <TextInput
               v-model="form.password"
               type="password"
-              :error="form.errors.password"
+              :error="errors.password"
               placeholder="Güçlü bir şifre girin"
               required
               minlength="6"
@@ -120,7 +120,7 @@
             <TextInput
               v-model="form.password_confirmation"
               type="password"
-              :error="form.errors.password_confirmation"
+              :error="errors.password_confirmation"
               placeholder="Şifreyi tekrar girin"
               required
               minlength="6"
@@ -132,7 +132,7 @@
         <FormGroup label="Adres">
           <TextArea
             v-model="form.address"
-            :error="form.errors.address"
+            :error="errors.address"
             placeholder="Kullanıcının adres bilgileri"
             rows="3"
           />
@@ -143,7 +143,7 @@
           <Select
             v-model="form.role_id"
             :options="roleOptions"
-            :error="form.errors.role_id"
+            :error="errors.role_id"
             placeholder="Kullanıcı rolü seçin"
           />
         </FormGroup>
@@ -153,7 +153,6 @@
 </template>
 
 <script setup>
-import { useForm } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
@@ -163,6 +162,7 @@ import TextInput from '@/Components/Panel/Forms/TextInput.vue'
 import TextArea from '@/Components/Panel/Forms/TextArea.vue'
 import Select from '@/Components/Panel/Forms/Select.vue'
 import FormCard from '@/Components/Panel/Forms/FormCard.vue'
+import { useForm, useNavigation, useNotification } from '@/Composables'
 
 const props = defineProps({
   roles: {
@@ -171,8 +171,12 @@ const props = defineProps({
   }
 })
 
+// Composable'ları başlat
+const navigation = useNavigation('panel.users')
+const { showSuccess, showError } = useNotification()
+
 // Form
-const form = useForm({
+const { form, errors, processing, submit, validate, reset } = useForm({
   first_name: '',
   last_name: '',
   email: '',
@@ -181,7 +185,28 @@ const form = useForm({
   password: '',
   password_confirmation: '',
   role_id: ''
+}, {
+  rules: {
+    first_name: ['required'],
+    last_name: ['required'],
+    email: ['required', 'email'],
+    password: ['required', 'min:6'],
+    password_confirmation: ['required']
+  },
+  route: 'panel.users.store',
+  onSuccess: () => {
+    showSuccess('Kullanıcı başarıyla oluşturuldu!')
+    navigation.goToIndex()
+  },
+  onError: (serverErrors) => {
+    showError('Kullanıcı oluşturulurken hata oluştu.')
+    console.log('Server errors:', serverErrors)
+  }
 })
+
+// Debug: Check if errors is reactive
+console.log('Errors object:', errors)
+console.log('Errors type:', typeof errors)
 
 // Role options for select
 const roleOptions = computed(() => {
@@ -193,62 +218,18 @@ const roleOptions = computed(() => {
 })
 
 // Methods
-const saveUser = () => {
-  // Client-side validation
-  form.clearErrors()
-  
-  let hasErrors = false
-  
-  if (!form.first_name.trim()) {
-    form.setError('first_name', 'Ad alanı zorunludur.')
-    hasErrors = true
-  }
-  
-  if (!form.last_name.trim()) {
-    form.setError('last_name', 'Soyad alanı zorunludur.')
-    hasErrors = true
-  }
-  
-  if (!form.email.trim()) {
-    form.setError('email', 'E-posta alanı zorunludur.')
-    hasErrors = true
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    form.setError('email', 'Geçerli bir e-posta adresi giriniz.')
-    hasErrors = true
-  }
-  
-  if (!form.password) {
-    form.setError('password', 'Şifre alanı zorunludur.')
-    hasErrors = true
-  } else if (form.password.length < 6) {
-    form.setError('password', 'Şifre en az 6 karakter olmalıdır.')
-    hasErrors = true
-  }
-  
-  if (!form.password_confirmation) {
-    form.setError('password_confirmation', 'Şifre tekrarı zorunludur.')
-    hasErrors = true
-  } else if (form.password !== form.password_confirmation) {
-    form.setError('password_confirmation', 'Şifre tekrarı eşleşmiyor.')
-    hasErrors = true
-  }
-  
-  if (hasErrors) {
+const saveUser = async () => {
+  // Custom validation for password confirmation
+  if (form.password !== form.password_confirmation) {
+    showError('Şifre tekrarı eşleşmiyor.')
     return
   }
   
-  form.post('/panel/users', {
-    onSuccess: () => {
-      // Başarılı olduğunda yapılacak işlemler
-    },
-    onError: (errors) => {
-      // Hata durumunda yapılacak işlemler
-      console.error('Form errors:', errors)
-    }
-  })
+  // Submit form using our composable
+  await submit()
 }
 
 const goBack = () => {
-  window.history.back()
+  navigation.goBack()
 }
 </script> 

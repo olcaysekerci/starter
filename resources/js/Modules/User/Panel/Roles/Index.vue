@@ -95,6 +95,17 @@
 
     <!-- Pagination -->
     <Pagination :links="roles.links" @navigate="goToPage" />
+
+    <!-- Delete Modal -->
+    <DeleteModal
+      :show="showDeleteModal"
+      :title="deleteConfig.title"
+      :description="deleteConfig.description"
+      :additional-info="deleteConfig.additionalInfo"
+      :loading="deleteLoading"
+      @close="closeDeleteModal"
+      @confirm="confirmDelete"
+    />
   </PanelLayout>
 </template>
 
@@ -114,6 +125,8 @@ import SearchInput from '@/Components/Panel/Actions/SearchInput.vue'
 import StatItem from '@/Components/Panel/InPageStatCard.vue'
 import RoleList from '@/Components/Panel/Role/RoleList.vue'
 import Pagination from '@/Components/Panel/Shared/Pagination.vue'
+import DeleteModal from '@/Components/Panel/DeleteModal.vue'
+import { useDeleteModal } from '@/Composables/useDeleteModal'
 
 const props = defineProps({ 
   roles: Object,
@@ -136,6 +149,16 @@ const props = defineProps({
 const searchQuery = ref(props.searchQuery || '')
 const showStats = ref(false)
 
+// Delete modal
+const { 
+  showDeleteModal, 
+  deleteLoading, 
+  deleteConfig, 
+  openDeleteModal, 
+  closeDeleteModal, 
+  confirmDelete 
+} = useDeleteModal()
+
 // Computed
 const filteredRoles = computed(() => {
   return props.roles.data || []
@@ -155,13 +178,12 @@ const viewRole = (role) => {
 }
 
 const deleteRole = (role) => {
-  if (confirm(`"${role.display_name}" rolünü silmek istediğinizden emin misiniz?`)) {
-    router.delete(route('panel.roles.destroy', role.id), {
-      onSuccess: () => {
-        // Başarı mesajı göster
-      }
-    })
-  }
+  openDeleteModal(role, {
+    title: 'Rol Silme Onayı',
+    description: `"${role.display_name}" rolünü silmek istediğinizden emin misiniz?`,
+    additionalInfo: 'Bu rolü silmek, bu role sahip tüm kullanıcıları etkileyecektir.',
+    route: 'panel.roles.destroy'
+  })
 }
 
 const exportExcel = () => {
