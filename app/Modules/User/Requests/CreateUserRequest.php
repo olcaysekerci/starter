@@ -27,10 +27,8 @@ class CreateUserRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:500'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['exists:roles,id'],
-            'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['exists:permissions,id'],
+            'role_id' => ['nullable', 'exists:roles,id'],
+
         ];
     }
 
@@ -54,10 +52,8 @@ class CreateUserRequest extends FormRequest
             'password.required' => 'Şifre alanı zorunludur.',
             'password.min' => 'Şifre en az 6 karakter olmalıdır.',
             'password.confirmed' => 'Şifre tekrarı eşleşmiyor.',
-            'roles.array' => 'Roller dizi olmalıdır.',
-            'roles.*.exists' => 'Seçilen rol geçersiz.',
-            'permissions.array' => 'İzinler dizi olmalıdır.',
-            'permissions.*.exists' => 'Seçilen izin geçersiz.',
+            'role_id.exists' => 'Seçilen rol geçersiz.',
+
         ];
     }
 

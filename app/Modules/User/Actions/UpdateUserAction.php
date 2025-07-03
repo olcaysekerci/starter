@@ -5,6 +5,7 @@ namespace App\Modules\User\Actions;
 use App\Modules\User\Models\User;
 use App\Modules\User\Repositories\UserRepository;
 use App\Modules\MailNotification\Services\MailDispatcherService;
+use App\Traits\TransactionTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -12,6 +13,8 @@ use Illuminate\Support\Arr;
 
 class UpdateUserAction
 {
+    use TransactionTrait;
+
     public function __construct(
         private UserRepository $userRepository,
         private MailDispatcherService $mailDispatcher
@@ -22,7 +25,7 @@ class UpdateUserAction
      */
     public function execute(User $user, array $data): User
     {
-        return $this->transaction(function () use ($user, $data) {
+        return $this->executeInTransaction(function () use ($user, $data) {
             $userData = [
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
@@ -36,20 +39,24 @@ class UpdateUserAction
                 $userData['password'] = Hash::make($data['password']);
             }
 
-            $user = $this->userService->update($user, $userData);
+            $user = $this->userRepository->update($user, $userData);
 
-            // Rolleri güncelle
-            if (isset($data['roles']) && is_array($data['roles'])) {
-                $user->roles()->sync($data['roles']);
+            // Rolü güncelle
+            if (isset($data['role_id'])) {
+                if (!empty($data['role_id'])) {
+                    $user->roles()->sync([$data['role_id']]);
+                } else {
+                    $user->roles()->detach();
+                }
             }
 
-            // İzinleri güncelle
-            if (isset($data['permissions']) && is_array($data['permissions'])) {
-                $user->permissions()->sync($data['permissions']);
+            // Email değişikliği bildirimi gönder
+            if (isset($data['email']) && $data['email'] !== $user->email) {
+                $this->sendEmailChangeNotification($user, $data['email']);
             }
 
             return $user;
-        });
+        }, 'user update');
     }
 
     /**
@@ -60,7 +67,7 @@ class UpdateUserAction
         $this->mailDispatcher->send([
             'to' => $newEmail,
             'subject' => 'Email Adresiniz Güncellendi - ' . config('app.name'),
-            'content' => "Merhaba {$user->name},\n\n" .
+            'content' => "Merhaba {$user->full_name},\n\n" .
                         "Hesabınızın email adresi başarıyla güncellendi.\n\n" .
                         "Yeni email adresiniz: {$newEmail}\n\n" .
                         "Bu değişikliği siz yapmadıysanız, lütfen bizimle iletişime geçin.\n\n" .
@@ -68,7 +75,7 @@ class UpdateUserAction
             'type' => 'email_change',
             'metadata' => [
                 'user_id' => $user->id,
-                'user_name' => $user->name,
+                'user_name' => $user->full_name,
                 'old_email' => $user->email,
                 'new_email' => $newEmail,
                 'action' => 'email_updated'

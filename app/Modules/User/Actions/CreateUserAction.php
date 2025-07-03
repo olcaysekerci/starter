@@ -5,6 +5,7 @@ namespace App\Modules\User\Actions;
 use App\Modules\User\Models\User;
 use App\Modules\User\Repositories\UserRepository;
 use App\Modules\MailNotification\Services\MailDispatcherService;
+use App\Traits\TransactionTrait;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Validator;
 
 class CreateUserAction
 {
+    use TransactionTrait;
+
     public function __construct(
         private UserRepository $userRepository,
         private MailDispatcherService $mailDispatcher
@@ -22,7 +25,7 @@ class CreateUserAction
      */
     public function execute(array $data): User
     {
-        return $this->transaction(function () use ($data) {
+        return $this->executeInTransaction(function () use ($data) {
             $userData = [
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
@@ -32,20 +35,18 @@ class CreateUserAction
                 'password' => Hash::make($data['password']),
             ];
 
-            $user = $this->userService->create($userData);
+            $user = $this->userRepository->create($userData);
 
-            // Rolleri ata
-            if (isset($data['roles']) && is_array($data['roles'])) {
-                $user->roles()->sync($data['roles']);
+            // Rolü ata
+            if (isset($data['role_id']) && !empty($data['role_id'])) {
+                $user->roles()->sync([$data['role_id']]);
             }
 
-            // İzinleri ata
-            if (isset($data['permissions']) && is_array($data['permissions'])) {
-                $user->permissions()->sync($data['permissions']);
-            }
+            // Hoş geldin maili gönder
+            $this->sendWelcomeEmail($user);
 
             return $user;
-        });
+        }, 'user creation');
     }
 
     /**
@@ -56,14 +57,14 @@ class CreateUserAction
         $this->mailDispatcher->send([
             'to' => $user->email,
             'subject' => 'Hoş Geldiniz - ' . config('app.name'),
-            'content' => "Merhaba {$user->name},\n\n" .
+            'content' => "Merhaba {$user->full_name},\n\n" .
                         "Sitemize hoş geldiniz! Hesabınız başarıyla oluşturuldu.\n\n" .
                         "Hesabınızla ilgili herhangi bir sorunuz olursa bizimle iletişime geçebilirsiniz.\n\n" .
                         "Saygılarımızla,\n" . config('app.name') . " Ekibi",
             'type' => 'welcome',
             'metadata' => [
                 'user_id' => $user->id,
-                'user_name' => $user->name,
+                'user_name' => $user->full_name,
                 'action' => 'user_created'
             ]
         ]);

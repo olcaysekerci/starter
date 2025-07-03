@@ -88,11 +88,9 @@ class UserController extends Controller
     public function create(): Response
     {
         $roles = $this->roleService->getAllRoles();
-        $permissions = $this->roleService->getAllPermissions();
         
         return Inertia::render('User/Panel/Create', [
-            'roles' => $roles,
-            'permissions' => $permissions
+            'roles' => $roles
         ]);
     }
 
@@ -143,12 +141,10 @@ class UserController extends Controller
         try {
             $user = $this->userService->getUserDTOById($id);
             $roles = $this->roleService->getAllRoles();
-            $permissions = $this->roleService->getAllPermissions();
         
         return Inertia::render('User/Panel/Edit', [
                 'user' => $user,
-                'roles' => $roles,
-                'permissions' => $permissions
+                'roles' => $roles
         ]);
         } catch (ModelNotFoundException $e) {
             return redirect()->route('panel.users.index')

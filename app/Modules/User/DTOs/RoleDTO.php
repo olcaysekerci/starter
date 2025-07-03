@@ -2,6 +2,8 @@
 
 namespace App\Modules\User\DTOs;
 
+use Illuminate\Support\Collection;
+
 class RoleDTO
 {
     public function __construct(
@@ -33,6 +35,22 @@ class RoleDTO
         );
     }
 
+    public static function fromModel($role): self
+    {
+        return new self(
+            id: $role->id,
+            name: $role->name,
+            guard_name: $role->guard_name,
+            display_name: $role->display_name,
+            description: $role->description,
+            is_active: $role->is_active ?? true,
+            created_at: $role->created_at?->toISOString(),
+            updated_at: $role->updated_at?->toISOString(),
+            permissions: $role->permissions?->toArray() ?? [],
+            users_count: $role->users_count ?? 0
+        );
+    }
+
     public function toArray(): array
     {
         return [
@@ -47,5 +65,61 @@ class RoleDTO
             'permissions' => $this->permissions,
             'users_count' => $this->users_count,
         ];
+    }
+
+    /**
+     * Rolün görünen adını döndür
+     */
+    public function getDisplayName(): string
+    {
+        return $this->display_name ?? $this->name;
+    }
+
+    /**
+     * Rolün sistem rolü olup olmadığını kontrol et
+     */
+    public function isSystemRole(): bool
+    {
+        return in_array($this->name, ['super-admin', 'admin', 'user']);
+    }
+
+    /**
+     * Rolün silinebilir olup olmadığını kontrol et
+     */
+    public function isDeletable(): bool
+    {
+        return !$this->isSystemRole() && $this->users_count === 0;
+    }
+
+    /**
+     * Rolün belirli bir izne sahip olup olmadığını kontrol et
+     */
+    public function hasPermission(string $permission): bool
+    {
+        return collect($this->permissions)->contains('name', $permission);
+    }
+
+    /**
+     * Rolün izin sayısını döndür
+     */
+    public function getPermissionCount(): int
+    {
+        return count($this->permissions);
+    }
+
+    /**
+     * Rolün aktif olup olmadığını kontrol et
+     */
+    public function isActive(): bool
+    {
+        return $this->is_active;
+    }
+
+    /**
+     * Rolün kullanıcı sayısını döndür
+     */
+    public function getUserCount(): int
+    {
+        return $this->users_count;
     }
 } 

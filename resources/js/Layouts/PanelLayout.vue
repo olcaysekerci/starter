@@ -2,6 +2,9 @@
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
     <Head :title="title" />
 
+    <!-- Flash Messages -->
+    <FlashMessage />
+
     <!-- Sidebar -->
     <Sidebar :is-open="sidebarOpen" :is-collapsed="isCollapsed" @close="sidebarOpen = false" />
     
@@ -225,6 +228,7 @@ import { Head, Link } from '@inertiajs/vue3'
 import Sidebar from '@/Components/Panel/Navigation/Sidebar.vue'
 import DarkModeToggle from '@/Components/Panel/DarkModeToggle.vue'
 import Breadcrumb from '@/Components/Panel/Header/Breadcrumb.vue'
+import FlashMessage from '@/Components/Panel/FlashMessage.vue'
 
 defineProps({
   title: {

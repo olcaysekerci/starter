@@ -121,4 +121,88 @@ class DashboardDTO
     {
         return $this->theme ?? 'light';
     }
+
+    /**
+     * Dashboard'ın boş olup olmadığını kontrol et
+     */
+    public function isEmpty(): bool
+    {
+        return empty($this->widgets) && empty($this->charts) && empty($this->statistics);
+    }
+
+    /**
+     * Dashboard'ın özel tema kullanıp kullanmadığını kontrol et
+     */
+    public function hasCustomTheme(): bool
+    {
+        return !is_null($this->theme) && $this->theme !== 'light';
+    }
+
+    /**
+     * Dashboard'ın özel layout kullanıp kullanmadığını kontrol et
+     */
+    public function hasCustomLayout(): bool
+    {
+        return !is_null($this->layout) && $this->layout !== 'default';
+    }
+
+    /**
+     * Dashboard'ın kullanıcı tercihleri olup olmadığını kontrol et
+     */
+    public function hasUserPreferences(): bool
+    {
+        return !empty($this->user_preferences);
+    }
+
+    /**
+     * Dashboard'ın veri sayısını döndür
+     */
+    public function getDataCount(): int
+    {
+        return count($this->data);
+    }
+
+    /**
+     * Dashboard'ın istatistik sayısını döndür
+     */
+    public function getStatisticsCount(): int
+    {
+        return count($this->statistics ?? []);
+    }
+
+    /**
+     * Dashboard'ın toplam bileşen sayısını döndür
+     */
+    public function getTotalComponentCount(): int
+    {
+        return $this->getWidgetCount() + $this->getChartCount() + $this->getStatisticsCount();
+    }
+
+    /**
+     * Dashboard'ın kısa açıklamasını döndür
+     */
+    public function getShortDescription(): string
+    {
+        return strlen($this->description) > 100 
+            ? substr($this->description, 0, 100) . '...' 
+            : $this->description;
+    }
+
+    /**
+     * Dashboard'ın oluşturulma tarihini formatlı döndür
+     */
+    public function getFormattedCreatedAt(): string
+    {
+        if (!$this->created_at) return '-';
+        return date('d.m.Y H:i', strtotime($this->created_at));
+    }
+
+    /**
+     * Dashboard'ın güncellenme tarihini formatlı döndür
+     */
+    public function getFormattedUpdatedAt(): string
+    {
+        if (!$this->updated_at) return '-';
+        return date('d.m.Y H:i', strtotime($this->updated_at));
+    }
 } 
