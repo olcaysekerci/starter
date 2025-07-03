@@ -276,7 +276,7 @@ class User extends Authenticatable
      */
     public function getInitialsAttribute(): string
     {
-        $words = explode(' ', $this->name);
+        $words = explode(' ', $this->full_name);
         $initials = '';
         
         foreach ($words as $word) {

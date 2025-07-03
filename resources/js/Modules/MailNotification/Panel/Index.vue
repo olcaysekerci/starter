@@ -272,7 +272,7 @@ const props = defineProps({
 // Reactive data
 const searchQuery = ref('')
 const showFilters = ref(false)
-const showStats = ref(true)
+const showStats = ref(false)
 const showTestModal = ref(false)
 const sendingTestMail = ref(false)
 const testMailForm = reactive({

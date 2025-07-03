@@ -5,13 +5,13 @@
     :breadcrumbs="[
       { title: 'Dashboard', url: '/dashboard' },
       { title: 'Kullanıcı Yönetimi', url: '/panel/users' },
-      { title: user.name }
+      { title: user.full_name }
     ]"
   >
     <!-- Page Header -->
     <PageHeader
       title="Kullanıcı Detayı"
-      :description="`${user.name} kullanıcısının detaylı bilgileri`"
+      :description="`${user.full_name} kullanıcısının detaylı bilgileri`"
     >
       <template #actions>
         <ActionButton 
@@ -49,7 +49,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ad Soyad</label>
-                <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ user.name }}</p>
+                <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ user.full_name }}</p>
                     </div>
                     <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">E-posta</label>

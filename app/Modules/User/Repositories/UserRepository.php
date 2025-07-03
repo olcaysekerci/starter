@@ -77,15 +77,10 @@ class UserRepository
     /**
      * Kullanıcı güncelle
      */
-    public function update(int $id, array $data): bool
+    public function update(User $user, array $data): User
     {
-        $user = $this->findById($id);
-        
-        if (!$user) {
-            return false;
-        }
-
-        return $user->update($data);
+        $user->update($data);
+        return $user->fresh();
     }
 
     /**

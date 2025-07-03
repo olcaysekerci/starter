@@ -100,16 +100,16 @@ class UserService
     public function update(User $user, array $data): User
     {
         return $this->transaction(function () use ($user, $data) {
-            $user = $this->userRepository->update($user->id, $data);
+            $updatedUser = $this->userRepository->update($user, $data);
             
             Log::info('Kullanıcı güncellendi', [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
+                'user_id' => $updatedUser->id,
+                'email' => $updatedUser->email,
+                'first_name' => $updatedUser->first_name,
+                'last_name' => $updatedUser->last_name,
             ]);
             
-            return $user;
+            return $updatedUser;
         });
     }
 
@@ -247,14 +247,14 @@ class UserService
         $this->mailDispatcher->send([
             'to' => $user->email,
             'subject' => 'Hoş Geldiniz - ' . config('app.name'),
-            'content' => "Merhaba {$user->name},\n\n" .
+            'content' => "Merhaba {$user->full_name},\n\n" .
                         "Sitemize hoş geldiniz! Hesabınız başarıyla oluşturuldu.\n\n" .
                         "Hesabınızla ilgili herhangi bir sorunuz olursa bizimle iletişime geçebilirsiniz.\n\n" .
                         "Saygılarımızla,\n" . config('app.name') . " Ekibi",
             'type' => 'welcome',
             'metadata' => [
                 'user_id' => $user->id,
-                'user_name' => $user->name,
+                'user_name' => $user->full_name,
                 'action' => 'user_created'
             ]
         ]);
@@ -268,7 +268,7 @@ class UserService
         $this->mailDispatcher->send([
             'to' => $newEmail,
             'subject' => 'Email Adresiniz Güncellendi - ' . config('app.name'),
-            'content' => "Merhaba {$user->name},\n\n" .
+            'content' => "Merhaba {$user->full_name},\n\n" .
                         "Hesabınızın email adresi başarıyla güncellendi.\n\n" .
                         "Yeni email adresiniz: {$newEmail}\n\n" .
                         "Bu değişikliği siz yapmadıysanız, lütfen bizimle iletişime geçin.\n\n" .
@@ -276,7 +276,7 @@ class UserService
             'type' => 'email_change',
             'metadata' => [
                 'user_id' => $user->id,
-                'user_name' => $user->name,
+                'user_name' => $user->full_name,
                 'old_email' => $user->email,
                 'new_email' => $newEmail,
                 'action' => 'email_updated'
@@ -292,7 +292,7 @@ class UserService
         $this->mailDispatcher->send([
             'to' => $user->email,
             'subject' => 'Hesabınız Silindi - ' . config('app.name'),
-            'content' => "Merhaba {$user->name},\n\n" .
+            'content' => "Merhaba {$user->full_name},\n\n" .
                         "Hesabınız sistemden silinmiştir.\n\n" .
                         "Bu işlem geri alınamaz. Hesabınızla ilgili tüm veriler kalıcı olarak silinmiştir.\n\n" .
                         "Eğer bu işlemi siz yapmadıysanız veya bir hata olduğunu düşünüyorsanız, lütfen bizimle iletişime geçin.\n\n" .
@@ -300,7 +300,7 @@ class UserService
             'type' => 'account_deletion',
             'metadata' => [
                 'user_id' => $user->id,
-                'user_name' => $user->name,
+                'user_name' => $user->full_name,
                 'user_email' => $user->email,
                 'action' => 'user_deleted'
             ]

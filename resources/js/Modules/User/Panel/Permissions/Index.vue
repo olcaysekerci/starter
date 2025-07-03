@@ -134,7 +134,7 @@ const props = defineProps({
 
 // Reactive data
 const searchQuery = ref(props.searchQuery || '')
-const showStats = ref(true)
+const showStats = ref(false)
 
 // Computed
 const filteredPermissions = computed(() => {
