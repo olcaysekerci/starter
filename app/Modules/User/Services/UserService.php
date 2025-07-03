@@ -83,11 +83,12 @@ class UserService
         return $this->transaction(function () use ($data) {
             $user = $this->userRepository->create($data);
             
-            Log::info('Kullanıcı oluşturuldu', [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
+            // Activity log - kullanıcı oluşturma
+            $user->logCustomActivity('Kullanıcı oluşturuldu', [
+                'admin_action' => true,
+                'created_by' => auth()->id(),
+                'user_email' => $user->email,
+                'user_name' => $user->name,
             ]);
             
             return $user;
@@ -102,11 +103,12 @@ class UserService
         return $this->transaction(function () use ($user, $data) {
             $updatedUser = $this->userRepository->update($user, $data);
             
-            Log::info('Kullanıcı güncellendi', [
-                'user_id' => $updatedUser->id,
-                'email' => $updatedUser->email,
-                'first_name' => $updatedUser->first_name,
-                'last_name' => $updatedUser->last_name,
+            // Activity log - kullanıcı güncelleme
+            $updatedUser->logCustomActivity('Kullanıcı güncellendi', [
+                'admin_action' => true,
+                'updated_by' => auth()->id(),
+                'user_email' => $updatedUser->email,
+                'user_name' => $updatedUser->name,
             ]);
             
             return $updatedUser;
@@ -139,13 +141,19 @@ class UserService
                 throw new \Exception('Kullanıcı silinirken bir hata oluştu.');
             }
             
+            // Activity log - kullanıcı silme
+            $user->logCustomActivity('Kullanıcı silindi', [
+                'admin_action' => true,
+                'deleted_by' => auth()->id(),
+                'deleted_user_info' => [
+                    'id' => $user->id,
+                    'email' => $user->email,
+                    'name' => $user->name,
+                ]
+            ]);
+            
             // Hesap silme bildirimi gönder
             $this->sendAccountDeletionNotification($user);
-            
-            Log::info('Kullanıcı silindi', [
-                'user_id' => $id,
-                'deleted_by' => auth()->id()
-            ]);
             
             return true;
         }, 'kullanıcı silme');

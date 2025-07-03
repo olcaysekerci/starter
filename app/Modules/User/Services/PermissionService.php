@@ -81,10 +81,13 @@ class PermissionService
 
             $permission = $this->permissionRepository->create($data);
             
-            Log::info('Yeni yetki oluşturuldu', [
-                'permission_id' => $permission->id,
+            // Activity log - yetki oluşturma
+            $permission->logCustomActivity('Yetki oluşturuldu', [
+                'admin_action' => true,
+                'created_by' => auth()->id(),
                 'permission_name' => $permission->name,
-                'created_by' => auth()->id()
+                'permission_display_name' => $permission->display_name,
+                'module' => $permission->module,
             ]);
             
             return $permission;
@@ -100,9 +103,14 @@ class PermissionService
             $result = $this->permissionRepository->update($id, $data);
             
             if ($result) {
-                Log::info('Yetki güncellendi', [
-                    'permission_id' => $id,
-                    'updated_by' => auth()->id()
+                $permission = $this->permissionRepository->findById($id);
+                // Activity log - yetki güncelleme
+                $permission->logCustomActivity('Yetki güncellendi', [
+                    'admin_action' => true,
+                    'updated_by' => auth()->id(),
+                    'permission_name' => $permission->name,
+                    'permission_display_name' => $permission->display_name,
+                    'module' => $permission->module,
                 ]);
             }
             
@@ -126,10 +134,13 @@ class PermissionService
             $result = $this->permissionRepository->delete($id);
             
             if ($result) {
-                Log::info('Yetki silindi', [
-                    'permission_id' => $id,
-                    'permission_name' => $permission->name ?? 'unknown',
-                    'deleted_by' => auth()->id()
+                // Activity log - yetki silme
+                $permission->logCustomActivity('Yetki silindi', [
+                    'admin_action' => true,
+                    'deleted_by' => auth()->id(),
+                    'permission_name' => $permission->name,
+                    'permission_display_name' => $permission->display_name,
+                    'module' => $permission->module,
                 ]);
             }
             

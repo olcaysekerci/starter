@@ -67,6 +67,18 @@ class SettingsService
             
             DB::commit();
             
+            // Activity log - uygulama ayarları güncelleme
+            activity()
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'admin_action' => true,
+                    'settings_category' => 'app',
+                    'updated_settings' => array_keys($data),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ])
+                ->log('Uygulama ayarları güncellendi');
+            
             Log::info('Uygulama ayarları güncellendi', $data);
             return true;
         } catch (SettingsException $e) {
@@ -124,6 +136,18 @@ class SettingsService
             }
             
             DB::commit();
+            
+            // Activity log - mail ayarları güncelleme
+            activity()
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'admin_action' => true,
+                    'settings_category' => 'mail',
+                    'updated_settings' => array_keys(array_except($data, ['password'])),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ])
+                ->log('Mail ayarları güncellendi');
             
             Log::info('Mail ayarları güncellendi', array_except($data, ['password']));
             return true;

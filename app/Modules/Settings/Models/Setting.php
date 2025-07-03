@@ -5,10 +5,11 @@ namespace App\Modules\Settings\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Cache;
+use App\Modules\ActivityLog\Traits\LogsActivity;
 
 class Setting extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $fillable = [
         'category',
@@ -23,6 +24,20 @@ class Setting extends Model
         'is_public' => 'boolean',
         'value' => 'json'
     ];
+
+    /**
+     * Activity log ayarları
+     */
+    protected $loggableAttributes = [
+        'category',
+        'key',
+        'value',
+        'type',
+        'description',
+        'is_public',
+    ];
+
+    protected $displayName = 'Ayar';
 
     /**
      * Cache key oluştur
@@ -138,5 +153,20 @@ class Setting extends Model
             default:
                 $this->value = (string) $value;
         }
+    }
+
+    /**
+     * Özel alan adlarını belirle
+     */
+    protected function getAttributeNames(): array
+    {
+        return [
+            'category' => 'Kategori',
+            'key' => 'Anahtar',
+            'value' => 'Değer',
+            'type' => 'Tip',
+            'description' => 'Açıklama',
+            'is_public' => 'Genel Erişim',
+        ];
     }
 } 

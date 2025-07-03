@@ -143,13 +143,24 @@ export function useForm(initialData = {}, options = {}) {
     }
 
     processing.value = true
-    const submitRoute = customRoute || route
+    let submitRoute = customRoute || route
     const submitMethod = customMethod || method
 
     if (!submitRoute) {
       console.error('Route belirtilmemiş')
       processing.value = false
       return false
+    }
+
+    // Route string ise Ziggy ile çözümle
+    if (typeof submitRoute === 'string' && !submitRoute.startsWith('/')) {
+      try {
+        submitRoute = window.route(submitRoute)
+      } catch (error) {
+        console.error('Route çözümleme hatası:', error)
+        processing.value = false
+        return false
+      }
     }
 
     try {

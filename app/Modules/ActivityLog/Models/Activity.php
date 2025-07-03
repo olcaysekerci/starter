@@ -71,6 +71,25 @@ class Activity extends SpatieActivity
             'logout' => 'çıkış yaptı',
             'profile_updated' => 'profil güncelledi',
             'password_changed' => 'şifre değiştirdi',
+            'Giriş yaptı' => 'giriş yaptı',
+            'Çıkış yaptı' => 'çıkış yaptı',
+            'Başarısız giriş denemesi' => 'başarısız giriş denemesi yaptı',
+            'Şifre sıfırlandı' => 'şifre sıfırladı',
+            'Kayıt oldu' => 'kayıt oldu',
+            'E-posta doğrulandı' => 'e-posta doğruladı',
+            'Kullanıcı oluşturuldu' => 'kullanıcı oluşturdu',
+            'Kullanıcı güncellendi' => 'kullanıcı güncelledi',
+            'Kullanıcı silindi' => 'kullanıcı sildi',
+            'Rol oluşturuldu' => 'rol oluşturdu',
+            'Rol güncellendi' => 'rol güncelledi',
+            'Rol silindi' => 'rol sildi',
+            'Yetki oluşturuldu' => 'yetki oluşturdu',
+            'Yetki güncellendi' => 'yetki güncelledi',
+            'Yetki silindi' => 'yetki sildi',
+            'Uygulama ayarları güncellendi' => 'uygulama ayarlarını güncelledi',
+            'Mail ayarları güncellendi' => 'mail ayarlarını güncelledi',
+            'Mail başarıyla gönderildi' => 'mail gönderdi',
+            'Mail gönderimi başarısız' => 'mail gönderimi başarısız oldu',
             'unknown' => 'bilinmeyen işlem',
         ];
 
@@ -86,6 +105,10 @@ class Activity extends SpatieActivity
         $modelNames = [
             'App\Models\User' => 'Kullanıcı',
             'App\Modules\User\Models\User' => 'Kullanıcı',
+            'App\Modules\User\Models\Role' => 'Rol',
+            'App\Modules\User\Models\Permission' => 'Yetki',
+            'App\Modules\Settings\Models\Setting' => 'Ayar',
+            'App\Modules\MailNotification\Models\MailLog' => 'Mail Log',
         ];
 
         return $modelNames[$this->subject_type] ?? class_basename($this->subject_type);

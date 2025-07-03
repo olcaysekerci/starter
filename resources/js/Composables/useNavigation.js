@@ -18,8 +18,13 @@ const route = window.route || ((name, params = {}) => {
 
 // Fallback router if Inertia router is not available
 const safeRouter = router || window.Inertia || {
-  get: (url) => window.location.href = url,
-  visit: (url) => window.location.href = url,
+  visit: (url, options = {}) => {
+    if (options.replace) {
+      window.location.replace(url)
+    } else {
+      window.location.href = url
+    }
+  },
   delete: (url) => {
     if (confirm('Bu öğeyi silmek istediğinizden emin misiniz?')) {
       window.location.href = url
@@ -42,12 +47,11 @@ export function useNavigation(baseRoute = null) {
       replace = false
     } = options
 
-    const navigationMethod = replace ? safeRouter.visit : safeRouter.get
-    
     try {
-      navigationMethod(route, params, {
+      safeRouter.visit(route, {
         preserveState,
-        preserveScroll
+        preserveScroll,
+        replace
       })
     } catch (error) {
       console.error('Navigation error:', error)

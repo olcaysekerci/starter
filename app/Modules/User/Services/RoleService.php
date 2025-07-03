@@ -75,10 +75,12 @@ class RoleService
 
             $role = $this->roleRepository->create($data);
             
-            Log::info('Yeni rol oluşturuldu', [
-                'role_id' => $role->id,
+            // Activity log - rol oluşturma
+            $role->logCustomActivity('Rol oluşturuldu', [
+                'admin_action' => true,
+                'created_by' => auth()->id(),
                 'role_name' => $role->name,
-                'created_by' => auth()->id()
+                'role_display_name' => $role->display_name,
             ]);
             
             return $role;
@@ -94,9 +96,13 @@ class RoleService
             $result = $this->roleRepository->update($id, $data);
             
             if ($result) {
-                Log::info('Rol güncellendi', [
-                    'role_id' => $id,
-                    'updated_by' => auth()->id()
+                $role = $this->roleRepository->findById($id);
+                // Activity log - rol güncelleme
+                $role->logCustomActivity('Rol güncellendi', [
+                    'admin_action' => true,
+                    'updated_by' => auth()->id(),
+                    'role_name' => $role->name,
+                    'role_display_name' => $role->display_name,
                 ]);
             }
             
@@ -120,10 +126,12 @@ class RoleService
             $result = $this->roleRepository->delete($id);
             
             if ($result) {
-                Log::info('Rol silindi', [
-                    'role_id' => $id,
-                    'role_name' => $role->name ?? 'unknown',
-                    'deleted_by' => auth()->id()
+                // Activity log - rol silme
+                $role->logCustomActivity('Rol silindi', [
+                    'admin_action' => true,
+                    'deleted_by' => auth()->id(),
+                    'role_name' => $role->name,
+                    'role_display_name' => $role->display_name,
                 ]);
             }
             

@@ -3,9 +3,12 @@
 namespace App\Modules\User\Models;
 
 use Spatie\Permission\Models\Permission as SpatiePermission;
+use App\Modules\ActivityLog\Traits\LogsActivity;
 
 class Permission extends SpatiePermission
 {
+    use LogsActivity;
+
     protected $fillable = [
         'name',
         'guard_name',
@@ -16,6 +19,19 @@ class Permission extends SpatiePermission
     ];
 
     protected $guarded = [];
+
+    /**
+     * Activity log ayarları
+     */
+    protected $loggableAttributes = [
+        'name',
+        'display_name',
+        'description',
+        'module',
+        'is_active',
+    ];
+
+    protected $displayName = 'Yetki';
 
     protected static function boot()
     {
@@ -70,5 +86,19 @@ class Permission extends SpatiePermission
     public function getRolesCountAttribute()
     {
         return $this->roles()->count();
+    }
+
+    /**
+     * Özel alan adlarını belirle
+     */
+    protected function getAttributeNames(): array
+    {
+        return [
+            'name' => 'Yetki Adı',
+            'display_name' => 'Görünen Ad',
+            'description' => 'Açıklama',
+            'module' => 'Modül',
+            'is_active' => 'Aktif Durumu',
+        ];
     }
 } 

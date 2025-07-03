@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Modules\MailNotification\Enums\MailStatus;
+use App\Modules\ActivityLog\Traits\LogsActivity;
 
 class MailLog extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'recipient',
@@ -41,6 +42,21 @@ class MailLog extends Model
         'sent_at',
         'last_retry_at',
     ];
+
+    /**
+     * Activity log ayarları
+     */
+    protected $loggableAttributes = [
+        'recipient',
+        'subject',
+        'type',
+        'status',
+        'sent_at',
+        'error_message',
+        'retry_count',
+    ];
+
+    protected $displayName = 'Mail Log';
 
     // Scopes
     public function scopeByStatus($query, $status)
@@ -146,5 +162,21 @@ class MailLog extends Model
     {
         $maxRetries = config('modules.MailNotification.settings.mail_notification.max_retry_attempts', 3);
         return $this->retry_count < $maxRetries;
+    }
+
+    /**
+     * Özel alan adlarını belirle
+     */
+    protected function getAttributeNames(): array
+    {
+        return [
+            'recipient' => 'Alıcı',
+            'subject' => 'Konu',
+            'type' => 'Tip',
+            'status' => 'Durum',
+            'sent_at' => 'Gönderim Tarihi',
+            'error_message' => 'Hata Mesajı',
+            'retry_count' => 'Yeniden Deneme Sayısı',
+        ];
     }
 } 

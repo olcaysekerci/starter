@@ -152,7 +152,6 @@ import DeleteModal from '@/Components/Panel/DeleteModal.vue'
 import { 
   useSearch, 
   useToggle, 
-  useNavigation, 
   useExport, 
   useNotification,
   useDeleteModal 
@@ -179,7 +178,6 @@ const props = defineProps({
 })
 
 // Composable'ları başlat
-const navigation = useNavigation('panel.users')
 const { showSuccess, showError } = useNotification()
 const { exportData } = useExport()
 
@@ -280,27 +278,15 @@ const filteredUsers = computed(() => {
 
 // Methods
 const goToPage = (url) => { 
-  navigation.goTo(url) 
+  router.visit(url) 
 }
 
 const viewUser = (user) => { 
-  try {
-    navigation.goToShow(user.id) 
-  } catch (error) {
-    console.error('Navigation error:', error)
-    // Fallback to direct URL
-    router.visit(`/panel/users/${user.id}`)
-  }
+  router.visit(`/panel/users/${user.id}`)
 }
 
 const editUser = (user) => { 
-  try {
-    navigation.goToEdit(user.id) 
-  } catch (error) {
-    console.error('Navigation error:', error)
-    // Fallback to direct URL
-    router.visit(`/panel/users/${user.id}/edit`)
-  }
+  router.visit(`/panel/users/${user.id}/edit`)
 }
 
 const deleteUser = (user) => {
@@ -313,13 +299,7 @@ const deleteUser = (user) => {
 }
 
 const addUser = () => { 
-  try {
-    navigation.goToCreate() 
-  } catch (error) {
-    console.error('Navigation error:', error)
-    // Fallback to direct URL
-    router.visit('/panel/users/create')
-  }
+  router.visit('/panel/users/create')
 }
 
 const exportExcel = async () => { 
