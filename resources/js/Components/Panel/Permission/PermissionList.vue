@@ -39,14 +39,7 @@
           </td>
           <td class="px-6 py-4 whitespace-nowrap">
             <div class="flex items-center">
-              <div class="flex-shrink-0 h-10 w-10">
-                <div class="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
-                  <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                  </svg>
-                </div>
-              </div>
-              <div class="ml-4">
+              <div>
                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {{ permission.display_name || permission.name }}
                 </div>
