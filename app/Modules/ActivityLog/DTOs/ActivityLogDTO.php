@@ -76,7 +76,7 @@ class ActivityLogDTO
             event: $activity->event,
             causer_id: $activity->causer_id,
             causer_type: $activity->causer_type,
-            properties: $activity->properties,
+            properties: $activity->properties ? $activity->properties->toArray() : null,
             batch_uuid: $activity->batch_uuid,
             created_at: $activity->created_at?->toISOString(),
             updated_at: $activity->updated_at?->toISOString(),

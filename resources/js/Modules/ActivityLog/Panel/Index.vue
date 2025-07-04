@@ -101,7 +101,8 @@
           <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Log Listesi</h3>
           <div class="flex items-center space-x-3">
             <SearchInput
-              v-model="searchQuery"
+              :model-value="searchQuery"
+              @update:model-value="updateSearch"
               placeholder="Log ara..."
               clearable
               class="w-full sm:w-64"
@@ -116,10 +117,7 @@
         </div>
       </div>
       
-      <div class="p-6 text-center text-gray-500 dark:text-gray-400">
-        <p>Log listesi bileşeni henüz oluşturulmadı.</p>
-        <p class="text-sm mt-2">Loglar: {{ logs.total }} adet</p>
-      </div>
+      <LogList :logs="logs.data" @view="viewLog" />
     </div>
 
     <!-- Pagination -->
@@ -159,6 +157,38 @@
         </div>
       </div>
     </Modal>
+
+    <!-- Log Detail Modal -->
+    <Modal :show="showLogModal" @close="closeLogModal">
+      <div v-if="selectedLog" class="p-6 max-w-lg mx-auto">
+        <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100 flex items-center">
+          <span class="mr-2">#{{ selectedLog.id }}</span>
+          <span class="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 ml-2">{{ selectedLog.model_name }}</span>
+        </h3>
+        <div class="mb-4 text-sm text-gray-600 dark:text-gray-300">
+          <span class="font-semibold">İşlem:</span> {{ selectedLog.formatted_description }}<br>
+          <span class="font-semibold">Açıklama:</span> {{ selectedLog.description }}<br>
+          <span class="font-semibold">Tarih:</span> {{ formatDate(selectedLog.created_at) }} {{ formatTime(selectedLog.created_at) }}<br>
+          <span class="font-semibold">Kullanıcı:</span> {{ selectedLog.causer?.full_name || selectedLog.user_name || 'Sistem' }}<br>
+          <span class="font-semibold">IP:</span> {{ selectedLog.ip_address || '-' }}<br>
+          <span class="font-semibold">User Agent:</span> {{ selectedLog.user_agent || '-' }}
+        </div>
+        <div v-if="selectedLog.formatted_changes && selectedLog.formatted_changes.length" class="mb-4">
+          <div class="font-semibold mb-1">Değişiklikler:</div>
+          <ul class="text-xs text-gray-700 dark:text-gray-200 list-disc ml-5">
+            <li v-for="change in selectedLog.formatted_changes" :key="change.field">
+              <span class="font-bold">{{ change.field_name || change.field }}:</span>
+              <span class="line-through text-red-500">{{ change.old }}</span>
+              <span class="mx-1">→</span>
+              <span class="text-green-600">{{ change.new }}</span>
+            </li>
+          </ul>
+        </div>
+        <div class="flex justify-end mt-6">
+          <ActionButton variant="secondary" @click="closeLogModal">Kapat</ActionButton>
+        </div>
+      </div>
+    </Modal>
   </PanelLayout>
 </template>
 
@@ -177,6 +207,7 @@ import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
 import SearchInput from '@/Components/Panel/Actions/SearchInput.vue'
 import InPageStatCard from '@/Components/Panel/InPageStatCard.vue'
 import FilterCard from '@/Components/Panel/FilterCard.vue'
+import LogList from '@/Components/Panel/ActivityLog/LogList.vue'
 import Pagination from '@/Components/Panel/Shared/Pagination.vue'
 import Modal from '@/Components/Panel/Modal.vue'
 
@@ -198,12 +229,16 @@ const props = defineProps({
 })
 
 // Reactive data
-const searchQuery = ref('')
+const searchQuery = ref(props.filters.search || '')
 const showFilters = ref(false)
 const showStats = ref(false)
 const showCleanupModal = ref(false)
 const cleanupDays = ref(30)
 const cleanupLoading = ref(false)
+
+// State
+const selectedLog = ref(null)
+const showLogModal = ref(false)
 
 // Filter configuration
 const filterConfig = [
@@ -250,6 +285,11 @@ const goToPage = (url) => {
   router.visit(url) 
 }
 
+const updateSearch = (value) => {
+  searchQuery.value = value
+  router.get(route('panel.activity-logs.index'), { search: value }, { preserveState: true })
+}
+
 const exportExcel = () => { 
   console.log('Excel export')
 }
@@ -266,6 +306,16 @@ const clearFilters = () => {
   router.get(route('panel.activity-logs.index'), {}, { preserveState: true })
 }
 
+const viewLog = (log) => {
+  selectedLog.value = log
+  showLogModal.value = true
+}
+
+const closeLogModal = () => {
+  showLogModal.value = false
+  selectedLog.value = null
+}
+
 const cleanupLogs = async () => {
   cleanupLoading.value = true
   
@@ -277,5 +327,16 @@ const cleanupLogs = async () => {
   } finally {
     cleanupLoading.value = false
   }
+}
+
+// Helper functions (assuming these are defined elsewhere or will be added)
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString()
+}
+
+const formatTime = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleTimeString()
 }
 </script> 

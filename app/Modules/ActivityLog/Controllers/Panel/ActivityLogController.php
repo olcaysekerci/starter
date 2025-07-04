@@ -42,23 +42,6 @@ class ActivityLogController extends Controller
     }
 
     /**
-     * Log detayı
-     */
-    public function show(int $id): Response|RedirectResponse
-    {
-        try {
-            $log = $this->activityLogService->getLogDTOById($id);
-
-            return Inertia::render('ActivityLog/Panel/Show', [
-                'log' => $log,
-            ]);
-        } catch (ActivityLogException $e) {
-            return redirect()->route('panel.activity-logs.index')
-                ->with('error', $e->getMessage());
-        }
-    }
-
-    /**
      * Eski logları temizle
      */
     public function cleanup(Request $request): RedirectResponse
