@@ -34,7 +34,8 @@ import {
   UsersIcon,
   DocumentTextIcon,
   ChartBarIcon,
-  CogIcon
+  CogIcon,
+  ClockIcon
 } from '@heroicons/vue/24/outline'
 
 const props = defineProps({
@@ -71,7 +72,8 @@ const iconComponent = computed(() => {
     'UsersIcon': UsersIcon,
     'DocumentTextIcon': DocumentTextIcon,
     'ChartBarIcon': ChartBarIcon,
-    'CogIcon': CogIcon
+    'CogIcon': CogIcon,
+    'ClockIcon': ClockIcon
   }
   return iconMap[props.icon] || ChartBarIcon
 })

@@ -60,14 +60,6 @@ class MailDispatcherService
                 $mailLog->markAsSent();
                 DB::commit();
                 
-                // Activity log - mail başarıyla gönderildi
-                $mailLog->logCustomActivity('Mail başarıyla gönderildi', [
-                    'recipient' => $mailData['to'],
-                    'subject' => $mailData['subject'],
-                    'type' => $mailData['type'],
-                    'admin_action' => true,
-                ]);
-                
                 Log::info('Mail başarıyla gönderildi', [
                     'recipient' => $mailData['to'],
                     'subject' => $mailData['subject'],
@@ -77,15 +69,6 @@ class MailDispatcherService
             } else {
                 $mailLog->markAsFailed('Mail gönderimi başarısız');
                 DB::commit();
-                
-                // Activity log - mail gönderimi başarısız
-                $mailLog->logCustomActivity('Mail gönderimi başarısız', [
-                    'recipient' => $mailData['to'],
-                    'subject' => $mailData['subject'],
-                    'type' => $mailData['type'],
-                    'error_message' => 'Mail gönderimi başarısız',
-                    'admin_action' => true,
-                ]);
                 
                 Log::error('Mail gönderimi başarısız', [
                     'recipient' => $mailData['to'],

@@ -10,6 +10,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use App\Modules\ActivityLog\Traits\LogsActivity;
 
 class User extends Authenticatable
 {
@@ -21,11 +22,29 @@ class User extends Authenticatable
     use Notifiable;
     use TwoFactorAuthenticatable;
     use HasRoles;
+    use LogsActivity;
 
     /**
      * The guard name for the permissions
      */
     protected $guard_name = 'web';
+
+    /**
+     * Activity log ayarları
+     */
+    protected $loggableAttributes = [
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'address',
+        'status',
+        'type',
+        'is_active',
+        'email_verified_at',
+    ];
+
+    protected $displayName = 'Kullanıcı';
 
     /**
      * The attributes that are mass assignable.

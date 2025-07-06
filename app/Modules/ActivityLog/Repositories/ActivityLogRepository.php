@@ -191,37 +191,6 @@ class ActivityLogRepository
         return $this->model->where('subject_type', $modelType)->delete();
     }
 
-    /**
-     * Toplu temizleme
-     */
-    public function bulkCleanup(array $criteria): int
-    {
-        $query = $this->model->query();
 
-        if (!empty($criteria['days'])) {
-            $query->where('created_at', '<', now()->subDays($criteria['days']));
-        }
 
-        if (!empty($criteria['user_id'])) {
-            $query->where('causer_id', $criteria['user_id']);
-        }
-
-        if (!empty($criteria['model_type'])) {
-            $query->where('subject_type', $criteria['model_type']);
-        }
-
-        if (!empty($criteria['event'])) {
-            $query->where('event', $criteria['event']);
-        }
-
-        return $query->delete();
-    }
-
-    /**
-     * Model instance'ını getir
-     */
-    public function getModel(): Activity
-    {
-        return $this->model;
-    }
 } 

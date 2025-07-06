@@ -105,20 +105,7 @@ trait LogsActivity
         ];
     }
 
-    /**
-     * Özel değişiklik logları
-     */
-    public function logCustomActivity(string $description, array $properties = []): void
-    {
-        activity()
-            ->causedBy(auth()->user())
-            ->performedOn($this)
-            ->withProperties(array_merge($properties, [
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent(),
-            ]))
-            ->log($description);
-    }
+
 
     /**
      * Şifre değişikliği logu

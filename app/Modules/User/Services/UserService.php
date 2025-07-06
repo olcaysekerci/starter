@@ -82,15 +82,6 @@ class UserService
     {
         return $this->transaction(function () use ($data) {
             $user = $this->userRepository->create($data);
-            
-            // Activity log - kullanıcı oluşturma
-            $user->logCustomActivity('Kullanıcı oluşturuldu', [
-                'admin_action' => true,
-                'created_by' => auth()->id(),
-                'user_email' => $user->email,
-                'user_name' => $user->name,
-            ]);
-            
             return $user;
         });
     }
@@ -102,15 +93,6 @@ class UserService
     {
         return $this->transaction(function () use ($user, $data) {
             $updatedUser = $this->userRepository->update($user, $data);
-            
-            // Activity log - kullanıcı güncelleme
-            $updatedUser->logCustomActivity('Kullanıcı güncellendi', [
-                'admin_action' => true,
-                'updated_by' => auth()->id(),
-                'user_email' => $updatedUser->email,
-                'user_name' => $updatedUser->name,
-            ]);
-            
             return $updatedUser;
         });
     }
@@ -140,17 +122,6 @@ class UserService
             if (!$deleted) {
                 throw new \Exception('Kullanıcı silinirken bir hata oluştu.');
             }
-            
-            // Activity log - kullanıcı silme
-            $user->logCustomActivity('Kullanıcı silindi', [
-                'admin_action' => true,
-                'deleted_by' => auth()->id(),
-                'deleted_user_info' => [
-                    'id' => $user->id,
-                    'email' => $user->email,
-                    'name' => $user->name,
-                ]
-            ]);
             
             // Hesap silme bildirimi gönder
             $this->sendAccountDeletionNotification($user);
@@ -192,7 +163,9 @@ class UserService
      */
     public function getUsersByRole(string $roleName): Collection
     {
-        return $this->userRepository->getModel()->role($roleName)->get();
+        return $this->userRepository->getAll()->filter(function ($user) use ($roleName) {
+            return $user->hasRole($roleName);
+        });
     }
 
     /**
@@ -200,7 +173,9 @@ class UserService
      */
     public function getUsersByPermission(string $permissionName): Collection
     {
-        return $this->userRepository->getModel()->permission($permissionName)->get();
+        return $this->userRepository->getAll()->filter(function ($user) use ($permissionName) {
+            return $user->hasPermissionTo($permissionName);
+        });
     }
 
     /**

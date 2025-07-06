@@ -58,10 +58,20 @@ class Activity extends SpatieActivity
      */
     public function getFormattedDescriptionAttribute(): string
     {
-        if (!$this->event) {
+        if (!$this->description) {
             return 'Bilinmeyen işlem';
         }
 
+        // Eğer description zaten Türkçe ise direkt döndür
+        if (str_contains($this->description, 'oluşturdu') || 
+            str_contains($this->description, 'güncelledi') || 
+            str_contains($this->description, 'sildi') ||
+            str_contains($this->description, 'giriş yaptı') ||
+            str_contains($this->description, 'çıkış yaptı')) {
+            return $this->description;
+        }
+
+        // Event'e göre mapping
         $descriptions = [
             'created' => 'oluşturdu',
             'updated' => 'güncelledi',
@@ -77,23 +87,10 @@ class Activity extends SpatieActivity
             'Şifre sıfırlandı' => 'şifre sıfırladı',
             'Kayıt oldu' => 'kayıt oldu',
             'E-posta doğrulandı' => 'e-posta doğruladı',
-            'Kullanıcı oluşturuldu' => 'kullanıcı oluşturdu',
-            'Kullanıcı güncellendi' => 'kullanıcı güncelledi',
-            'Kullanıcı silindi' => 'kullanıcı sildi',
-            'Rol oluşturuldu' => 'rol oluşturdu',
-            'Rol güncellendi' => 'rol güncelledi',
-            'Rol silindi' => 'rol sildi',
-            'Yetki oluşturuldu' => 'yetki oluşturdu',
-            'Yetki güncellendi' => 'yetki güncelledi',
-            'Yetki silindi' => 'yetki sildi',
-            'Uygulama ayarları güncellendi' => 'uygulama ayarlarını güncelledi',
-            'Mail ayarları güncellendi' => 'mail ayarlarını güncelledi',
-            'Mail başarıyla gönderildi' => 'mail gönderdi',
-            'Mail gönderimi başarısız' => 'mail gönderimi başarısız oldu',
             'unknown' => 'bilinmeyen işlem',
         ];
 
-        return $descriptions[$this->event] ?? $this->event;
+        return $descriptions[$this->description] ?? $this->description;
     }
 
     public function getModelNameAttribute(): string
@@ -120,7 +117,7 @@ class Activity extends SpatieActivity
             return 'Sistem';
         }
         
-        return $this->causer->name ?? 'Bilinmeyen Kullanıcı';
+        return $this->causer->full_name ?? $this->causer->name ?? 'Bilinmeyen Kullanıcı';
     }
 
     public function getIpAddressAttribute(): ?string

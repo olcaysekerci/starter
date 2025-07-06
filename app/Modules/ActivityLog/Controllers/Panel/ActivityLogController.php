@@ -42,6 +42,24 @@ class ActivityLogController extends Controller
     }
 
     /**
+     * Log detayı
+     */
+    public function show($id): Response
+    {
+        try {
+            $log = $this->activityLogService->getLogById($id);
+
+            return Inertia::render('ActivityLog/Panel/Show', [
+                'log' => $log,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            abort(404, 'Log bulunamadı.');
+        } catch (ActivityLogException $e) {
+            abort(500, $e->getMessage());
+        }
+    }
+
+    /**
      * Eski logları temizle
      */
     public function cleanup(Request $request): RedirectResponse

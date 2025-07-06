@@ -81,15 +81,6 @@ class PermissionService
 
             $permission = $this->permissionRepository->create($data);
             
-            // Activity log - yetki oluşturma
-            $permission->logCustomActivity('Yetki oluşturuldu', [
-                'admin_action' => true,
-                'created_by' => auth()->id(),
-                'permission_name' => $permission->name,
-                'permission_display_name' => $permission->display_name,
-                'module' => $permission->module,
-            ]);
-            
             return $permission;
         }, 'yetki oluşturma');
     }
@@ -101,18 +92,6 @@ class PermissionService
     {
         return $this->updateInTransaction(function() use ($id, $data) {
             $result = $this->permissionRepository->update($id, $data);
-            
-            if ($result) {
-                $permission = $this->permissionRepository->findById($id);
-                // Activity log - yetki güncelleme
-                $permission->logCustomActivity('Yetki güncellendi', [
-                    'admin_action' => true,
-                    'updated_by' => auth()->id(),
-                    'permission_name' => $permission->name,
-                    'permission_display_name' => $permission->display_name,
-                    'module' => $permission->module,
-                ]);
-            }
             
             return $result;
         }, 'yetki güncelleme');
@@ -132,17 +111,6 @@ class PermissionService
             }
             
             $result = $this->permissionRepository->delete($id);
-            
-            if ($result) {
-                // Activity log - yetki silme
-                $permission->logCustomActivity('Yetki silindi', [
-                    'admin_action' => true,
-                    'deleted_by' => auth()->id(),
-                    'permission_name' => $permission->name,
-                    'permission_display_name' => $permission->display_name,
-                    'module' => $permission->module,
-                ]);
-            }
             
             return $result;
         }, 'yetki silme');

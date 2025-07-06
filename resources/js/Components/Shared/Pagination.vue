@@ -18,7 +18,7 @@
     </div>
     <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
       <div>
-        <p class="text-sm text-gray-700">
+        <p class="text-sm text-gray-700 dark:text-gray-300">
           Toplam <span class="font-medium">{{ total }}</span> kayıttan
           <span class="font-medium">{{ from }}</span> - <span class="font-medium">{{ to }}</span> arası gösteriliyor
         </p>
@@ -33,11 +33,11 @@
             class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
             :class="[
               !link.url
-                ? 'text-gray-300 cursor-default'
-                : 'text-gray-700 hover:bg-gray-50',
+                ? 'text-gray-300 dark:text-gray-600 cursor-default'
+                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700',
               link.active
-                ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                : 'bg-white border-gray-300'
+                ? 'z-10 bg-indigo-50 dark:bg-indigo-900 border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600'
             ]"
             @click="!link.url && $event.preventDefault()"
           />

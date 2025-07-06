@@ -75,14 +75,6 @@ class RoleService
 
             $role = $this->roleRepository->create($data);
             
-            // Activity log - rol oluşturma
-            $role->logCustomActivity('Rol oluşturuldu', [
-                'admin_action' => true,
-                'created_by' => auth()->id(),
-                'role_name' => $role->name,
-                'role_display_name' => $role->display_name,
-            ]);
-            
             return $role;
         }, 'rol oluşturma');
     }
@@ -94,17 +86,6 @@ class RoleService
     {
         return $this->updateInTransaction(function() use ($id, $data) {
             $result = $this->roleRepository->update($id, $data);
-            
-            if ($result) {
-                $role = $this->roleRepository->findById($id);
-                // Activity log - rol güncelleme
-                $role->logCustomActivity('Rol güncellendi', [
-                    'admin_action' => true,
-                    'updated_by' => auth()->id(),
-                    'role_name' => $role->name,
-                    'role_display_name' => $role->display_name,
-                ]);
-            }
             
             return $result;
         }, 'rol güncelleme');
@@ -124,16 +105,6 @@ class RoleService
             }
             
             $result = $this->roleRepository->delete($id);
-            
-            if ($result) {
-                // Activity log - rol silme
-                $role->logCustomActivity('Rol silindi', [
-                    'admin_action' => true,
-                    'deleted_by' => auth()->id(),
-                    'role_name' => $role->name,
-                    'role_display_name' => $role->display_name,
-                ]);
-            }
             
             return $result;
         }, 'rol silme');

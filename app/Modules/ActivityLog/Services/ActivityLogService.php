@@ -65,6 +65,40 @@ class ActivityLogService
     }
 
     /**
+     * Log detayını getir (frontend için)
+     */
+    public function getLogById(int $id): array
+    {
+        $log = $this->activityLogRepository->findById($id);
+        
+        if (!$log) {
+            throw new ModelNotFoundException('Log bulunamadı.');
+        }
+        
+        return [
+            'id' => $log->id,
+            'event' => $log->event,
+            'description' => $log->description,
+            'subject_type' => $log->subject_type,
+            'subject_id' => $log->subject_id,
+            'causer_id' => $log->causer_id,
+            'causer' => $log->causer ? [
+                'id' => $log->causer->id,
+                'full_name' => $log->causer->full_name,
+                'email' => $log->causer->email,
+            ] : null,
+            'user_name' => $log->user_name,
+            'model_name' => $log->model_name,
+            'ip_address' => $log->ip_address,
+            'user_agent' => $log->user_agent,
+            'batch_uuid' => $log->batch_uuid,
+            'created_at' => $log->created_at,
+            'updated_at' => $log->updated_at,
+            'formatted_changes' => $log->formatted_changes,
+        ];
+    }
+
+    /**
      * İstatistikleri al
      */
     public function getStats(): array
@@ -155,74 +189,9 @@ class ActivityLogService
         return Activity::where('subject_type', $modelType)->delete();
     }
 
-    /**
-     * Özel log kaydet
-     */
-    public function logCustomActivity(string $description, array $properties = []): Activity
-    {
-        return activity()
-            ->causedBy(auth()->user())
-            ->withProperties(array_merge($properties, [
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent(),
-            ]))
-            ->log($description);
-    }
 
-    /**
-     * Auth event logları
-     */
-    public function logAuthEvent(string $event, array $properties = []): Activity
-    {
-        return activity()
-            ->causedBy(auth()->user())
-            ->withProperties(array_merge($properties, [
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent(),
-            ]))
-            ->log($event);
-    }
 
-    /**
-     * Model değişiklik logları için özel metod
-     */
-    public function logModelChange(string $modelType, int $modelId, string $event, array $changes = []): Activity
-    {
-        return activity()
-            ->causedBy(auth()->user())
-            ->performedOn($modelType::find($modelId))
-            ->withProperties(array_merge($changes, [
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent(),
-            ]))
-            ->log($event);
-    }
 
-    /**
-     * Toplu log temizleme
-     */
-    public function bulkCleanup(array $criteria): int
-    {
-        $query = Activity::query();
-
-        if (!empty($criteria['days'])) {
-            $query->where('created_at', '<', now()->subDays($criteria['days']));
-        }
-
-        if (!empty($criteria['user_id'])) {
-            $query->where('causer_id', $criteria['user_id']);
-        }
-
-        if (!empty($criteria['model_type'])) {
-            $query->where('subject_type', $criteria['model_type']);
-        }
-
-        if (!empty($criteria['event'])) {
-            $query->where('event', $criteria['event']);
-        }
-
-        return $query->delete();
-    }
 
     /**
      * Log analizi
