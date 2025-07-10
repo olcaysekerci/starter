@@ -4,7 +4,7 @@ namespace App\Modules\User\Actions;
 
 use App\Modules\User\Models\User;
 use App\Modules\User\Repositories\UserRepository;
-use App\Modules\MailNotification\Services\MailDispatcherService;
+use App\Modules\MailNotification\Services\MailNotificationService;
 use App\Traits\TransactionTrait;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +17,7 @@ class CreateUserAction
 
     public function __construct(
         private UserRepository $userRepository,
-        private MailDispatcherService $mailDispatcher
+        private MailNotificationService $mailDispatcher
     ) {}
 
     /**
@@ -44,6 +44,23 @@ class CreateUserAction
 
             // Hoş geldin maili gönder
             $this->sendWelcomeEmail($user);
+
+            // Aktivite log kaydet
+            activity('user_management')
+                ->causedBy(auth()->user())
+                ->performedOn($user)
+                ->withProperties([
+                    'user_data' => [
+                        'first_name' => $user->first_name,
+                        'last_name' => $user->last_name,
+                        'email' => $user->email,
+                        'phone' => $user->phone,
+                    ],
+                    'role_assigned' => isset($data['role_id']) ? $data['role_id'] : null,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ])
+                ->log('Yeni kullanıcı oluşturuldu');
 
             return $user;
         }, 'user creation');

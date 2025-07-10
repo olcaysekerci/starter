@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Modules\MailNotification\Enums\MailStatus;
+use App\Modules\ActivityLog\Traits\LogsActivity;
 
 class MailLog extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'recipient',
@@ -41,6 +42,33 @@ class MailLog extends Model
         'sent_at',
         'last_retry_at',
     ];
+
+    /**
+     * Activity log ayarları
+     */
+    protected static $logAttributes = [
+        'recipient',
+        'subject',
+        'type',
+        'status',
+        'sent_at',
+        'error_message',
+        'retry_count'
+    ];
+
+    protected static $logOnlyDirty = true;
+    protected static $submitEmptyLogs = false;
+
+    public function getDescriptionForEvent(string $eventName): string
+    {
+        $descriptions = [
+            'created' => 'Mail log kaydı oluşturuldu',
+            'updated' => 'Mail log durumu güncellendi',
+            'deleted' => 'Mail log kaydı silindi',
+        ];
+
+        return $descriptions[$eventName] ?? "Mail log {$eventName}";
+    }
 
     // Scopes
     public function scopeByStatus($query, $status)

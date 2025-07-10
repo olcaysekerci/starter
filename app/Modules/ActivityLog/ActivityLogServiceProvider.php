@@ -41,5 +41,25 @@ class ActivityLogServiceProvider extends ServiceProvider
             \Illuminate\Auth\Events\Logout::class,
             \App\Modules\ActivityLog\Listeners\AuthEventListener::class
         );
+        
+        $this->app['events']->listen(
+            \Illuminate\Auth\Events\Failed::class,
+            \App\Modules\ActivityLog\Listeners\AuthEventListener::class
+        );
+        
+        $this->app['events']->listen(
+            \Illuminate\Auth\Events\PasswordReset::class,
+            \App\Modules\ActivityLog\Listeners\AuthEventListener::class
+        );
+        
+        $this->app['events']->listen(
+            \Illuminate\Auth\Events\Registered::class,
+            \App\Modules\ActivityLog\Listeners\AuthEventListener::class
+        );
+        
+        $this->app['events']->listen(
+            \Illuminate\Auth\Events\Verified::class,
+            \App\Modules\ActivityLog\Listeners\AuthEventListener::class
+        );
     }
 }

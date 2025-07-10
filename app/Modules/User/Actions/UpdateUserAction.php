@@ -4,7 +4,7 @@ namespace App\Modules\User\Actions;
 
 use App\Modules\User\Models\User;
 use App\Modules\User\Repositories\UserRepository;
-use App\Modules\MailNotification\Services\MailDispatcherService;
+use App\Modules\MailNotification\Services\MailNotificationService;
 use App\Traits\TransactionTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +17,7 @@ class UpdateUserAction
 
     public function __construct(
         private UserRepository $userRepository,
-        private MailDispatcherService $mailDispatcher
+        private MailNotificationService $mailDispatcher
     ) {}
 
     /**
@@ -54,6 +54,22 @@ class UpdateUserAction
             if (isset($data['email']) && $data['email'] !== $user->email) {
                 $this->sendEmailChangeNotification($user, $data['email']);
             }
+
+            // Aktivite log kaydet
+            activity('user_management')
+                ->causedBy(auth()->user())
+                ->performedOn($user)
+                ->withProperties([
+                    'updated_data' => array_intersect_key($data, array_flip([
+                        'first_name', 'last_name', 'email', 'phone', 'address'
+                    ])),
+                    'role_changed' => isset($data['role_id']),
+                    'password_changed' => isset($data['password']) && !empty($data['password']),
+                    'email_changed' => isset($data['email']) && $data['email'] !== $user->getOriginal('email'),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ])
+                ->log('Kullanıcı bilgileri güncellendi');
 
             return $user;
         }, 'user update');

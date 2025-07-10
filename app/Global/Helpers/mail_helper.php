@@ -1,6 +1,6 @@
 <?php
 
-use App\Modules\MailNotification\Services\MailDispatcherService;
+use App\Modules\MailNotification\Services\MailNotificationService;
 
 if (!function_exists('send_mail')) {
     /**
@@ -8,7 +8,7 @@ if (!function_exists('send_mail')) {
      */
     function send_mail(array $data): bool
     {
-        $mailDispatcher = app(MailDispatcherService::class);
+        $mailDispatcher = app(MailNotificationService::class);
         return $mailDispatcher->send($data);
     }
 }
@@ -19,7 +19,7 @@ if (!function_exists('send_test_mail')) {
      */
     function send_test_mail(string $to, string $subject = 'Test Mail'): bool
     {
-        $mailDispatcher = app(MailDispatcherService::class);
+        $mailDispatcher = app(MailNotificationService::class);
         return $mailDispatcher->sendTestMail($to, $subject);
     }
 } 

@@ -7,7 +7,7 @@ use App\Modules\User\Repositories\UserRepository;
 use App\Modules\User\DTOs\UserDTO;
 use App\Modules\User\Actions\CreateUserAction;
 use App\Modules\User\Actions\UpdateUserAction;
-use App\Modules\MailNotification\Services\MailDispatcherService;
+use App\Modules\MailNotification\Services\MailNotificationService;
 use App\Modules\User\Exceptions\UserException;
 use App\Traits\TransactionTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -26,7 +26,7 @@ class UserService
 
     public function __construct(
         private UserRepository $userRepository,
-        private MailDispatcherService $mailDispatcher,
+        private MailNotificationService $mailNotificationService,
         private CreateUserAction $createUserAction,
         private UpdateUserAction $updateUserAction
     ) {}
@@ -126,6 +126,22 @@ class UserService
             // Hesap silme bildirimi gönder
             $this->sendAccountDeletionNotification($user);
             
+            // Aktivite log kaydet
+            activity('user_management')
+                ->causedBy(auth()->user())
+                ->performedOn($user)
+                ->withProperties([
+                    'deleted_user' => [
+                        'first_name' => $user->first_name,
+                        'last_name' => $user->last_name,
+                        'email' => $user->email,
+                        'id' => $user->id
+                    ],
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ])
+                ->log('Kullanıcı hesabı silindi');
+            
             return true;
         }, 'kullanıcı silme');
     }
@@ -205,7 +221,26 @@ class UserService
             return false;
         }
 
-        return $user->update(['status' => $status]);
+        $oldStatus = $user->status;
+        $result = $user->update(['status' => $status]);
+        
+        if ($result) {
+            // Aktivite log kaydet
+            activity('user_management')
+                ->causedBy(auth()->user())
+                ->performedOn($user)
+                ->withProperties([
+                    'status_change' => [
+                        'old_status' => $oldStatus,
+                        'new_status' => $status
+                    ],
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ])
+                ->log('Kullanıcı durumu güncellendi');
+        }
+
+        return $result;
     }
 
     /**
@@ -227,7 +262,7 @@ class UserService
      */
     private function sendWelcomeEmail(User $user): void
     {
-        $this->mailDispatcher->send([
+        $this->mailNotificationService->send([
             'to' => $user->email,
             'subject' => 'Hoş Geldiniz - ' . config('app.name'),
             'content' => "Merhaba {$user->full_name},\n\n" .
@@ -248,7 +283,7 @@ class UserService
      */
     private function sendEmailChangeNotification(User $user, string $newEmail): void
     {
-        $this->mailDispatcher->send([
+        $this->mailNotificationService->send([
             'to' => $newEmail,
             'subject' => 'Email Adresiniz Güncellendi - ' . config('app.name'),
             'content' => "Merhaba {$user->full_name},\n\n" .
@@ -272,7 +307,7 @@ class UserService
      */
     private function sendAccountDeletionNotification(User $user): void
     {
-        $this->mailDispatcher->send([
+        $this->mailNotificationService->send([
             'to' => $user->email,
             'subject' => 'Hesabınız Silindi - ' . config('app.name'),
             'content' => "Merhaba {$user->full_name},\n\n" .

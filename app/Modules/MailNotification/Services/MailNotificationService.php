@@ -44,9 +44,42 @@ class MailNotificationService
             
             if ($sent) {
                 $mailLog->markAsSent();
+                
+                // Başarılı mail gönderimi aktivite log
+                activity('mail_notification')
+                    ->causedBy(auth()->user())
+                    ->performedOn($mailLog)
+                    ->withProperties([
+                        'mail_data' => [
+                            'recipient' => $mailData['to'],
+                            'subject' => $mailData['subject'],
+                            'type' => $mailData['type']
+                        ],
+                        'ip_address' => request()->ip(),
+                        'user_agent' => request()->userAgent()
+                    ])
+                    ->log('Mail başarıyla gönderildi');
+                
                 return true;
             } else {
                 $mailLog->markAsFailed('Mail gönderimi başarısız');
+                
+                // Başarısız mail gönderimi aktivite log
+                activity('mail_notification')
+                    ->causedBy(auth()->user())
+                    ->performedOn($mailLog)
+                    ->withProperties([
+                        'mail_data' => [
+                            'recipient' => $mailData['to'],
+                            'subject' => $mailData['subject'],
+                            'type' => $mailData['type']
+                        ],
+                        'error' => 'Mail gönderimi başarısız',
+                        'ip_address' => request()->ip(),
+                        'user_agent' => request()->userAgent()
+                    ])
+                    ->log('Mail gönderimi başarısız');
+                
                 return false;
             }
         }, 'mail sending');
@@ -180,6 +213,23 @@ class MailNotificationService
 
         if ($this->sendMail($mailData)) {
             $mailLog->markAsSent();
+            
+            // Mail yeniden deneme aktivite log
+            activity('mail_notification')
+                ->causedBy(auth()->user())
+                ->performedOn($mailLog)
+                ->withProperties([
+                    'retry_attempt' => $mailLog->retry_count,
+                    'mail_data' => [
+                        'recipient' => $mailLog->recipient,
+                        'subject' => $mailLog->subject,
+                        'type' => $mailLog->type
+                    ],
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ])
+                ->log('Başarısız mail yeniden denendi');
+                
             return true;
         }
 
