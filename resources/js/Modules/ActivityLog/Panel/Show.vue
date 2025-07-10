@@ -1,14 +1,17 @@
 <template>
-  <PanelLayout>
+  <PanelLayout 
+    title="Log Detayı" 
+    page-title="Log Detayı"
+    :breadcrumbs="[
+      { title: 'Dashboard', url: '/dashboard' },
+      { title: 'Aktivite Logları', url: '/panel/activity-logs' },
+      { title: `Log #${log.id}` }
+    ]"
+  >
     <!-- Page Header -->
     <PageHeader
       title="Log Detayı"
       description="Aktivite log detaylarını görüntüleyin"
-      :breadcrumbs="[
-        { name: 'Panel', href: route('panel.dashboard') },
-        { name: 'Aktivite Logları', href: route('panel.activity-logs.index') },
-        { name: `#${log.id}`, href: route('panel.activity-logs.show', log.id) }
-      ]"
     >
       <template #actions>
         <ActionButton variant="secondary" @click="goBack" size="sm">

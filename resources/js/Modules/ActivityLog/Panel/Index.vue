@@ -1,13 +1,16 @@
 <template>
-  <PanelLayout>
+  <PanelLayout 
+    title="Aktivite Logları" 
+    page-title="Aktivite Logları"
+    :breadcrumbs="[
+      { title: 'Dashboard', url: '/dashboard' },
+      { title: 'Aktivite Logları' }
+    ]"
+  >
     <!-- Page Header -->
     <PageHeader
       title="Aktivite Logları"
       description="Sistem aktivitelerini takip edin ve izleyin"
-      :breadcrumbs="[
-        { name: 'Panel', href: route('panel.dashboard') },
-        { name: 'Aktivite Logları', href: route('panel.activity-logs.index') }
-      ]"
     >
       <template #actions>
         <ActionButton 
@@ -21,6 +24,20 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
           </svg>
         </ActionButton>
+        <ActionButton 
+          @click="toggle('showFilters')" 
+          variant="ghost" 
+          size="sm"
+          :class="{ 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700': toggles.showFilters || hasActiveFilters }"
+          title="Filtreleri Göster/Gizle"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"/>
+          </svg>
+          <span v-if="activeFilterCount > 0" class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-blue-100 bg-blue-600 rounded-full">
+            {{ activeFilterCount }}
+          </span>
+        </ActionButton>
         <ActionButton variant="secondary" @click="exportExcel" size="sm">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -31,30 +48,30 @@
     </PageHeader>
 
     <!-- Stats Cards -->
-    <div v-if="toggles.showStats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div v-if="toggles.showStats" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
       <InPageStatCard
         title="Toplam Log"
         :value="stats.totalLogs"
-        :icon="DocumentTextIcon"
         color="blue"
+        :icon="DocumentTextIcon"
       />
+      
       <InPageStatCard
-        title="Bugün"
+        title="Bugünkü Aktiviteler"
         :value="stats.todayLogs"
+        color="emerald"
+        change="+12%"
+        changeType="increase"
         :icon="ClockIcon"
-        color="green"
       />
-      <InPageStatCard
-        title="Bu Hafta"
-        :value="stats.thisWeekLogs"
-        :icon="CalendarIcon"
-        color="yellow"
-      />
+      
       <InPageStatCard
         title="Bu Ay"
         :value="stats.thisMonthLogs"
+        color="orange"
+        change="+8%"
+        changeType="increase"
         :icon="ChartBarIcon"
-        color="purple"
       />
     </div>
 
@@ -82,11 +99,11 @@
               clearable
               class="w-full sm:w-64"
             />
-            <ActionButton variant="secondary" @click="toggle('showFilters')" size="sm">
+            <ActionButton variant="secondary" @click="exportExcel" size="sm">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
               </svg>
-              Filtrele
+              Excel
             </ActionButton>
           </div>
         </div>

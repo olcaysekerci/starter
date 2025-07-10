@@ -1,5 +1,11 @@
 <template>
-  <PanelLayout title="Dashboard" page-title="Dashboard">
+  <PanelLayout 
+    title="Dashboard" 
+    page-title="Dashboard"
+    :breadcrumbs="[
+      { title: 'Dashboard' }
+    ]"
+  >
     <PageHeader title="Dashboard" description="Yönetim paneli ana sayfası.">
       <template #actions>
         <!-- Buraya dashboard aksiyon butonları eklenebilir -->

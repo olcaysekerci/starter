@@ -22,22 +22,26 @@
           Test Mail
         </ActionButton>
         <ActionButton 
-          @click="showStats = !showStats" 
+          @click="toggle('showStats')" 
           variant="ghost" 
           size="sm"
-          :class="{ 'bg-gray-100 dark:bg-gray-700': showStats }"
+          :class="{ 'bg-gray-100 dark:bg-gray-700': toggles.showStats }"
           title="İstatistikleri Göster/Gizle"
         >
-          <ChartBarIcon class="w-4 h-4" />
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
         </ActionButton>
         <ActionButton 
-          @click="showFilters = !showFilters" 
+          @click="toggle('showFilters')" 
           variant="ghost" 
           size="sm"
-          :class="{ 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700': showFilters || hasActiveFilters }"
+          :class="{ 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700': toggles.showFilters || hasActiveFilters }"
           title="Filtreleri Göster/Gizle"
         >
-          <FunnelIcon class="w-4 h-4" />
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"/>
+          </svg>
           <span v-if="activeFilterCount > 0" class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-blue-100 bg-blue-600 rounded-full">
             {{ activeFilterCount }}
           </span>
@@ -55,7 +59,7 @@
     </PageHeader>
 
     <!-- Stats Cards -->
-    <div v-if="showStats" class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+    <div v-if="toggles.showStats" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
       <InPageStatCard
         title="Toplam Mail"
         :value="stats.total"
@@ -246,10 +250,8 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   CalendarIcon,
-  FunnelIcon,
   EyeIcon,
-  ArrowPathIcon,
-  ChartBarIcon
+  ArrowPathIcon
 } from '@heroicons/vue/24/outline'
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
@@ -260,6 +262,11 @@ import InPageStatCard from '@/Components/Panel/InPageStatCard.vue'
 import FilterCard from '@/Components/Panel/FilterCard.vue'
 import Pagination from '@/Components/Panel/Shared/Pagination.vue'
 import Modal from '@/Components/Panel/Modal.vue'
+import { 
+  useToggle, 
+  useExport, 
+  useNotification
+} from '@/Composables'
 
 // Props
 const props = defineProps({
@@ -269,10 +276,15 @@ const props = defineProps({
   filterOptions: Object,
 })
 
+// Composable'ları başlat
+const { showSuccess, showError } = useNotification()
+const { exportData } = useExport()
+
+// Toggle states
+const { toggles, toggle } = useToggle(['showFilters', 'showStats'])
+
 // Reactive data
 const searchQuery = ref('')
-const showFilters = ref(false)
-const showStats = ref(false)
 const showTestModal = ref(false)
 const sendingTestMail = ref(false)
 const testMailForm = reactive({
