@@ -4,7 +4,7 @@ const routes = [
   {
     path: '/panel/users',
     name: 'panel.users.index',
-    component: () => import('./Dashboard.vue')
+    component: () => import('./Index.vue')
   },
   {
     path: '/panel/users/:id',

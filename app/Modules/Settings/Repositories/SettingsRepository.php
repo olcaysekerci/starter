@@ -7,12 +7,15 @@ use Illuminate\Support\Collection;
 
 class SettingsRepository
 {
+    public function __construct(
+        private Setting $model
+    ) {}
     /**
      * Tüm ayarları al
      */
     public function getAll(): Collection
     {
-        return Setting::all();
+        return $this->model->all();
     }
 
     /**
@@ -20,7 +23,7 @@ class SettingsRepository
      */
     public function getByCategory(string $category): array
     {
-        return Setting::getCategory($category);
+        return $this->model::getCategory($category);
     }
 
     /**
@@ -28,7 +31,7 @@ class SettingsRepository
      */
     public function get(string $category, string $key, $default = null)
     {
-        return Setting::get($category, $key, $default);
+        return $this->model::get($category, $key, $default);
     }
 
     /**
@@ -36,7 +39,7 @@ class SettingsRepository
      */
     public function set(string $category, string $key, $value, string $type = 'string', string $description = null): bool
     {
-        return Setting::set($category, $key, $value, $type, $description);
+        return $this->model::set($category, $key, $value, $type, $description);
     }
 
     /**
@@ -66,8 +69,8 @@ class SettingsRepository
     public function deleteCategory(string $category): bool
     {
         try {
-            Setting::where('category', $category)->delete();
-            Setting::clearCache($category);
+            $this->model->where('category', $category)->delete();
+            $this->model::clearCache($category);
             return true;
         } catch (\Exception $e) {
             return false;
@@ -80,10 +83,10 @@ class SettingsRepository
     public function delete(string $category, string $key): bool
     {
         try {
-            Setting::where('category', $category)
+            $this->model->where('category', $category)
                    ->where('key', $key)
                    ->delete();
-            Setting::clearCache($category, $key);
+            $this->model::clearCache($category, $key);
             return true;
         } catch (\Exception $e) {
             return false;
@@ -95,7 +98,7 @@ class SettingsRepository
      */
     public function clearCache(string $category = null, string $key = null): void
     {
-        Setting::clearCache($category, $key);
+        $this->model::clearCache($category, $key);
     }
 
     /**

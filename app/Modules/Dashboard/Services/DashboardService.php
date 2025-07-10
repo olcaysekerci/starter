@@ -2,15 +2,16 @@
 
 namespace App\Modules\Dashboard\Services;
 
+use App\Traits\TransactionTrait;
 use App\Modules\Dashboard\Repositories\DashboardRepository;
 use App\Modules\Dashboard\DTOs\DashboardDTO;
 use App\Modules\Dashboard\Exceptions\DashboardException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
+    use TransactionTrait;
     public function __construct(
         private DashboardRepository $dashboardRepository
     ) {}
@@ -91,29 +92,9 @@ class DashboardService
      */
     public function updateUserPreferences(int $userId, array $preferences): bool
     {
-        try {
-            DB::beginTransaction();
-            
-            $result = $this->dashboardRepository->updateUserPreferences($userId, $preferences);
-            
-            DB::commit();
-            
-            if ($result) {
-                Log::info('Kullanıcı tercihleri güncellendi', [
-                    'user_id' => $userId,
-                    'updated_by' => auth()->id()
-                ]);
-            }
-            
-            return $result;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Kullanıcı tercihleri güncellenirken hata oluştu', [
-                'user_id' => $userId,
-                'error' => $e->getMessage()
-            ]);
-            throw DashboardException::userPreferencesSaveFailed();
-        }
+        return $this->updateInTransaction(function () use ($userId, $preferences) {
+            return $this->dashboardRepository->updateUserPreferences($userId, $preferences);
+        }, 'user preferences update');
     }
 
     /**

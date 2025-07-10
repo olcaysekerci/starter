@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Modules\MailNotification\Models\MailLog;
-use App\Modules\MailNotification\Services\MailDispatcherService;
+use App\Modules\MailNotification\Services\MailNotificationService;
 use App\Modules\MailNotification\Repositories\MailNotificationRepository;
 use App\Modules\MailNotification\Exceptions\MailNotificationException;
 use App\Modules\MailNotification\Enums\MailStatus;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 class MailNotificationController extends Controller
 {
     public function __construct(
-        private MailDispatcherService $mailDispatcher,
+        private MailNotificationService $mailNotificationService,
         private MailNotificationRepository $mailNotificationRepository
     ) {}
 
@@ -39,7 +39,7 @@ class MailNotificationController extends Controller
             $mailLogs = $this->mailNotificationRepository->getWithFilters($filters, 15);
 
             // İstatistikler
-            $stats = $this->mailDispatcher->getStats();
+            $stats = $this->mailNotificationService->getStats();
 
             // Filtre seçenekleri
             $statusOptions = collect(MailStatus::cases())->map(function ($status) {
@@ -122,7 +122,7 @@ class MailNotificationController extends Controller
         $subject = $request->subject ?? 'Test Mail - ' . config('app.name');
 
         try {
-            $sent = $this->mailDispatcher->sendTestMail($email, $subject);
+            $sent = $this->mailNotificationService->sendTestMail($email, $subject);
 
             if ($sent) {
                 return back()->with('success', 'Test mail başarıyla gönderildi!');
@@ -148,7 +148,7 @@ class MailNotificationController extends Controller
     public function retry()
     {
         try {
-            $retriedCount = $this->mailDispatcher->retryFailedMails();
+            $retriedCount = $this->mailNotificationService->retryFailedMails();
 
             if ($retriedCount > 0) {
                 return back()->with('success', "{$retriedCount} mail başarıyla yeniden gönderildi.");
@@ -184,7 +184,7 @@ class MailNotificationController extends Controller
                 throw MailNotificationException::maxRetryAttemptsReached($id);
             }
 
-            $sent = $this->mailDispatcher->retrySingleMail($mailLog);
+            $sent = $this->mailNotificationService->retrySingleMail($mailLog);
 
             if ($sent) {
                 return back()->with('success', 'Mail başarıyla yeniden gönderildi.');
@@ -215,7 +215,7 @@ class MailNotificationController extends Controller
                 throw MailNotificationException::mailLogNotFound($id);
             }
 
-            $sent = $this->mailDispatcher->resendMail($mailLog);
+            $sent = $this->mailNotificationService->resendMail($mailLog);
 
             if ($sent) {
                 return back()->with('success', 'Mail başarıyla yeniden gönderildi.');
@@ -241,7 +241,7 @@ class MailNotificationController extends Controller
     {
 
         try {
-            $deletedCount = $this->mailDispatcher->cleanupOldLogs($request->days);
+            $deletedCount = $this->mailNotificationService->cleanupOldLogs($request->days);
             return back()->with('success', "{$deletedCount} eski mail logu temizlendi.");
         } catch (\Exception $e) {
             Log::error('Log temizleme hatası', [

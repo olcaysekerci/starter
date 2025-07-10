@@ -146,7 +146,7 @@ import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
 import SearchInput from '@/Components/Panel/Actions/SearchInput.vue'
 import InPageStatCard from '@/Components/Panel/InPageStatCard.vue'
 import FilterCard from '@/Components/Panel/FilterCard.vue'
-import UserList from '@/Components/Panel/User/UserList.vue'
+import UserList from './Components/UserList.vue'
 import Pagination from '@/Components/Panel/Shared/Pagination.vue'
 import DeleteModal from '@/Components/Panel/DeleteModal.vue'
 import { 

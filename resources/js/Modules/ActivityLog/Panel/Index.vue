@@ -112,7 +112,7 @@ import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
 import SearchInput from '@/Components/Panel/Actions/SearchInput.vue'
 import InPageStatCard from '@/Components/Panel/InPageStatCard.vue'
 import FilterCard from '@/Components/Panel/FilterCard.vue'
-import ActivityLogList from '@/Components/Panel/ActivityLog/ActivityLogList.vue'
+import ActivityLogList from './Components/ActivityLogList.vue'
 import Pagination from '@/Components/Panel/Shared/Pagination.vue'
 import { 
   useSearch, 

@@ -2,14 +2,15 @@
 
 namespace App\Modules\Settings\Services;
 
+use App\Traits\TransactionTrait;
 use App\Modules\Settings\Repositories\SettingsRepository;
 use App\Modules\Settings\Exceptions\SettingsException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 
 class SettingsService
 {
+    use TransactionTrait;
     public function __construct(
         private SettingsRepository $settingsRepository
     ) {}
@@ -46,9 +47,7 @@ class SettingsService
      */
     public function updateAppSettings(array $data): bool
     {
-        try {
-            DB::beginTransaction();
-            
+        return $this->updateInTransaction(function () use ($data) {
             $settings = [
                 ['category' => 'app', 'key' => 'site_name', 'value' => $data['site_name'] ?? '', 'type' => 'string'],
                 ['category' => 'app', 'key' => 'site_description', 'value' => $data['site_description'] ?? '', 'type' => 'string'],
@@ -65,8 +64,6 @@ class SettingsService
                 throw SettingsException::appSettingsUpdateFailed();
             }
             
-            DB::commit();
-            
             // Activity log - uygulama ayarları güncelleme
             activity()
                 ->causedBy(auth()->user())
@@ -79,23 +76,8 @@ class SettingsService
                 ])
                 ->log('Uygulama ayarları güncellendi');
             
-            Log::info('Uygulama ayarları güncellendi', $data);
             return true;
-        } catch (SettingsException $e) {
-            DB::rollBack();
-            Log::error('Uygulama ayarları güncellenirken hata oluştu', [
-                'error' => $e->getMessage(),
-                'data' => $data
-            ]);
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Uygulama ayarları güncellenirken beklenmeyen hata oluştu', [
-                'error' => $e->getMessage(),
-                'data' => $data
-            ]);
-            throw SettingsException::appSettingsUpdateFailed();
-        }
+        }, 'app settings update');
     }
 
     /**
