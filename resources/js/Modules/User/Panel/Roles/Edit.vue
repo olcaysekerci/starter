@@ -40,91 +40,71 @@
       <div class="space-y-6">
         <!-- Basic Information -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <FormInput
+          <FormGroup label="Rol Adı" required>
+            <TextInput
               v-model="form.name"
-              label="Rol Adı"
-              name="name"
+              :error="form.errors.name"
               placeholder="Örn: Admin, Editor, Viewer"
               required
-              :error="form.errors.name"
-              description="Rolün benzersiz adı"
             />
-          </div>
+          </FormGroup>
 
-          <div>
-            <FormInput
+          <FormGroup label="Guard Name" required>
+            <TextInput
               v-model="form.guard_name"
-              label="Guard Name"
-              name="guard_name"
+              :error="form.errors.guard_name"
               placeholder="web"
               required
-              :error="form.errors.guard_name"
-              description="Laravel guard adı (genellikle 'web')"
             />
-          </div>
+          </FormGroup>
         </div>
 
-        <div>
-          <FormTextarea
+        <FormGroup label="Açıklama">
+          <TextArea
             v-model="form.description"
-            label="Açıklama"
-            name="description"
-            rows="3"
-            placeholder="Bu rolün ne için kullanıldığını açıklayın..."
             :error="form.errors.description"
-            description="Rolün ne için kullanıldığına dair açıklama"
+            placeholder="Bu rolün ne için kullanıldığını açıklayın..."
+            rows="3"
           />
-        </div>
+        </FormGroup>
 
         <!-- Permissions Section -->
         <div>
           <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
             <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-              İzinler
-              <span class="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
-                Bu role hangi izinlerin verileceğini seçin
-              </span>
+              Yetkiler
             </h3>
-
             <div class="space-y-4">
-              <!-- Select All Checkbox -->
-              <div class="flex items-center">
-                <input
-                  id="select-all"
-                  type="checkbox"
-                  :checked="allPermissionsSelected"
-                  @change="toggleAllPermissions"
-                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                >
-                <label for="select-all" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">
-                  Tüm İzinleri Seç/Kaldır
-                </label>
-              </div>
-
-              <!-- Permissions Grid -->
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div
-                  v-for="permission in permissions"
-                  :key="permission.id"
-                  class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-                >
-                  <input
-                    :id="`permission-${permission.id}`"
-                    v-model="form.permissions"
-                    :value="permission.id"
-                    type="checkbox"
-                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              <div v-for="(modulePermissions, moduleName) in groupedPermissions" :key="moduleName" class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="text-md font-medium text-gray-900 dark:text-gray-100">
+                    {{ moduleName }}
+                  </h4>
+                  <button type="button"
+                    class="text-xs px-3 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/50 transition"
+                    @click="toggleModulePermissions(modulePermissions)">
+                    {{ isAllModuleSelected(modulePermissions) ? 'Tümünü Kaldır' : 'Tümünü Seç' }}
+                  </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <label 
+                    v-for="permission in modulePermissions" 
+                    :key="permission.id"
+                    class="flex items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
                   >
-                  <label
-                    :for="`permission-${permission.id}`"
-                    class="ml-3 text-sm cursor-pointer"
-                  >
-                    <div class="font-medium text-gray-900 dark:text-gray-100">
-                      {{ permission.name }}
-                    </div>
-                    <div v-if="permission.description" class="text-xs text-gray-500 dark:text-gray-400">
-                      {{ permission.description }}
+                    <input
+                      v-model="form.permissions"
+                      :value="permission.id"
+                      type="checkbox"
+                      class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    />
+                    <div class="ml-3">
+                      <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        {{ permission.display_name || permission.name }}
+                      </div>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">
+                        {{ permission.description }}
+                      </div>
                     </div>
                   </label>
                 </div>
@@ -154,9 +134,10 @@ import { router } from '@inertiajs/vue3'
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
-import FormCard from '@/Components/Panel/Form/FormCard.vue'
-import FormInput from '@/Components/Panel/Form/FormInput.vue'
-import FormTextarea from '@/Components/Panel/Form/FormTextarea.vue'
+import FormCard from '@/Components/Panel/Forms/FormCard.vue'
+import FormGroup from '@/Components/Panel/Forms/FormGroup.vue'
+import TextInput from '@/Components/Panel/Forms/TextInput.vue'
+import TextArea from '@/Components/Panel/Forms/TextArea.vue'
 import { useNotification } from '@/Composables'
 
 const props = defineProps({
@@ -182,17 +163,36 @@ const form = useForm({
 })
 
 // Computed
-const allPermissionsSelected = computed(() => {
-  return props.permissions.length > 0 && form.permissions.length === props.permissions.length
+const groupedPermissions = computed(() => {
+  if (!props.permissions || props.permissions.length === 0) return {}
+  
+  // If permissions is already grouped (object), return as is
+  if (typeof props.permissions === 'object' && !Array.isArray(props.permissions)) {
+    return props.permissions
+  }
+  
+  // If permissions is array, group by module name
+  const grouped = {}
+  props.permissions.forEach(permission => {
+    // Extract module name from permission name (e.g., "user.create" -> "User")
+    const moduleName = permission.name.split('.')[0]
+    const moduleDisplayName = moduleName.charAt(0).toUpperCase() + moduleName.slice(1)
+    
+    if (!grouped[moduleDisplayName]) {
+      grouped[moduleDisplayName] = []
+    }
+    grouped[moduleDisplayName].push(permission)
+  })
+  
+  return grouped
 })
 
 // Methods
-
 const saveRole = () => {
-  form.put(`/panel/users/roles/${props.role.id}`, {
+  form.put(`/panel/roles/${props.role.id}`, {
     onSuccess: () => {
       showSuccess('Rol başarıyla güncellendi')
-      router.visit('/panel/users/roles')
+      router.visit(route('panel.roles.index'))
     },
     onError: (errors) => {
       console.error('Form errors:', errors)
@@ -201,11 +201,20 @@ const saveRole = () => {
   })
 }
 
-const toggleAllPermissions = (event) => {
-  if (event.target.checked) {
-    form.permissions = props.permissions.map(p => p.id)
+// Modül bazında tümünü seç/kaldır
+const isAllModuleSelected = (modulePermissions) => {
+  return modulePermissions.every(p => form.permissions.includes(p.id))
+}
+
+const toggleModulePermissions = (modulePermissions) => {
+  const allSelected = isAllModuleSelected(modulePermissions)
+  if (allSelected) {
+    // Kaldır
+    form.permissions = form.permissions.filter(p => !modulePermissions.some(mp => mp.id === p))
   } else {
-    form.permissions = []
+    // Ekle
+    const toAdd = modulePermissions.map(p => p.id).filter(p => !form.permissions.includes(p))
+    form.permissions = [...form.permissions, ...toAdd]
   }
 }
 </script>
