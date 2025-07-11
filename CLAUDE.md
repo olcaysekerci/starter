@@ -54,6 +54,18 @@ php artisan test --filter=UserTest   # Run specific test
 php artisan create:super-admin        # Create super admin user
 ```
 
+#### Module Generation
+```bash
+# Create new module (panel only)
+php artisan make:module ModuleName
+
+# Create module with web routes
+php artisan make:module ModuleName --web
+
+# Force overwrite existing module
+php artisan make:module ModuleName --force
+```
+
 ## 🏢 Modular Architecture
 
 ### Module Structure
@@ -503,11 +515,45 @@ SANCTUM_STATEFUL_DOMAINS=yourdomain.com
 ## 🎛️ Customization Guidelines
 
 ### Adding New Modules
+
+#### Automated Module Generation
+Use the built-in command to generate a complete module structure:
+
+```bash
+# Generate module with panel routes only
+php artisan make:module YourModuleName
+
+# Generate module with both panel and web routes
+php artisan make:module YourModuleName --web
+
+# Force overwrite if module exists
+php artisan make:module YourModuleName --force
+```
+
+The command automatically creates:
+- **Complete directory structure** following project standards
+- **All base classes** (Service, Repository, Controller, Model, etc.)
+- **Request validation classes** for create/update operations
+- **Action classes** for specific operations
+- **Exception classes** with common error scenarios
+- **DTO class** for data transfer
+- **Routes** (Panel and optionally Web)
+- **ServiceProvider** registration in `bootstrap/providers.php`
+
+#### Manual Module Creation (if needed)
 1. **Create module directory** in `app/Modules/`
 2. **Follow standard structure** (Controllers, Services, Repositories, etc.)
-3. **Create ServiceProvider** and register in `config/app.php`
+3. **Create ServiceProvider** and register in `bootstrap/providers.php`
 4. **Add routes** (Panel/routes.php, Web/routes.php)
 5. **Create frontend components** in `resources/js/Modules/`
+
+#### Post-Generation Steps
+After generating a module, you should:
+1. **Create database migration** if needed: `php artisan make:migration create_[table_name]_table`
+2. **Update model relationships** and fillable attributes
+3. **Create frontend Vue components** in `resources/js/Modules/YourModule/Panel/`
+4. **Add permissions** to the role/permission seeder
+5. **Write tests** for the new functionality
 
 ### Extending Base Classes
 ```php

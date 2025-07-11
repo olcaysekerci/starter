@@ -117,6 +117,15 @@ npm run dev
 php artisan create:super-admin
 ```
 
+9. **Yeni modül oluşturun (isteğe bağlı)**
+```bash
+# Sadece panel ile modül oluştur
+php artisan make:module ModuleName
+
+# Panel ve web route'ları ile modül oluştur
+php artisan make:module ModuleName --web
+```
+
 ## 🏗️ Proje Mimarisi
 
 ### Modüler Yapı
@@ -235,6 +244,18 @@ npm run build
 ```bash
 # Laravel server + Queue + Logs + Vite'ı aynı anda başlatır
 composer dev
+```
+
+### Modül Geliştirme
+```bash
+# Yeni modül oluştur (sadece panel)
+php artisan make:module ModuleName
+
+# Web route'ları ile modül oluştur
+php artisan make:module ModuleName --web
+
+# Mevcut modülü zorla yeniden oluştur
+php artisan make:module ModuleName --force
 ```
 
 ## 🔐 Güvenlik Özellikleri
