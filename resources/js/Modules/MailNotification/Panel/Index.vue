@@ -385,7 +385,7 @@ const retrySingleMail = async (id) => {
 
 const exportExcel = () => {
   // Excel export işlemi
-  console.log('Excel export')
+  // TODO: Implement Excel export functionality
 }
 
 const formatDate = (date) => {

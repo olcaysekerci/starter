@@ -15,16 +15,6 @@
     >
       <template #actions>
         <ActionButton 
-          @click="goBack" 
-          variant="secondary" 
-          size="sm"
-        >
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-          </svg>
-          Geri Dön
-        </ActionButton>
-        <ActionButton 
           @click="saveUser" 
           variant="primary" 
           size="sm"
@@ -45,7 +35,6 @@
       submit-text="Değişiklikleri Kaydet"
       :processing="form.processing"
       @submit="saveUser"
-      @cancel="goBack"
     >
       <div class="space-y-6">
         <!-- Basic Information -->
@@ -255,12 +244,9 @@ const saveUser = () => {
     },
     onError: (errors) => {
       // Hata durumunda yapılacak işlemler
-      console.error('Form errors:', errors)
+      // Server side validation errors will be shown in the form
     }
   })
 }
 
-const goBack = () => {
-  window.history.back()
-}
 </script> 

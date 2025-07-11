@@ -15,14 +15,6 @@
     >
       <template #actions>
         <ActionButton 
-          @click="goBack" 
-          variant="secondary" 
-          size="sm"
-        >
-          <ArrowLeftIcon class="w-4 h-4 mr-2" />
-          Geri
-        </ActionButton>
-        <ActionButton 
           v-if="mailLog.status === 'failed' && mailLog.can_retry"
           @click="retryMail" 
           variant="warning" 
@@ -212,9 +204,6 @@ const {
 } = useDeleteModal()
 
 // Methods
-const goBack = () => {
-  router.get(route('panel.mail-notifications.index'))
-}
 
 const retryMail = async () => {
   await router.post(route('panel.mail-notifications.retry-single', props.mailLog.id))

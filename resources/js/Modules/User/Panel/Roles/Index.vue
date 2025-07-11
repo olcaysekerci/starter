@@ -188,7 +188,7 @@ const deleteRole = (role) => {
 
 const exportExcel = () => {
   // Excel export işlemi
-  console.log('Excel export')
+  // TODO: Implement Excel export functionality
 }
 
 const goToPage = (url) => {

@@ -14,12 +14,6 @@
       description="Aktivite log detaylarını görüntüleyin"
     >
       <template #actions>
-        <ActionButton variant="secondary" @click="goBack" size="sm">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-          </svg>
-          Geri
-        </ActionButton>
       </template>
     </PageHeader>
 
@@ -200,7 +194,4 @@ const getEventBadgeClass = (event) => {
   return classes[event] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
 }
 
-const goBack = () => {
-  router.visit(route('panel.activity-logs.index'))
-}
 </script> 

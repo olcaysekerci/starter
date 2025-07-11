@@ -12,20 +12,7 @@
     <PageHeader
       title="Yeni Yetki Oluştur"
       description="Sistem için yeni bir yetki oluşturun. Yetki adı benzersiz olmalı ve modül bilgisi doğru girilmelidir."
-    >
-      <template #actions>
-        <ActionButton 
-          @click="$router.back()" 
-          variant="secondary" 
-          size="sm"
-        >
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-          </svg>
-          Geri Dön
-        </ActionButton>
-      </template>
-    </PageHeader>
+    />
 
     <!-- Form -->
     <FormCard
@@ -34,7 +21,6 @@
       submit-text="Yetki Oluştur"
       :processing="form.processing"
       @submit="submitForm"
-      @cancel="$router.back()"
     >
       <div class="space-y-6">
         <!-- Basic Information -->

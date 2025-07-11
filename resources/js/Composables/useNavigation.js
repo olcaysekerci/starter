@@ -32,11 +32,7 @@ const safeRouter = router || window.Inertia || {
   }
 }
 
-// Debug: Check if router and route are available
-console.log('Router available:', typeof router)
-console.log('Safe router available:', typeof safeRouter)
-console.log('Route function available:', typeof window.route)
-console.log('Fallback route function:', typeof route)
+// Router and route function are initialized and ready for use
 
 export function useNavigation(baseRoute = null) {
   // Methods
@@ -54,8 +50,7 @@ export function useNavigation(baseRoute = null) {
         replace
       })
     } catch (error) {
-      console.error('Navigation error:', error)
-      // Fallback to window.location
+      // Navigation error, fallback to window.location
       window.location.href = route
     }
   }
@@ -92,8 +87,7 @@ export function useNavigation(baseRoute = null) {
     try {
       goTo(route(targetRoute), params, options)
     } catch (error) {
-      console.error(`Route '${targetRoute}' not found:`, error)
-      // Fallback to direct URL
+      // Route not found, using fallback URL
       goTo(`/${baseRoute}`, params, options)
     }
   }
@@ -103,8 +97,7 @@ export function useNavigation(baseRoute = null) {
     try {
       goTo(route(targetRoute), params, options)
     } catch (error) {
-      console.error(`Route '${targetRoute}' not found:`, error)
-      // Fallback to direct URL
+      // Route not found, using fallback URL
       goTo(`/${baseRoute}/create`, params, options)
     }
   }
@@ -114,8 +107,7 @@ export function useNavigation(baseRoute = null) {
     try {
       goTo(route(targetRoute, { id }), params, options)
     } catch (error) {
-      console.error(`Route '${targetRoute}' not found:`, error)
-      // Fallback to direct URL
+      // Route not found, using fallback URL
       goTo(`/${baseRoute}/${id}`, params, options)
     }
   }
@@ -125,8 +117,7 @@ export function useNavigation(baseRoute = null) {
     try {
       goTo(route(targetRoute, { id }), params, options)
     } catch (error) {
-      console.error(`Route '${targetRoute}' not found:`, error)
-      // Fallback to direct URL
+      // Route not found, using fallback URL
       goTo(`/${baseRoute}/${id}/edit`, params, options)
     }
   }
@@ -136,8 +127,7 @@ export function useNavigation(baseRoute = null) {
     try {
       safeRouter.delete(route(targetRoute, { id }), params, options)
     } catch (error) {
-      console.error(`Route '${targetRoute}' not found:`, error)
-      // Fallback to direct URL
+      // Route not found, using fallback URL
       safeRouter.delete(`/${baseRoute}/${id}`, params, options)
     }
   }

@@ -16,16 +16,6 @@
     >
       <template #actions>
         <ActionButton 
-          @click="goBack" 
-          variant="secondary" 
-          size="sm"
-        >
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-          </svg>
-          Geri Dön
-        </ActionButton>
-        <ActionButton 
           @click="saveRole" 
           variant="primary" 
           size="sm"
@@ -46,7 +36,6 @@
       submit-text="Değişiklikleri Kaydet"
       :processing="form.processing"
       @submit="saveRole"
-      @cancel="goBack"
     >
       <div class="space-y-6">
         <!-- Basic Information -->
@@ -198,9 +187,6 @@ const allPermissionsSelected = computed(() => {
 })
 
 // Methods
-const goBack = () => {
-  router.visit('/panel/users/roles')
-}
 
 const saveRole = () => {
   form.put(`/panel/users/roles/${props.role.id}`, {
