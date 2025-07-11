@@ -88,14 +88,14 @@
 
     <!-- Filter Card -->
     <FilterCard 
-      :show="showFilters"
+      :show="toggles.showFilters"
       :filters="filters"
       title="Mail Filtreleri"
       :filter-config="filterConfig"
       @update-filter="updateFilter"
       @apply-filters="applyFilters"
       @clear-filters="clearFilters"
-      @close="showFilters = false"
+      @close="toggle('showFilters')"
     />
 
     <!-- Mail Logs Table -->

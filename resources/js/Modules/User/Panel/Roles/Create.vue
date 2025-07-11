@@ -74,7 +74,7 @@
             <textarea
               id="description"
               v-model="form.description"
-              rows="3"
+              :rows="3"
               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
               placeholder="Rolün amacını ve kapsamını açıklayın..."
             ></textarea>

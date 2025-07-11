@@ -83,7 +83,7 @@
               type="password"
               :error="form.errors.password"
               placeholder="Değiştirmek istiyorsanız yeni şifre girin"
-              minlength="6"
+              :minlength="6"
             />
           </FormGroup>
 
@@ -93,7 +93,7 @@
               type="password"
               :error="form.errors.password_confirmation"
               placeholder="Yeni şifreyi tekrar girin"
-              minlength="6"
+              :minlength="6"
             />
           </FormGroup>
         </div>
@@ -104,7 +104,7 @@
             v-model="form.address"
             :error="form.errors.address"
             placeholder="Kullanıcının adres bilgileri"
-            rows="3"
+            :rows="3"
           />
         </FormGroup>
 

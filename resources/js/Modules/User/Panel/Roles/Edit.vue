@@ -64,7 +64,7 @@
             v-model="form.description"
             :error="form.errors.description"
             placeholder="Bu rolün ne için kullanıldığını açıklayın..."
-            rows="3"
+            :rows="3"
           />
         </FormGroup>
 
@@ -146,7 +146,7 @@ const props = defineProps({
     required: true
   },
   permissions: {
-    type: Array,
+    type: [Array, Object],
     default: () => []
   }
 })

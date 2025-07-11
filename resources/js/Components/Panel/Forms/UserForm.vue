@@ -60,7 +60,7 @@
               :error="errors.password"
               placeholder="Güçlü bir şifre girin"
               required
-              minlength="6"
+              :minlength="6"
             />
           </FormGroup>
 
@@ -71,7 +71,7 @@
               :error="errors.password_confirmation"
               placeholder="Şifreyi tekrar girin"
               required
-              minlength="6"
+              :minlength="6"
             />
           </FormGroup>
         </div>
@@ -82,7 +82,7 @@
             v-model="form.address"
             :error="errors.address"
             placeholder="Kullanıcının adres bilgileri"
-            rows="3"
+            :rows="3"
           />
         </FormGroup>
 
