@@ -1,61 +1,420 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Starter - Modern Modular Application
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+<img src="https://img.shields.io/badge/Laravel-12.x-red.svg" alt="Laravel Version">
+<img src="https://img.shields.io/badge/Vue.js-3.x-green.svg" alt="Vue Version">
+<img src="https://img.shields.io/badge/PHP-8.2+-blue.svg" alt="PHP Version">
+<img src="https://img.shields.io/badge/Inertia.js-2.x-purple.svg" alt="Inertia Version">
+<img src="https://img.shields.io/badge/TailwindCSS-3.x-teal.svg" alt="Tailwind Version">
 </p>
 
-## About Laravel
+## 📖 Proje Hakkında
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Bu proje, modern web uygulamaları geliştirmek için tasarlanmış kapsamlı bir Laravel starter kit'idir. Modüler mimari, kullanıcı yönetimi, rol & yetki sistemi, aktivite logları, mail bildirimleri ve yönetici paneli gibi temel özellikleri içerir.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 🎯 Proje Vizyonu
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Modern, ölçeklenebilir ve sürdürülebilir web uygulamaları geliştirmek için gerekli tüm temel bileşenlerin hazır olduğu bir başlangıç noktası sunmak.
 
-## Learning Laravel
+## ✨ Ana Özellikler
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 🏗️ Modern Teknoloji Stack'i
+- **Laravel 12** - En son PHP framework
+- **Vue 3 + Composition API** - Reaktif frontend framework
+- **Inertia.js** - Modern monolith yaklaşımı
+- **Tailwind CSS** - Utility-first CSS framework
+- **Vite** - Hızlı build tool
+- **Laravel Jetstream** - Gelişmiş authentication
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 🔐 Güvenlik & Kimlik Doğrulama
+- **Çok faktörlü kimlik doğrulama (2FA)**
+- **Laravel Sanctum** API authentication
+- **Spatie Laravel Permission** rol & yetki yönetimi
+- **Güvenlik middleware**'leri
+- **Şifre politikaları**
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 📊 Yönetim Paneli
+- **Modern, responsive admin panel**
+- **Kullanıcı yönetimi** (CRUD, rol atama)
+- **Rol & yetki yönetimi**
+- **Aktivite logları** ve audit trail
+- **Mail bildirimleri** ve log takibi
+- **Sistem ayarları** yönetimi
+- **Dashboard** ve istatistikler
 
-## Laravel Sponsors
+### 🏢 Modüler Mimari
+- **Bağımsız modüller** (User, ActivityLog, MailNotification, Settings, Dashboard)
+- **Service-Repository pattern**
+- **DTO (Data Transfer Objects)** kullanımı
+- **Action classes** ile business logic ayrımı
+- **Consistent exception handling**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 🎨 Kullanıcı Deneyimi
+- **Dark/Light mode** desteği
+- **Responsive design**
+- **Vue 3 composables** ile reusable logic
+- **Modern UI components**
+- **Toast notifications**
+- **Modal sistemleri**
 
-### Premium Partners
+## 🚀 Hızlı Başlangıç
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Gereksinimler
+- PHP 8.2+
+- Composer
+- Node.js 18+
+- SQLite/MySQL/PostgreSQL
 
-## Contributing
+### Kurulum
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. **Projeyi klonlayın**
+```bash
+git clone <repository-url>
+cd starter
+```
 
-## Code of Conduct
+2. **Backend bağımlılıklarını yükleyin**
+```bash
+composer install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+3. **Frontend bağımlılıklarını yükleyin**
+```bash
+npm install
+```
 
-## Security Vulnerabilities
+4. **Çevre dosyasını hazırlayın**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+5. **Veritabanını hazırlayın**
+```bash
+# SQLite için (varsayılan)
+touch database/database.sqlite
 
-## License
+# MySQL için .env dosyasını güncelleyin
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+6. **Veritabanını migrate edin**
+```bash
+php artisan migrate --seed
+```
+
+7. **Geliştirme sunucusunu başlatın**
+```bash
+# Tam geliştirme ortamı (önerilen)
+composer dev
+
+# Veya ayrı ayrı
+php artisan serve
+npm run dev
+```
+
+8. **Super admin kullanıcısı oluşturun**
+```bash
+php artisan create:super-admin
+```
+
+## 🏗️ Proje Mimarisi
+
+### Modüler Yapı
+```
+app/Modules/
+├── User/              # Kullanıcı yönetimi
+├── Dashboard/         # Dashboard ve istatistikler
+├── ActivityLog/       # Aktivite takibi
+├── MailNotification/  # Mail yönetimi
+└── Settings/         # Sistem ayarları
+```
+
+### Her Modül İçeriği
+```
+ModuleName/
+├── Controllers/       # HTTP controllers
+├── Services/         # Business logic
+├── Repositories/     # Data access layer
+├── Models/          # Eloquent models
+├── DTOs/           # Data transfer objects
+├── Actions/        # Specific operations
+├── Requests/       # Form validation
+├── Exceptions/     # Custom exceptions
+├── Panel/routes.php    # Admin routes
+├── Web/routes.php      # Frontend routes
+└── ModuleNameServiceProvider.php
+```
+
+### Frontend Yapısı
+```
+resources/js/
+├── Components/
+│   ├── Panel/      # Admin panel components
+│   ├── Shared/     # Jetstream shared components
+│   └── Web/        # Frontend components
+├── Layouts/        # Layout components
+├── Modules/        # Module-specific components
+├── Composables/    # Vue 3 composables
+├── Pages/          # Page components
+└── Utils/          # Utility functions
+```
+
+## 📋 Temel Kullanım
+
+### Kullanıcı Yönetimi
+
+**Yeni kullanıcı oluşturma:**
+```php
+$userService = new UserService();
+$userData = new UserDTO([
+    'first_name' => 'John',
+    'last_name' => 'Doe',
+    'email' => 'john@example.com',
+    'password' => 'password123'
+]);
+$user = $userService->create($userData);
+```
+
+**Rol atama:**
+```php
+$user->assignRole('admin');
+$user->givePermissionTo('user.create');
+```
+
+### Aktivite Logları
+
+Aktivite logları otomatik olarak kaydedilir:
+```php
+// Otomatik log kaydı
+activity('user')
+    ->performedOn($user)
+    ->log('Kullanıcı oluşturuldu');
+```
+
+### Mail Bildirimleri
+
+Mail gönderimi ve loglanması:
+```php
+$mailService = new MailNotificationService();
+$mailService->sendMail($to, $subject, $content);
+```
+
+## 🔧 Geliştirme Komutları
+
+### Backend Komutları
+```bash
+# Kod formatlama
+vendor/bin/pint
+
+# Test çalıştırma
+composer test
+php artisan test
+
+# Cache temizleme
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+
+# Queue işleme
+php artisan queue:listen --tries=1
+
+# Log izleme
+php artisan pail --timeout=0
+```
+
+### Frontend Komutları
+```bash
+# Geliştirme sunucusu
+npm run dev
+
+# Production build
+npm run build
+```
+
+### Tam Geliştirme Ortamı
+```bash
+# Laravel server + Queue + Logs + Vite'ı aynı anda başlatır
+composer dev
+```
+
+## 🔐 Güvenlik Özellikleri
+
+### Kimlik Doğrulama
+- **Laravel Jetstream** ile gelişmiş authentication
+- **İki faktörlü kimlik doğrulama (2FA)**
+- **Güvenli şifre sıfırlama**
+- **Email doğrulama**
+
+### Yetkilendirme
+- **Spatie Laravel Permission** ile rol & yetki sistemi
+- **Middleware tabanlı koruma**
+- **API token yönetimi**
+- **Resource-based permissions**
+
+### Güvenlik Middleware'leri
+- **UserSecurityMiddleware** - Kullanıcı güvenlik kontrolü
+- **Rate limiting** - API call sınırlaması
+- **CSRF protection** - Cross-site request forgery koruması
+
+## 📊 Monitoring ve Loglar
+
+### Aktivite Logları
+- **Kullanıcı işlemleri** takibi
+- **Sistem değişiklikleri** kaydı
+- **Audit trail** oluşturma
+- **Filtreleme** ve raporlama
+
+### Mail Logları
+- **Gönderilen mailler** takibi
+- **Delivery status** kontrolü
+- **Hata logları** ve retry mekanizması
+- **Test mail** gönderimi
+
+### Sistem Logları
+- **Laravel log channels**
+- **Real-time log monitoring** (Pail)
+- **Error tracking**
+- **Performance monitoring**
+
+## 🎨 UI/UX Özellikleri
+
+### Tasarım Sistemi
+- **Consistent component library**
+- **Dark/Light mode** geçişi
+- **Responsive design** (mobile-first)
+- **Accessibility** standartları
+
+### Vue 3 Components
+- **Composition API** kullanımı
+- **Reusable composables**
+- **Type-safe props**
+- **Reactive state management**
+
+### Kullanıcı Etkileşimi
+- **Toast notifications**
+- **Modal dialogs**
+- **Loading states**
+- **Form validations**
+
+## 🧪 Test Stratejisi
+
+### Test Türleri
+- **Feature tests** - End-to-end functionality
+- **Unit tests** - Individual components
+- **Browser tests** - UI interactions
+- **API tests** - Endpoint validations
+
+### Test Komutları
+```bash
+# Tüm testleri çalıştır
+composer test
+
+# Specific test dosyası
+php artisan test --filter UserTest
+
+# Coverage raporu
+php artisan test --coverage
+```
+
+## 📦 Deployment
+
+### Production Hazırlığı
+```bash
+# Dependencies yükle
+composer install --no-dev --optimize-autoloader
+
+# Frontend build
+npm run build
+
+# Configuration cache
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Migration
+php artisan migrate --force
+
+# Storage link
+php artisan storage:link
+```
+
+### Environment Ayarları
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://yourdomain.com
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_DATABASE=your_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+MAIL_MAILER=smtp
+MAIL_HOST=your-smtp-host
+MAIL_PORT=587
+MAIL_USERNAME=your-username
+MAIL_PASSWORD=your-password
+```
+
+## 🤝 Katkıda Bulunma
+
+### Geliştirme Süreci
+1. **Fork** yapın
+2. **Feature branch** oluşturun (`git checkout -b feature/amazing-feature`)
+3. **Commit** yapın (`git commit -m 'Add some amazing feature'`)
+4. **Push** edin (`git push origin feature/amazing-feature`)
+5. **Pull Request** açın
+
+### Kod Standartları
+- **PSR-12** coding standards
+- **Laravel conventions** takip edin
+- **Vue 3 best practices** uygulayın
+- **Type hints** kullanın
+- **DocBlocks** yazın
+
+### Commit Mesajları
+```
+feat: add user export functionality
+fix: resolve permission checking issue
+docs: update installation guide
+style: format code with Pint
+refactor: improve service layer structure
+test: add user creation tests
+```
+
+## 📝 Changelog
+
+### v1.0.0 (2025-01-XX)
+- ✨ İlk stable release
+- 🎉 Modüler mimari implementasyonu
+- 🔐 Kapsamlı güvenlik özellikleri
+- 📊 Admin panel ve dashboard
+- 🎨 Modern UI/UX tasarımı
+
+## 📄 Lisans
+
+Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakınız.
+
+## 🙏 Teşekkürler
+
+Bu proje aşağıdaki open source projeleri kullanmaktadır:
+- [Laravel](https://laravel.com)
+- [Vue.js](https://vuejs.org)
+- [Inertia.js](https://inertiajs.com)
+- [Tailwind CSS](https://tailwindcss.com)
+- [Spatie Laravel Permission](https://spatie.be/docs/laravel-permission)
+- [Laravel Jetstream](https://jetstream.laravel.com)
+
+## 📞 İletişim
+
+Sorular, öneriler veya geri bildirimler için:
+- **Email**: [your-email@domain.com]
+- **GitHub Issues**: [Repository Issues](https://github.com/your-repo/issues)
+- **Documentation**: [Wiki](https://github.com/your-repo/wiki)
+
+---
+
+<p align="center">
+Made with ❤️ using Laravel, Vue.js, and modern web technologies
+</p>

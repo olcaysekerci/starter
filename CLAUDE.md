@@ -1,202 +1,639 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides comprehensive guidance to Claude Code (claude.ai/code) when working with this Laravel project.
 
-## Project Overview
+## 📋 Project Overview
 
-This is a Laravel 12 application using Inertia.js with Vue 3 and Tailwind CSS. The project follows a modular architecture pattern with a custom module system for better code organization and maintainability.
+This is a **Laravel 12 Starter Kit** featuring a modern, modular architecture designed for scalable web applications. The project combines **Laravel 12** backend with **Vue 3 + Inertia.js** frontend, implementing industry best practices for enterprise-level applications.
 
-## Development Commands
+### 🎯 Project Purpose
+A comprehensive starter template for building modern web applications with user management, role-based permissions, activity logging, mail notifications, and a full-featured admin panel.
 
-### Backend
-- `composer dev` - Start full development environment (Laravel server, queue worker, logs, and Vite)
-- `composer test` - Run PHPUnit tests with configuration cleanup
-- `php artisan serve` - Start Laravel development server
-- `php artisan queue:listen --tries=1` - Start queue worker
-- `php artisan pail --timeout=0` - Start log monitoring
-- `php artisan tinker` - Open Laravel REPL
-- `php artisan make:command {name}` - Create artisan command
+### 🏗️ Architecture Philosophy
+- **Modular Design**: Each feature is organized into self-contained modules
+- **Service-Repository Pattern**: Clear separation of business logic and data access
+- **Component-Based Frontend**: Reusable Vue 3 components with Composition API
+- **Security-First Approach**: Built-in authentication, authorization, and audit trails
 
-### Frontend
-- `npm run dev` - Start Vite development server
-- `npm run build` - Build production assets
+## 🚀 Development Environment
 
-### Testing
-- `composer test` - Run all tests
-- `php artisan test` - Run tests directly
-- `php artisan test --filter {TestName}` - Run specific test
+### Quick Start Commands
 
-### Code Quality
-- `vendor/bin/pint` - Run Laravel Pint for code formatting
+#### Full Development Environment (Recommended)
+```bash
+composer dev  # Starts Laravel server, queue worker, log monitoring, and Vite
+```
 
-## Architecture Overview
+#### Individual Services
+```bash
+# Backend
+php artisan serve                    # Laravel development server (http://localhost:8000)
+php artisan queue:listen --tries=1   # Queue worker for background jobs
+php artisan pail --timeout=0         # Real-time log monitoring
 
-### Modular Structure
-The application uses a custom modular architecture where each module is self-contained:
+# Frontend
+npm run dev                          # Vite development server with HMR
+npm run build                        # Production build
+
+# Database
+php artisan migrate                  # Run pending migrations
+php artisan migrate:fresh --seed     # Fresh database with sample data
+php artisan db:seed                  # Run only seeders
+```
+
+#### Code Quality & Testing
+```bash
+vendor/bin/pint                      # Code formatting (Laravel Pint)
+composer test                        # Run tests with configuration cleanup
+php artisan test                     # Run PHPUnit tests directly
+php artisan test --filter=UserTest   # Run specific test
+```
+
+#### Admin Setup
+```bash
+php artisan create:super-admin        # Create super admin user
+```
+
+## 🏢 Modular Architecture
+
+### Module Structure
+Each module follows a consistent structure for maintainability and scalability:
 
 ```
 app/Modules/{ModuleName}/
-├── Controllers/
-├── Models/
-├── Services/
-├── Repositories/
-├── DTOs/
-├── Actions/
-├── Requests/
-├── Exceptions/
-├── Panel/Controllers/    # Admin panel controllers
-├── Web/Controllers/      # Frontend controllers
-├── Panel/routes.php      # Admin routes
-├── Web/routes.php        # Frontend routes
-└── {ModuleName}ServiceProvider.php
+├── Controllers/                    # HTTP request handlers
+│   ├── Panel/                     # Admin panel controllers
+│   └── Web/                       # Frontend controllers
+├── Services/                      # Business logic layer
+├── Repositories/                  # Data access layer
+├── Models/                        # Eloquent models
+├── DTOs/                         # Data Transfer Objects
+├── Actions/                      # Single-purpose operations
+├── Requests/                     # Form validation rules
+├── Exceptions/                   # Custom exception classes
+├── Middleware/                   # Module-specific middleware
+├── Helpers/                      # Utility functions
+├── Panel/routes.php              # Admin routes
+├── Web/routes.php                # Frontend routes
+└── {ModuleName}ServiceProvider.php # Module service provider
 ```
 
-### Key Modules
-- **User** - User management, roles, permissions
-- **Dashboard** - Admin dashboard functionality
-- **Settings** - Application and mail settings
-- **ActivityLog** - Activity tracking and audit logs
-- **MailNotification** - Email notifications and logs
+### Core Modules
 
-### Frontend Architecture
+#### 1. User Module (`app/Modules/User/`)
+- **Purpose**: Complete user management system
+- **Features**: CRUD operations, role assignment, profile management
+- **Models**: User, Role, Permission
+- **Key Services**: UserService, RoleService, PermissionService
+- **Authentication**: Laravel Jetstream with 2FA support
+
+#### 2. ActivityLog Module (`app/Modules/ActivityLog/`)
+- **Purpose**: System audit trail and user activity tracking
+- **Features**: Automatic logging, filtering, bulk operations
+- **Integration**: Spatie Laravel ActivityLog
+- **Storage**: Comprehensive activity records with context
+
+#### 3. MailNotification Module (`app/Modules/MailNotification/`)
+- **Purpose**: Email management and logging system
+- **Features**: Send emails, track delivery, retry failed emails
+- **Logging**: Complete mail history with status tracking
+- **Testing**: Built-in test email functionality
+
+#### 4. Settings Module (`app/Modules/Settings/`)
+- **Purpose**: Application configuration management
+- **Features**: App settings, mail configuration, dynamic settings
+- **Storage**: Database-driven configuration with caching
+
+#### 5. Dashboard Module (`app/Modules/Dashboard/`)
+- **Purpose**: Analytics and overview interface
+- **Features**: Statistics, charts, system overview
+- **Real-time**: Live data updates and monitoring
+
+## 🎨 Frontend Architecture
+
+### Technology Stack
 - **Vue 3** with Composition API
 - **Inertia.js** for SPA-like experience
 - **Tailwind CSS** for styling
-- **Vite** for asset bundling
+- **Vite** for fast builds and HMR
+- **TypeScript-ready** (configurable)
 
-### Frontend Structure
+### Component Organization
 ```
 resources/js/
 ├── Components/
-│   ├── Panel/          # Generic admin panel components
-│   ├── Shared/         # Jetstream shared components
-│   └── Web/           # Generic frontend components
+│   ├── Panel/                    # Admin panel components
+│   │   ├── Actions/             # Buttons, search, export
+│   │   ├── Forms/               # Form components
+│   │   ├── Navigation/          # Sidebar, breadcrumbs
+│   │   ├── Page/                # Page headers, stats
+│   │   └── Shared/              # Reusable components
+│   ├── Shared/                  # Jetstream components
+│   └── Web/                     # Frontend components
 ├── Layouts/
-│   ├── AppLayout.vue   # Main app layout
-│   ├── PanelLayout.vue # Admin panel layout
-│   └── GuestLayout.vue # Guest layout
-├── Modules/           # Module-specific Vue components
+│   ├── AppLayout.vue            # Main application layout
+│   ├── PanelLayout.vue          # Admin panel layout
+│   └── GuestLayout.vue          # Authentication layout
+├── Modules/                     # Module-specific components
 │   └── {ModuleName}/
-│       ├── Panel/
-│       │   ├── Components/  # Module admin components
-│       │   ├── Index.vue
-│       │   ├── Show.vue
-│       │   ├── Create.vue
-│       │   └── Edit.vue
-│       ├── Web/
-│       │   └── Components/  # Module frontend components
-│       ├── Shared/
-│       │   └── components/  # Module shared components
-│       └── routes.js
-├── Pages/             # Page components
-├── Composables/       # Vue composables
-└── app.js            # Main entry point
+│       ├── Panel/Components/    # Admin components
+│       ├── Web/Components/      # Frontend components
+│       └── Shared/components/   # Module shared components
+├── Composables/                 # Vue 3 composables
+├── Pages/                       # Inertia page components
+└── Utils/                       # JavaScript utilities
 ```
 
-## Development Patterns
+### Key Composables
+```javascript
+// State Management
+useForm()           // Form handling with validation
+useModal()          // Modal state management
+useLoading()        // Loading state control
+useToggle()         // Toggle functionality
 
-### Module Development
-When creating new modules:
-1. Create module directory in `app/Modules/{ModuleName}`
-2. Follow the standard module structure
-3. Create ServiceProvider to register module services
-4. Register the ServiceProvider in `config/app.php`
-5. Use the ModuleLoader helper for route loading
+// Data Operations
+usePagination()     // Pagination logic
+useSearch()         // Search functionality
+useExport()         // Data export operations
+useDeleteModal()    // Delete confirmation workflow
 
-### Service Layer Pattern
-Each module follows the service-repository pattern:
-- **Controllers** handle HTTP requests and extend `BaseController`
-- **Services** contain business logic and use `TransactionTrait`
-- **Repositories** handle data access and extend `BaseRepository`
-- **DTOs** for data transfer with consistent typing
-- **Actions** for specific operations
-- **Exceptions** extend `BaseException` for consistent error handling
+// UI/UX
+useNotification()   // Toast notifications
+useNavigation()     // Routing and navigation
+useFormat()         // Data formatting utilities
+```
 
-### Base Classes Usage
-- **Services**: Use `TransactionTrait` for consistent transaction handling
-- **Repositories**: Extend `BaseRepository` and implement `BaseRepositoryInterface`
-- **Controllers**: Extend `BaseController` for consistent response patterns
-- **Exceptions**: Extend `BaseException` for structured error handling
+## 🔐 Security & Authentication
 
-### Frontend Patterns
-- Use composables for reusable logic
-- Components should be modular and reusable
-- Follow Vue 3 Composition API patterns
-- Use Inertia.js for page navigation
-- Module-specific components go in `/Modules/{ModuleName}/Panel/Components/`
-- Generic reusable components go in `/Components/Panel/` or `/Components/Shared/`
-- Follow PascalCase naming convention for all Vue files
-- Use consistent component suffixes: List, ListRow, Card, Form
+### Authentication System
+- **Laravel Jetstream**: Modern authentication scaffolding
+- **Two-Factor Authentication (2FA)**: Google2FA integration
+- **Laravel Sanctum**: API token authentication
+- **Email Verification**: Built-in email confirmation
+- **Password Reset**: Secure password recovery
 
-## Database
+### Authorization & Permissions
+- **Spatie Laravel Permission**: Role and permission management
+- **Resource-Based Permissions**: Granular access control
+- **Middleware Protection**: Route-level security
+- **Dynamic Permission Checking**: Runtime permission validation
 
-- **SQLite** for development (located at `database/database.sqlite`)
-- **MySQL/PostgreSQL** for production
-- Uses Laravel migrations and seeders
+### Security Middleware
+```php
+UserSecurityMiddleware::class      // User-specific security checks
+'auth:sanctum'                     // API authentication
+'verified'                         // Email verification requirement
+'permission:permission.name'       // Permission-based access
+'role:role.name'                   // Role-based access
+```
 
-## Authentication & Authorization
+## 🗄️ Database Architecture
 
-- **Laravel Jetstream** for authentication
-- **Spatie Laravel Permission** for roles and permissions
-- **Laravel Sanctum** for API authentication
-- Custom middleware for user security
+### Connection Configuration
+- **Primary**: SQLite (development), MySQL/PostgreSQL (production)
+- **Migrations**: Version-controlled schema changes
+- **Seeders**: Sample data and role/permission setup
+- **Factories**: Test data generation
 
-## Key Technologies
+### Key Tables
+```sql
+users                    # User accounts and profiles
+roles                    # User roles (admin, user, etc.)
+permissions              # System permissions
+model_has_permissions    # User-specific permissions
+model_has_roles         # User role assignments
+activity_log            # System activity tracking
+mail_logs              # Email delivery tracking
+settings               # Application configuration
+```
 
-- **Laravel 12** - PHP framework
-- **Vue 3** - Frontend framework
-- **Inertia.js** - Modern monolith approach
-- **Tailwind CSS** - Utility-first CSS
-- **Vite** - Build tool
-- **SQLite/MySQL** - Database
-- **Laravel Jetstream** - Authentication scaffolding
-- **Spatie Laravel Permission** - Role/permission management
-- **Spatie Laravel ActivityLog** - Activity logging
+### Migration Strategy
+```bash
+# Database setup
+php artisan migrate              # Apply pending migrations
+php artisan migrate:rollback     # Rollback last batch
+php artisan migrate:reset        # Rollback all migrations
+php artisan migrate:refresh      # Reset and re-run all migrations
+php artisan migrate:fresh --seed # Fresh database with seeders
+```
 
-## Environment Setup
+## 🏛️ Service Layer Patterns
 
-1. Copy `.env.example` to `.env`
-2. Run `php artisan key:generate`
-3. Create SQLite database: `touch database/database.sqlite`
-4. Run migrations: `php artisan migrate`
-5. Install dependencies: `composer install && npm install`
-6. Start development: `composer dev`
+### Base Classes & Traits
 
-## Code Style
+#### BaseController (`app/Abstracts/BaseController.php`)
+```php
+// Consistent response methods
+successResponse($data, $message)
+errorResponse($message, $status)
+jsonSuccessResponse($data, $message)
+handleException($exception)
+handleCustomException($exception)
+```
 
-- Follow Laravel conventions
-- Use type hints for PHP 8.2+
-- Follow PSR-12 coding standards
-- Use Laravel Pint for code formatting
-- Component names should be PascalCase
-- Use meaningful variable and method names
+#### BaseService with TransactionTrait
+```php
+// Database transaction methods
+executeInTransaction($callback)
+updateInTransaction($model, $data)
+deleteInTransaction($model)
+```
 
-## Coding Standards
+#### BaseRepository (`app/Abstracts/BaseRepository.php`)
+```php
+// Standard repository methods
+getAll()
+getAllPaginated($perPage)
+findById($id)
+findByIdOrFail($id)
+create($data)
+update($model, $data)
+delete($model)
+```
 
-### Service Layer Standards
-- Always use `TransactionTrait` for database operations
-- Implement consistent constructor dependency injection
-- Use `executeInTransaction()`, `updateInTransaction()`, `deleteInTransaction()` methods
-- Follow consistent error handling patterns
+### Service Implementation Example
+```php
+class UserService
+{
+    use TransactionTrait;
 
-### Repository Layer Standards
-- Extend `BaseRepository` for common functionality
-- Implement `BaseRepositoryInterface` 
-- Use consistent method naming: `getAll()`, `getAllPaginated()`, `findById()`, `findByIdOrFail()`
-- Return consistent types: Collection, Model, or LengthAwarePaginator
+    public function __construct(
+        private UserRepository $userRepository,
+        private RoleRepository $roleRepository
+    ) {}
 
-### Controller Layer Standards
-- Extend `BaseController` for common response methods
-- Use `successResponse()`, `errorResponse()`, `jsonSuccessResponse()` for consistent responses
-- Handle exceptions with `handleException()` or `handleCustomException()`
-- Use Form Request classes for validation
+    public function create(UserDTO $userData): User
+    {
+        return $this->executeInTransaction(function () use ($userData) {
+            $user = $this->userRepository->create($userData->toArray());
+            
+            if ($userData->role_id) {
+                $role = $this->roleRepository->findByIdOrFail($userData->role_id);
+                $user->assignRole($role);
+            }
 
-### Exception Standards
-- Extend `BaseException` for structured error handling
-- Include error codes and context data
-- Use static factory methods for common exceptions
+            activity('user')
+                ->performedOn($user)
+                ->log('User created');
 
-### Frontend Standards
-- Module-specific components in `{Module}/Panel/Components/`
-- Use relative imports for module components: `./Components/ComponentName.vue`
-- Follow Vue 3 Composition API patterns consistently
+            return $user;
+        });
+    }
+}
+```
+
+## 🎯 Development Patterns & Best Practices
+
+### Code Standards
+- **PSR-12**: PHP coding standards
+- **Laravel Conventions**: Framework-specific patterns
+- **Vue 3 Best Practices**: Composition API, component naming
+- **Type Hints**: PHP 8.2+ features with strict typing
+- **DocBlocks**: Comprehensive code documentation
+
+### Component Naming Conventions
+```javascript
+// Vue Components (PascalCase)
+UserList.vue              // List components
+UserListRow.vue           // Row/item components
+UserCard.vue              // Card/display components
+UserForm.vue              // Form components
+UserModal.vue             // Modal components
+
+// Composables (camelCase with 'use' prefix)
+useUserManagement.js      // Module-specific logic
+useFormValidation.js      // Reusable functionality
+```
+
+### Error Handling Strategy
+```php
+// Custom Exceptions
+UserException::userNotFound($id)
+UserException::invalidPermissions($user)
+UserException::emailAlreadyExists($email)
+
+// Global Exception Handler
+app/Exceptions/Handler.php  // Centralized error handling
+```
+
+### Import Patterns
+```javascript
+// Relative imports for module components
+import UserCard from './Components/UserCard.vue'
+
+// Absolute imports for shared components
+import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
+
+// Composables
+import { useForm } from '@/Composables/useForm'
+```
+
+## 📊 Monitoring & Logging
+
+### Activity Logging
+```php
+// Automatic logging with LogsActivity trait
+activity('module')
+    ->performedOn($model)
+    ->withProperties(['key' => 'value'])
+    ->log('Action description');
+
+// Manual logging
+activity()
+    ->causedBy($user)
+    ->performedOn($model)
+    ->withProperties($data)
+    ->log('Custom action');
+```
+
+### Mail Logging
+All emails are automatically logged with:
+- Delivery status tracking
+- Retry mechanisms for failed emails
+- Complete email history
+- Performance monitoring
+
+### System Monitoring
+```bash
+php artisan pail --timeout=0     # Real-time log monitoring
+php artisan queue:work           # Queue processing
+php artisan horizon             # Queue dashboard (if installed)
+```
+
+## 🧪 Testing Strategy
+
+### Test Organization
+```
+tests/
+├── Feature/                    # Integration tests
+│   ├── Auth/                  # Authentication tests
+│   ├── User/                  # User management tests
+│   └── Api/                   # API endpoint tests
+├── Unit/                      # Unit tests
+│   ├── Services/              # Service layer tests
+│   ├── Repositories/          # Repository tests
+│   └── Helpers/               # Helper function tests
+└── Browser/                   # Laravel Dusk tests (if configured)
+```
+
+### Testing Commands
+```bash
+php artisan test                    # Run all tests
+php artisan test --filter=UserTest # Run specific test
+php artisan test --coverage        # Generate coverage report
+php artisan test --parallel        # Run tests in parallel
+```
+
+### Test Data Management
+```php
+// Factories for test data
+UserFactory::new()->create()
+UserFactory::new()->withRole('admin')->create()
+
+// Database seeding for tests
+$this->seed(RolePermissionSeeder::class)
+```
+
+## 🔧 Configuration & Environment
+
+### Environment Files
+```bash
+.env                    # Main environment configuration
+.env.example           # Template for environment setup
+.env.testing           # Testing environment overrides
+```
+
+### Key Configuration Areas
+```env
+# Application
+APP_NAME="Laravel Starter"
+APP_ENV=local
+APP_DEBUG=true
+APP_TIMEZONE=UTC
+
+# Database
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+
+# Mail Configuration
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+
+# Queue Configuration
+QUEUE_CONNECTION=database
+
+# Authentication
+SESSION_LIFETIME=120
+SANCTUM_STATEFUL_DOMAINS=localhost,127.0.0.1
+```
+
+## 📦 Package Management
+
+### Core Dependencies
+```json
+{
+  "php": "^8.2",
+  "laravel/framework": "^12.0",
+  "laravel/jetstream": "^5.3",
+  "laravel/sanctum": "^4.0",
+  "inertiajs/inertia-laravel": "^2.0",
+  "spatie/laravel-activitylog": "^4.10",
+  "spatie/laravel-permission": "^6.20",
+  "tightenco/ziggy": "^2.0"
+}
+```
+
+### Frontend Dependencies
+```json
+{
+  "@inertiajs/vue3": "^2.0",
+  "vue": "^3.3.13",
+  "@vitejs/plugin-vue": "^5.0.0",
+  "tailwindcss": "^3.4.0",
+  "@heroicons/vue": "^2.2.0"
+}
+```
+
+## 🚀 Deployment Guidelines
+
+### Production Environment Setup
+```bash
+# Dependencies
+composer install --no-dev --optimize-autoloader
+npm install && npm run build
+
+# Configuration
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Database
+php artisan migrate --force
+
+# Storage
+php artisan storage:link
+```
+
+### Performance Optimization
+```bash
+# Laravel optimizations
+php artisan optimize
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Composer optimizations
+composer install --optimize-autoloader --no-dev
+
+# Frontend optimizations
+npm run build
+```
+
+### Security Considerations
+```env
+# Production security settings
+APP_DEBUG=false
+APP_ENV=production
+SESSION_SECURE_COOKIE=true
+SANCTUM_STATEFUL_DOMAINS=yourdomain.com
+```
+
+## 🎛️ Customization Guidelines
+
+### Adding New Modules
+1. **Create module directory** in `app/Modules/`
+2. **Follow standard structure** (Controllers, Services, Repositories, etc.)
+3. **Create ServiceProvider** and register in `config/app.php`
+4. **Add routes** (Panel/routes.php, Web/routes.php)
+5. **Create frontend components** in `resources/js/Modules/`
+
+### Extending Base Classes
+```php
+// Service extension
+class CustomService extends BaseService
+{
+    use TransactionTrait;
+    // Custom implementation
+}
+
+// Repository extension
+class CustomRepository extends BaseRepository
+{
+    protected $model = CustomModel::class;
+    // Custom methods
+}
+```
+
+### Component Development
+```javascript
+// Reusable component pattern
+<template>
+  <div class="component-wrapper">
+    <!-- Component content -->
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue'
+
+// Props with validation
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true
+  },
+  options: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+// Emits definition
+const emit = defineEmits(['update', 'delete'])
+
+// Reactive state
+const loading = ref(false)
+
+// Computed properties
+const formattedData = computed(() => {
+  // Processing logic
+})
+</script>
+```
+
+## 💡 Troubleshooting & Common Issues
+
+### Development Issues
+```bash
+# Clear caches
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+
+# Permission issues
+chmod -R 775 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache
+
+# Node modules issues
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Database Issues
+```bash
+# Reset database
+php artisan migrate:fresh --seed
+
+# Check database connection
+php artisan tinker
+DB::connection()->getPdo()
+
+# Fix migration issues
+php artisan migrate:rollback
+php artisan migrate
+```
+
+### Frontend Issues
+```bash
+# Vite issues
+rm -rf node_modules
+npm install
+npm run dev
+
+# Build issues
+npm run build
+
+# Port conflicts
+npm run dev -- --port 3001
+```
+
+## 📝 Important Notes for Claude Code
+
+### When Working with This Project:
+
+1. **Always Use Base Classes**: Extend BaseController, BaseService, BaseRepository
+2. **Follow Module Structure**: Keep module-specific code in respective directories
+3. **Use Transactions**: Wrap database operations in transactions via TransactionTrait
+4. **Consistent Error Handling**: Use BaseException and consistent error responses
+5. **Frontend Patterns**: Use Composition API, proper component naming, relative imports
+6. **Security First**: Always consider permissions and authentication
+7. **Activity Logging**: Log important user actions for audit trails
+8. **Code Quality**: Run Pint before committing, write tests for new features
+
+### File Modification Priorities:
+1. **Service Layer**: Business logic goes in Services
+2. **Repository Layer**: Data access in Repositories
+3. **Controller Layer**: HTTP handling only, delegate to Services
+4. **Frontend Components**: Follow Vue 3 best practices
+5. **Routes**: Keep organized in module-specific route files
+
+### Testing Requirements:
+- Write tests for new Services and Repositories
+- Test permission checking in Controllers
+- Verify frontend components work correctly
+- Ensure database transactions work properly
+
+This documentation should provide comprehensive guidance for working effectively with this Laravel starter project.
