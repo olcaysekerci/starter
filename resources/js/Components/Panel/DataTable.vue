@@ -90,7 +90,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import Pagination from '@/Components/Shared/Pagination.vue'
+import Pagination from '@/Components/Panel/Shared/Pagination.vue'
 
 const props = defineProps({
   title: {

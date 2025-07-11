@@ -123,7 +123,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { usePage, Link, router } from '@inertiajs/vue3'
-import { HomeIcon, UsersIcon, DocumentTextIcon, EnvelopeIcon, Cog6ToothIcon, ShieldCheckIcon, KeyIcon } from '@heroicons/vue/24/outline'
+import { HomeIcon, UsersIcon, DocumentTextIcon, EnvelopeIcon, Cog6ToothIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline'
 
 const emit = defineEmits(['close'])
 const props = defineProps({
@@ -137,8 +137,7 @@ const menuItems = [
   {
     name: 'User/Panel', label: 'Kullanıcı Yönetimi', icon: UsersIcon, children: [
       { name: 'User/Panel', label: 'Kullanıcılar', href: route('panel.users.index'), routeName: 'panel.users.' },
-      { name: 'User/Panel/Roles', label: 'Roller', href: route('panel.roles.index'), routeName: 'panel.roles.' },
-      { name: 'User/Panel/Permissions', label: 'Yetkiler', href: route('panel.permissions.index'), routeName: 'panel.permissions.' }
+      { name: 'User/Panel/Roles', label: 'Rol ve Yetki Yönetimi', href: route('panel.roles.index'), routeName: 'panel.roles.' }
     ]
   },
   { name: 'ActivityLog/Panel', label: 'Aktivite Logları', href: route('panel.activity-logs.index'), icon: DocumentTextIcon, routeName: 'panel.activity-logs.' },

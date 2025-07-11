@@ -154,6 +154,7 @@ import TextArea from '@/Components/Panel/Forms/TextArea.vue'
 import Select from '@/Components/Panel/Forms/Select.vue'
 import FormCard from '@/Components/Panel/Forms/FormCard.vue'
 import { useForm, useNavigation, useNotification } from '@/Composables'
+import { formatTurkishPhone } from '@/utils'
 
 const props = defineProps({
   roles: {
@@ -209,35 +210,7 @@ const roleOptions = computed(() => {
 
 // Methods
 const formatPhone = (event) => {
-  let value = event.target.value
-  
-  // Sadece rakamları al
-  value = value.replace(/[^0-9]/g, '')
-  
-  // Türkiye telefon numarası formatı
-  if (value.length > 0) {
-    // +90 ile başlıyorsa, 90'ı kaldır
-    if (value.startsWith('90') && value.length > 10) {
-      value = value.substring(2)
-    }
-    // Başında 0 varsa kaldır
-    else if (value.startsWith('0')) {
-      value = value.substring(1)
-    }
-    
-    // 10 haneli format
-    if (value.length <= 3) {
-      value = value
-    } else if (value.length <= 6) {
-      value = value.substring(0, 3) + ' ' + value.substring(3)
-    } else if (value.length <= 8) {
-      value = value.substring(0, 3) + ' ' + value.substring(3, 6) + ' ' + value.substring(6)
-    } else {
-      value = value.substring(0, 3) + ' ' + value.substring(3, 6) + ' ' + value.substring(6, 8) + ' ' + value.substring(8, 10)
-    }
-  }
-  
-  form.phone = value
+  form.phone = formatTurkishPhone(event.target.value)
 }
 
 const saveUser = async () => {

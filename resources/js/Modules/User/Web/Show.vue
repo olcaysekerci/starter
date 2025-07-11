@@ -67,8 +67,8 @@
 import { defineProps, computed } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import PrimaryButton from '@/Components/Shared/PrimaryButton.vue'
-import SecondaryButton from '@/Components/Shared/SecondaryButton.vue'
+import PrimaryButton from '@/Components/Web/PrimaryButton.vue'
+import SecondaryButton from '@/Components/Web/SecondaryButton.vue'
 
 const props = defineProps({
   user: {

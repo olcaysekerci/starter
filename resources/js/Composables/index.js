@@ -29,4 +29,7 @@ export { useLoading } from './useLoading'
 export { useNavigation } from './useNavigation'
 
 // Delete Modal Management (already created)
-export { useDeleteModal } from './useDeleteModal' 
+export { useDeleteModal } from './useDeleteModal'
+
+// Performance Optimization
+export { useOptimizedComputed, useDebouncedComputed, useAsyncComputed } from './useOptimizedComputed' 

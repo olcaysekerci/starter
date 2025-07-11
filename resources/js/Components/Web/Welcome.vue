@@ -1,5 +1,5 @@
 <script setup>
-import ApplicationLogo from '@/Components/Shared/ApplicationLogo.vue';
+import ApplicationLogo from '@/Components/Web/ApplicationLogo.vue';
 </script>
 
 <template>
