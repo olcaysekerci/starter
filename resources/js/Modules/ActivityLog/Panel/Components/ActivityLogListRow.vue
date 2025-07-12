@@ -5,8 +5,8 @@
       {{ log.causer?.full_name || log.user_name || 'Sistem' }}
     </td>
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-      <span :class="getEventBadgeClass(log.event)" class="px-2 py-1 rounded text-xs font-semibold">
-        {{ getEventLabel(log.event) }}
+      <span :class="getEventBadgeClass(log.resolved_event || log.event || log.description)" class="px-2 py-1 rounded text-xs font-semibold">
+        {{ getEventLabel(log.resolved_event || log.event, log.description) }}
       </span>
     </td>
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
@@ -15,15 +15,10 @@
       </span>
     </td>
     <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200 max-w-xs truncate">
-      {{ log.description }}
+      {{ log.formatted_description || log.description || 'İşlem detayı bulunamadı' }}
     </td>
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-      <div class="text-sm text-gray-900 dark:text-gray-100">
-        {{ formatDate(log.created_at) }}
-      </div>
-      <div class="text-xs text-gray-500 dark:text-gray-400">
-        {{ formatTime(log.created_at) }}
-      </div>
+      {{ formatDateTime(log.created_at) }}
     </td>
     <td class="px-4 py-3 whitespace-nowrap text-right">
       <div class="flex items-center justify-end space-x-1">
@@ -44,19 +39,33 @@ import TableActionButton from '@/Components/Panel/Actions/TableActionButton.vue'
 const props = defineProps({ log: Object })
 defineEmits(['view'])
 
-const formatDate = (date) => {
-  if (!date) return '-'
-  return new Date(date).toLocaleDateString('tr-TR')
-}
-
-const formatTime = (date) => {
+const formatDateTime = (date) => {
   if (!date) return '-'
   const d = new Date(date)
-  return d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+  return d.toLocaleString('tr-TR', { 
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
+const getEventLabel = (event, description) => {
+  // Eğer event boşsa, description'dan event'i çıkar
+  if (!event && description) {
+    if (description.includes('Giriş yaptı')) return 'Giriş'
+    if (description.includes('Çıkış yaptı')) return 'Çıkış'
+    if (description.includes('Başarısız giriş denemesi')) return 'Başarısız Giriş'
+    if (description.includes('Şifre sıfırlandı')) return 'Şifre Sıfırlandı'
+    if (description.includes('Kayıt oldu')) return 'Kayıt Oldu'
+    if (description.includes('E-posta doğrulandı')) return 'E-posta Doğrulandı'
+    if (description.includes('oluşturdu')) return 'Oluşturuldu'
+    if (description.includes('güncelledi')) return 'Güncellendi'
+    if (description.includes('sildi')) return 'Silindi'
+    if (description.includes('geri yükledi')) return 'Geri Yüklendi'
+  }
 
-const getEventLabel = (event) => {
   const labels = {
     'created': 'Oluşturuldu',
     'updated': 'Güncellendi',
@@ -64,10 +73,21 @@ const getEventLabel = (event) => {
     'restored': 'Geri Yüklendi',
     'login': 'Giriş',
     'logout': 'Çıkış',
+    'failed_login': 'Başarısız Giriş',
+    'password_reset': 'Şifre Sıfırlandı',
+    'registered': 'Kayıt Oldu',
+    'email_verified': 'E-posta Doğrulandı',
     'password_changed': 'Şifre Değişti',
-    'email_changed': 'E-posta Değişti'
+    'email_changed': 'E-posta Değişti',
+    'profile_updated': 'Profil Güncellendi',
+    'Giriş yaptı': 'Giriş',
+    'Çıkış yaptı': 'Çıkış',
+    'Başarısız giriş denemesi': 'Başarısız Giriş',
+    'Şifre sıfırlandı': 'Şifre Sıfırlandı',
+    'Kayıt oldu': 'Kayıt Oldu',
+    'E-posta doğrulandı': 'E-posta Doğrulandı'
   }
-  return labels[event] || event
+  return labels[event] || event || 'Bilinmeyen İşlem'
 }
 
 const getEventBadgeClass = (event) => {
@@ -78,8 +98,29 @@ const getEventBadgeClass = (event) => {
     'restored': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
     'login': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
     'logout': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+    'failed_login': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    'password_reset': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+    'registered': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    'email_verified': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
     'password_changed': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
     'email_changed': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+    'profile_updated': 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200',
+    'Giriş yaptı': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
+    'Çıkış yaptı': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+    'Başarısız giriş denemesi': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    'Şifre sıfırlandı': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+    'Kayıt oldu': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    'E-posta doğrulandı': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    'Giriş': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
+    'Çıkış': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+    'Başarısız Giriş': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    'Şifre Sıfırlandı': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+    'Kayıt Oldu': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    'E-posta Doğrulandı': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    'Oluşturuldu': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    'Güncellendi': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    'Silindi': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    'Geri Yüklendi': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
   }
   return classes[event] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
 }

@@ -22,7 +22,8 @@ class Activity extends SpatieActivity
         'is_password_change',
         'is_email_change',
         'is_admin_action',
-        'deleted_info'
+        'deleted_info',
+        'resolved_event'
     ];
 
     /**
@@ -59,7 +60,7 @@ class Activity extends SpatieActivity
     public function getFormattedDescriptionAttribute(): string
     {
         if (!$this->description) {
-            return 'Bilinmeyen işlem';
+            return 'İşlem detayı bulunamadı';
         }
 
         // Eğer description zaten Türkçe ise direkt döndür
@@ -191,6 +192,54 @@ class Activity extends SpatieActivity
     public function getDeletedInfoAttribute(): ?array
     {
         return $this->properties['deleted_user_info'] ?? null;
+    }
+
+    /**
+     * Event alanı boşsa description'dan event'i çıkar
+     */
+    public function getResolvedEventAttribute(): string
+    {
+        if ($this->event) {
+            return $this->event;
+        }
+
+        if (!$this->description) {
+            return 'unknown';
+        }
+
+        // Description'dan event'i çıkar
+        if (str_contains($this->description, 'Giriş yaptı')) {
+            return 'login';
+        }
+        if (str_contains($this->description, 'Çıkış yaptı')) {
+            return 'logout';
+        }
+        if (str_contains($this->description, 'Başarısız giriş denemesi')) {
+            return 'failed_login';
+        }
+        if (str_contains($this->description, 'Şifre sıfırlandı')) {
+            return 'password_reset';
+        }
+        if (str_contains($this->description, 'Kayıt oldu')) {
+            return 'registered';
+        }
+        if (str_contains($this->description, 'E-posta doğrulandı')) {
+            return 'email_verified';
+        }
+        if (str_contains($this->description, 'oluşturdu')) {
+            return 'created';
+        }
+        if (str_contains($this->description, 'güncelledi')) {
+            return 'updated';
+        }
+        if (str_contains($this->description, 'sildi')) {
+            return 'deleted';
+        }
+        if (str_contains($this->description, 'geri yükledi')) {
+            return 'restored';
+        }
+
+        return 'unknown';
     }
 
     /**

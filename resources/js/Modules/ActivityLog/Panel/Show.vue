@@ -24,8 +24,8 @@
           <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
             Log #{{ log.id }}
           </h3>
-          <span :class="getEventBadgeClass(log.event)" class="px-3 py-1 rounded-full text-sm font-semibold">
-            {{ getEventLabel(log.event) }}
+          <span :class="getEventBadgeClass(log.resolved_event || log.event)" class="px-3 py-1 rounded-full text-sm font-semibold">
+            {{ getEventLabel(log.resolved_event || log.event) }}
           </span>
         </div>
       </div>
@@ -174,10 +174,15 @@ const getEventLabel = (event) => {
     'restored': 'Geri Yüklendi',
     'login': 'Giriş',
     'logout': 'Çıkış',
+    'failed_login': 'Başarısız Giriş',
+    'password_reset': 'Şifre Sıfırlandı',
+    'registered': 'Kayıt Oldu',
+    'email_verified': 'E-posta Doğrulandı',
     'password_changed': 'Şifre Değişti',
-    'email_changed': 'E-posta Değişti'
+    'email_changed': 'E-posta Değişti',
+    'profile_updated': 'Profil Güncellendi'
   }
-  return labels[event] || event
+  return labels[event] || event || 'Bilinmeyen İşlem'
 }
 
 const getEventBadgeClass = (event) => {
@@ -188,8 +193,13 @@ const getEventBadgeClass = (event) => {
     'restored': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
     'login': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
     'logout': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+    'failed_login': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    'password_reset': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+    'registered': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    'email_verified': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
     'password_changed': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
     'email_changed': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+    'profile_updated': 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200'
   }
   return classes[event] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
 }

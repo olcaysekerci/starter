@@ -33,6 +33,32 @@ class ActivityLogController extends Controller
 
         $logs = $this->activityLogService->getLogs($filters, 15);
         $stats = $this->activityLogService->getStats();
+        
+        // Logların accessor'larının düzgün çalışması için
+        $logs->getCollection()->transform(function ($log) {
+            return [
+                'id' => $log->id,
+                'log_name' => $log->log_name,
+                'description' => $log->description,
+                'formatted_description' => $log->formatted_description,
+                'subject_type' => $log->subject_type,
+                'subject_id' => $log->subject_id,
+                'causer_type' => $log->causer_type,
+                'causer_id' => $log->causer_id,
+                'causer' => $log->causer ? [
+                    'id' => $log->causer->id,
+                    'full_name' => $log->causer->full_name ?? $log->causer->name,
+                    'email' => $log->causer->email,
+                ] : null,
+                'user_name' => $log->user_name,
+                'model_name' => $log->model_name,
+                'event' => $log->event,
+                'resolved_event' => $log->resolved_event,
+                'properties' => $log->properties,
+                'created_at' => $log->created_at,
+                'updated_at' => $log->updated_at,
+            ];
+        });
 
         return Inertia::render('ActivityLog/Panel/Index', [
             'logs' => $logs,

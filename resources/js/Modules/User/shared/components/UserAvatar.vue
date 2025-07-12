@@ -36,9 +36,9 @@ const props = defineProps({
 })
 
 const userInitials = computed(() => {
-  if (!props.user?.name) return '?'
+  if (!props.user?.full_name) return '?'
   
-  return props.user.name
+  return props.user.full_name
     .split(' ')
     .map(name => name.charAt(0))
     .join('')

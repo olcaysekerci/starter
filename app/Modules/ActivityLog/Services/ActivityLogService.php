@@ -78,6 +78,7 @@ class ActivityLogService
         return [
             'id' => $log->id,
             'event' => $log->event,
+            'resolved_event' => $log->resolved_event,
             'description' => $log->description,
             'subject_type' => $log->subject_type,
             'subject_id' => $log->subject_id,

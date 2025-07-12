@@ -95,6 +95,7 @@ class User extends Authenticatable
         'profile_photo_url',
         'full_name',
         'formatted_phone',
+        'last_login',
     ];
 
     /**
@@ -323,6 +324,19 @@ class User extends Authenticatable
         }
         
         return $phone;
+    }
+
+    /**
+     * Get last login from activity log
+     */
+    public function getLastLoginAttribute(): ?string
+    {
+        $lastLoginActivity = \App\Modules\ActivityLog\Models\Activity::where('causer_id', $this->id)
+            ->where('description', 'Giriş yaptı')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return $lastLoginActivity ? $lastLoginActivity->created_at->toISOString() : null;
     }
 
 

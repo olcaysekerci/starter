@@ -18,6 +18,7 @@ class UserDTO
         public readonly ?string $email_verified_at = null,
         public readonly ?string $created_at = null,
         public readonly ?string $updated_at = null,
+        public readonly ?string $last_login = null,
         public readonly ?Collection $roles = null,
         public readonly ?Collection $permissions = null,
     ) {}
@@ -36,6 +37,7 @@ class UserDTO
             email_verified_at: $data['email_verified_at'] ?? null,
             created_at: $data['created_at'] ?? null,
             updated_at: $data['updated_at'] ?? null,
+            last_login: $data['last_login'] ?? null,
             roles: isset($data['roles']) ? collect($data['roles']) : null,
             permissions: isset($data['permissions']) ? collect($data['permissions']) : null,
         );
@@ -55,6 +57,7 @@ class UserDTO
             email_verified_at: $user->email_verified_at?->toISOString(),
             created_at: $user->created_at?->toISOString(),
             updated_at: $user->updated_at?->toISOString(),
+            last_login: $user->last_login,
             roles: $user->roles ?? null,
             permissions: $user->permissions ?? null,
         );
@@ -72,6 +75,7 @@ class UserDTO
             'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'last_login' => $this->last_login,
             'roles' => $this->roles?->toArray(),
             'permissions' => $this->permissions?->toArray(),
         ];
@@ -94,6 +98,7 @@ class UserDTO
             'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'last_login' => $this->last_login,
             'roles' => $this->roles?->toArray(),
             'permissions' => $this->permissions?->toArray(),
         ];

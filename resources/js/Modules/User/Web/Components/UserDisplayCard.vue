@@ -14,7 +14,7 @@
       
       <div class="flex-1 min-w-0">
         <h3 class="text-lg font-medium text-gray-900 truncate">
-          {{ user.name }}
+          {{ user.full_name }}
         </h3>
         <p class="text-sm text-gray-500 truncate">
           {{ user.email }}
@@ -47,7 +47,7 @@ const props = defineProps({
 })
 
 const userInitials = computed(() => {
-  return props.user.name
+  return props.user.full_name
     .split(' ')
     .map(name => name.charAt(0))
     .join('')
