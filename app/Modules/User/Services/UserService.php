@@ -76,6 +76,57 @@ class UserService
     }
 
     /**
+     * Kullanıcı detayını genişletilmiş bilgilerle getir
+     */
+    public function getUserDetailWithStats(int $id): array
+    {
+        $user = $this->userRepository->findById($id);
+        
+        if (!$user) {
+            throw UserException::userNotFound($id);
+        }
+
+        // Kullanıcının aktivite loglarını al
+        $activityLogs = \App\Modules\ActivityLog\Models\Activity::where('causer_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
+        // Son giriş bilgisi
+        $lastLogin = $activityLogs->where('description', 'Giriş yaptı')->first();
+
+        // Toplam giriş sayısı
+        $totalLogins = \App\Modules\ActivityLog\Models\Activity::where('causer_id', $id)
+            ->where('description', 'Giriş yaptı')
+            ->count();
+
+        // Son aktivite tarihi
+        $lastActivity = $activityLogs->first();
+
+        // Hesap yaşı
+        $accountAge = $user->created_at ? $user->created_at->diffInDays(now()) : 0;
+
+        return [
+            'user' => UserDTO::fromModel($user),
+            'stats' => [
+                'total_logins' => $totalLogins,
+                'last_login' => $lastLogin ? $lastLogin->created_at->toISOString() : null,
+                'last_activity' => $lastActivity ? $lastActivity->created_at->toISOString() : null,
+                'account_age_days' => (int) $accountAge,
+                'recent_activities' => $activityLogs->map(function ($activity) {
+                    return [
+                        'id' => $activity->id,
+                        'description' => $activity->description,
+                        'created_at' => $activity->created_at->toISOString(),
+                        'event' => $activity->event,
+                        'resolved_event' => $activity->resolved_event,
+                    ];
+                })
+            ]
+        ];
+    }
+
+    /**
      * Kullanıcı oluştur
      */
     public function create(array $data): User

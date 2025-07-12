@@ -122,10 +122,11 @@ class UserController extends Controller
     public function show(int $id): Response|RedirectResponse
     {
         try {
-            $user = $this->userService->getUserDTOById($id);
+            $userDetail = $this->userService->getUserDetailWithStats($id);
         
             return Inertia::render('User/Panel/Show', [
-                'user' => $user
+                'user' => $userDetail['user'],
+                'stats' => $userDetail['stats']
             ]);
         } catch (UserException $e) {
             return redirect()->route('panel.users.index')
