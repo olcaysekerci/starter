@@ -48,23 +48,6 @@
                 Benzersiz rol adı (küçük harfler, tire ile ayrılmış)
               </p>
             </div>
-
-            <div>
-              <label for="display_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Görünen Ad *
-              </label>
-              <input
-                id="display_name"
-                v-model="form.display_name"
-                type="text"
-                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                placeholder="Örn: Editör"
-                required
-              />
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Kullanıcıların göreceği rol adı
-              </p>
-            </div>
           </div>
 
           <div class="mt-6">
@@ -78,19 +61,6 @@
               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
               placeholder="Rolün amacını ve kapsamını açıklayın..."
             ></textarea>
-          </div>
-
-          <div class="mt-6">
-            <label class="flex items-center">
-              <input
-                v-model="form.is_active"
-                type="checkbox"
-                class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              />
-              <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                Rol aktif
-              </span>
-            </label>
           </div>
         </div>
 
@@ -159,10 +129,8 @@ const props = defineProps({
 // Form data
 const form = reactive({
   name: '',
-  display_name: '',
   description: '',
   guard_name: 'web',
-  is_active: true,
   permissions: []
 })
 

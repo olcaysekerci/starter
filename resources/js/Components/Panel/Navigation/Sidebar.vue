@@ -2,7 +2,10 @@
   <aside
     v-show="props.isOpen"
     :class="[
-      props.isCollapsed ? 'w-20' : 'w-64',
+      // Mobilde tam genişlik, desktop'ta sidebar durumuna göre
+      'lg:w-64 lg:w-20',
+      props.isCollapsed ? 'lg:w-20' : 'lg:w-64',
+      'w-64',
       'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-300 z-50 fixed left-0 top-0 h-screen'
     ]"
   >
@@ -117,7 +120,7 @@
     </div>
   </aside>
   <!-- Mobilde overlay -->
-  <div v-if="props.isOpen" @click="$emit('close')" class="fixed inset-0 z-30 bg-black bg-opacity-50 lg:hidden"></div>
+  <div v-if="props.isOpen" @click="$emit('close')" class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"></div>
 </template>
 
 <script setup>
