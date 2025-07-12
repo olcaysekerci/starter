@@ -10,11 +10,8 @@
     
     <!-- Sağ İçerik Alanı -->
     <div :class="[
-      'flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-gray-900 transition-all duration-300',
-      // Desktop'ta sidebar durumuna göre margin
-      'lg:ml-64 lg:ml-20',
-      // Mobilde tam genişlik, desktop'ta sidebar durumuna göre
-      isCollapsed ? 'lg:ml-20' : 'lg:ml-64'
+      'flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-gray-900 w-full transition-all duration-300',
+      isCollapsed ? 'ml-20' : 'ml-64'
     ]">
       <!-- Top Navigation -->
       <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -25,15 +22,8 @@
               @click="toggleSidebar"
               class="p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-600 lg:border-0 ml-1 lg:ml-0"
           >
-              <!-- Mobilde hamburger menü, desktop'ta collapse/expand ikonu -->
-              <svg v-if="isMobile" class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-              </svg>
-              <svg v-else-if="isCollapsed" class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-              </svg>
-              <svg v-else class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>
           </button>
           
@@ -277,13 +267,8 @@ const checkMobile = () => {
     isMobile.value = window.innerWidth < 1024
     if (isMobile.value) {
         sidebarOpen.value = false
-        isCollapsed.value = false
     } else {
         sidebarOpen.value = true
-        // Desktop'ta varsayılan olarak açık
-        if (isCollapsed.value === undefined) {
-            isCollapsed.value = false
-        }
     }
 }
 

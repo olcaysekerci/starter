@@ -4,8 +4,9 @@
     page-title="Rol Düzenle"
     :breadcrumbs="[
       { title: 'Dashboard', url: '/dashboard' },
-      { title: 'Roller', url: '/panel/roles' },
-      { title: role.name, url: null }
+      { title: 'Kullanıcı Yönetimi', url: '/panel/users' },
+      { title: 'Roller', url: '/panel/users/roles' },
+      { title: role.name }
     ]"
   >
     <!-- Page Header -->
@@ -44,6 +45,15 @@
               v-model="form.name"
               :error="form.errors.name"
               placeholder="Örn: Admin, Editor, Viewer"
+              required
+            />
+          </FormGroup>
+
+          <FormGroup label="Guard Name" required>
+            <TextInput
+              v-model="form.guard_name"
+              :error="form.errors.guard_name"
+              placeholder="web"
               required
             />
           </FormGroup>
@@ -147,6 +157,7 @@ const { showSuccess, showError } = useNotification()
 // Form
 const form = useForm({
   name: props.role.name || '',
+  guard_name: props.role.guard_name || 'web',
   description: props.role.description || '',
   permissions: props.role.permissions ? props.role.permissions.map(p => p.id) : []
 })
