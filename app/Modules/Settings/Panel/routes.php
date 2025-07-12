@@ -22,8 +22,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::post('/test', [SettingsController::class, 'testMail'])->name('test');
             });
             
-            // Eski route'lar (geriye uyumluluk için)
-            Route::get('/profile', [SettingsController::class, 'profile'])->name('profile');
+            // Profil ayarları
+            Route::prefix('profile')->name('profile.')->group(function () {
+                Route::get('/', [SettingsController::class, 'profile'])->name('index');
+                Route::put('/', [SettingsController::class, 'updateProfile'])->name('update');
+                Route::put('/password', [SettingsController::class, 'updatePassword'])->name('password');
+            });
+            
+            // Güvenlik ayarları
             Route::get('/security', [SettingsController::class, 'security'])->name('security');
         });
     });

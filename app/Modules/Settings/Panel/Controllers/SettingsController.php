@@ -7,6 +7,8 @@ use App\Modules\Settings\Services\SettingsService;
 use App\Modules\Settings\Requests\UpdateAppSettingsRequest;
 use App\Modules\Settings\Requests\UpdateMailSettingsRequest;
 use App\Modules\Settings\Requests\TestMailRequest;
+use App\Modules\Settings\Requests\UpdateProfileRequest;
+use App\Modules\Settings\Requests\UpdatePasswordRequest;
 use App\Modules\Settings\Exceptions\SettingsException;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -115,12 +117,58 @@ class SettingsController extends Controller
     }
 
     /**
-     * Profil ayarları (eski method - geriye uyumluluk için)
+     * Profil ayarları
      */
     public function profile(): Response
     {
-        return Inertia::render('Settings/Panel/Profile');
+        $user = auth()->user();
+        
+        return Inertia::render('Settings/Panel/Profile', [
+            'user' => $user
+        ]);
     }
+
+    /**
+     * Profil bilgilerini güncelle
+     */
+    public function updateProfile(UpdateProfileRequest $request): RedirectResponse
+    {
+        try {
+            $user = auth()->user();
+            $user->update($request->validated());
+            
+            return back()->with('success', 'Profil bilgileriniz başarıyla güncellendi.');
+        } catch (\Exception $e) {
+            Log::error('Profil güncellenirken hata oluştu', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage()
+            ]);
+            return back()->with('error', 'Profil güncellenirken bir hata oluştu.');
+        }
+    }
+
+    /**
+     * Şifre güncelle
+     */
+    public function updatePassword(UpdatePasswordRequest $request): RedirectResponse
+    {
+        try {
+            $user = auth()->user();
+            $user->update([
+                'password' => bcrypt($request->password)
+            ]);
+            
+            return back()->with('success', 'Şifreniz başarıyla güncellendi.');
+        } catch (\Exception $e) {
+            Log::error('Şifre güncellenirken hata oluştu', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage()
+            ]);
+            return back()->with('error', 'Şifre güncellenirken bir hata oluştu.');
+        }
+    }
+
+
 
     /**
      * Güvenlik ayarları (eski method - geriye uyumluluk için)

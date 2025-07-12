@@ -146,7 +146,7 @@ const menuItems = [
     name: 'Settings', label: 'Ayarlar', icon: Cog6ToothIcon, children: [
       { name: 'Settings/Panel/App', label: 'Uygulama Ayarları', href: route('panel.settings.app.index'), routeName: 'panel.settings.app.' },
       { name: 'Settings/Panel/Mail', label: 'Mail Ayarları', href: route('panel.settings.mail.index'), routeName: 'panel.settings.mail.' },
-      { name: 'Settings/Panel/Profile', label: 'Profil Ayarları', href: route('panel.settings.profile'), routeName: 'panel.settings.profile' },
+      { name: 'Settings/Panel/Profile', label: 'Profil Ayarları', href: route('panel.settings.profile.index'), routeName: 'panel.settings.profile.index' },
       { name: 'Settings/Panel/Security', label: 'Güvenlik', href: route('panel.settings.security'), routeName: 'panel.settings.security' }
     ]
   }

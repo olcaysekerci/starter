@@ -37,9 +37,9 @@
               Mail Ayarları
             </Link>
             <Link 
-              :href="route('panel.settings.profile')"
+              :href="route('panel.settings.profile.index')"
               class="flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
-              :class="route().current('panel.settings.profile') ? 'bg-indigo-50 dark:bg-gray-800 text-indigo-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300'"
+              :class="route().current('panel.settings.profile.index') ? 'bg-indigo-50 dark:bg-gray-800 text-indigo-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300'"
             >
               <UserIcon class="w-4 h-4 mr-3" />
               Profil Ayarları

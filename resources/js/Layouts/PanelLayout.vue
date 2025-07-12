@@ -178,11 +178,11 @@
               <!-- User Dropdown Menu -->
               <div v-if="showUserMenu" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
                   <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                      <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">Admin Kullanıcı</p>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 truncate">admin@example.com</p>
+                      <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ usePage().props.auth.user.full_name }}</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ usePage().props.auth.user.email }}</p>
                   </div>
                   <div class="py-1">
-                      <Link href="/profile" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                      <Link :href="route('panel.settings.profile.index')" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                           <svg class="w-4 h-4 text-gray-500 dark:text-gray-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                           </svg>
@@ -224,7 +224,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Head, Link } from '@inertiajs/vue3'
+import { Head, Link, usePage } from '@inertiajs/vue3'
 import Sidebar from '@/Components/Panel/Navigation/Sidebar.vue'
 import DarkModeToggle from '@/Components/Panel/DarkModeToggle.vue'
 import Breadcrumb from '@/Components/Panel/Header/Breadcrumb.vue'
