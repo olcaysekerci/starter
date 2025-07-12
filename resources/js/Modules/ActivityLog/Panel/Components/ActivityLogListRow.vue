@@ -2,23 +2,7 @@
   <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">#{{ log.id }}</td>
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-      <div class="flex items-center">
-        <div class="flex-shrink-0 h-8 w-8">
-          <div class="h-8 w-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ getUserInitials(log.causer?.full_name || log.user_name || 'Sistem') }}
-            </span>
-          </div>
-        </div>
-        <div class="ml-3">
-          <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-            {{ log.causer?.full_name || log.user_name || 'Sistem' }}
-          </div>
-          <div v-if="log.causer?.email" class="text-sm text-gray-500 dark:text-gray-400">
-            {{ log.causer.email }}
-          </div>
-        </div>
-      </div>
+      {{ log.causer?.full_name || log.user_name || 'Sistem' }}
     </td>
     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
       <span :class="getEventBadgeClass(log.event)" class="px-2 py-1 rounded text-xs font-semibold">
@@ -71,10 +55,6 @@ const formatTime = (date) => {
   return d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
 }
 
-const getUserInitials = (name) => {
-  if (!name || name === 'Sistem') return 'S'
-  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-}
 
 const getEventLabel = (event) => {
   const labels = {

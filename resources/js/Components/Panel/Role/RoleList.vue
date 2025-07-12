@@ -18,12 +18,6 @@
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             Kullanıcılar
           </th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Durum
-          </th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Oluşturulma
-          </th>
           <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             İşlemler
           </th>
@@ -34,50 +28,17 @@
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
             #{{ role.id }}
           </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex items-center">
-              <div>
-                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {{ role.display_name || role.name }}
-                </div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                  {{ role.name }}
-                </div>
-              </div>
-            </div>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+            {{ role.display_name || role.name }}
           </td>
-          <td class="px-6 py-4">
-            <div class="text-sm text-gray-900 dark:text-gray-100 max-w-xs truncate">
-              {{ role.description || 'Açıklama yok' }}
-            </div>
+          <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-200 max-w-xs truncate">
+            {{ role.description || '-' }}
           </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-900 dark:text-gray-100">
-              {{ role.permissions?.length || 0 }} yetki
-            </div>
-            <div class="text-xs text-gray-500 dark:text-gray-400">
-              {{ getPermissionNames(role.permissions) }}
-            </div>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+            {{ role.permissions?.length || 0 }} yetki
           </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-900 dark:text-gray-100">
-              {{ role.users_count || 0 }} kullanıcı
-            </div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <span 
-              :class="[
-                'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-                role.is_active 
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                  : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-              ]"
-            >
-              {{ role.is_active ? 'Aktif' : 'Pasif' }}
-            </span>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-            {{ formatDate(role.created_at) }}
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+            {{ role.users_count || 0 }} kullanıcı
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex items-center justify-end space-x-1">
@@ -146,23 +107,6 @@ const props = defineProps({
 const emit = defineEmits(['edit', 'delete', 'view'])
 
 // Methods
-const getPermissionNames = (permissions) => {
-  if (!permissions || permissions.length === 0) {
-    return 'Yetki yok'
-  }
-  
-  const names = permissions.map(p => p.display_name || p.name).slice(0, 3)
-  if (permissions.length > 3) {
-    names.push(`+${permissions.length - 3} daha`)
-  }
-  
-  return names.join(', ')
-}
-
-const formatDate = (date) => {
-  if (!date) return '-'
-  return new Date(date).toLocaleDateString('tr-TR')
-}
 
 const isSystemRole = (role) => {
   return ['super-admin', 'admin'].includes(role.name)
