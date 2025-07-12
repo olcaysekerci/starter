@@ -37,6 +37,24 @@ class MailNotificationController extends Controller
             ];
 
             $mailLogs = $this->mailNotificationRepository->getWithFilters($filters, 15);
+            
+            // Mail loglarının accessor'larının düzgün çalışması için
+            $mailLogs->getCollection()->transform(function ($mailLog) {
+                return [
+                    'id' => $mailLog->id,
+                    'recipient' => $mailLog->recipient,
+                    'subject' => $mailLog->subject,
+                    'content' => $mailLog->content,
+                    'type' => $mailLog->type,
+                    'status' => $mailLog->status->value,
+                    'status_label' => $mailLog->status_label,
+                    'status_badge_class' => $mailLog->status_badge_class,
+                    'sent_at' => $mailLog->sent_at,
+                    'error_message' => $mailLog->error_message,
+                    'created_at' => $mailLog->created_at,
+                    'updated_at' => $mailLog->updated_at,
+                ];
+            });
 
             // İstatistikler
             $stats = $this->mailNotificationService->getStats();

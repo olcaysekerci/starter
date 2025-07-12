@@ -46,15 +46,6 @@
             {{ activeFilterCount }}
           </span>
         </ActionButton>
-        <ActionButton 
-          @click="retryFailedMails" 
-          variant="warning" 
-          size="sm"
-          :disabled="stats.failed === 0"
-        >
-          <ArrowPathIcon class="w-4 h-4 mr-2" />
-          Yeniden Dene
-        </ActionButton>
       </template>
     </PageHeader>
 
@@ -71,12 +62,6 @@
         :value="stats.sent"
         color="green"
         :icon="CheckCircleIcon"
-      />
-      <InPageStatCard
-        title="Başarısız"
-        :value="stats.failed"
-        color="red"
-        :icon="XCircleIcon"
       />
       <InPageStatCard
         title="Bugün"
@@ -125,6 +110,9 @@
           <thead class="bg-gray-50 dark:bg-gray-700">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                ID
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Alıcı
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -146,6 +134,9 @@
           </thead>
           <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             <tr v-for="mailLog in mailLogs.data" :key="mailLog.id" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                {{ mailLog.id }}
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                 {{ mailLog.recipient }}
               </td>
@@ -176,15 +167,6 @@
                     title="Görüntüle"
                   >
                     <EyeIcon class="w-4 h-4" />
-                  </TableActionButton>
-                  <TableActionButton
-                    v-if="mailLog.status === 'failed' && mailLog.can_retry"
-                    @click="retrySingleMail(mailLog.id)"
-                    variant="warning"
-                    size="sm"
-                    title="Yeniden Dene"
-                  >
-                    <ArrowPathIcon class="w-4 h-4" />
                   </TableActionButton>
                 </div>
               </td>
@@ -248,10 +230,8 @@ import { router } from '@inertiajs/vue3'
 import {
   EnvelopeIcon,
   CheckCircleIcon,
-  XCircleIcon,
   CalendarIcon,
-  EyeIcon,
-  ArrowPathIcon
+  EyeIcon
 } from '@heroicons/vue/24/outline'
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
@@ -373,14 +353,6 @@ const sendTestMail = async () => {
   } finally {
     sendingTestMail.value = false
   }
-}
-
-const retryFailedMails = async () => {
-  await router.post(route('panel.mail-notifications.retry'))
-}
-
-const retrySingleMail = async (id) => {
-  await router.post(route('panel.mail-notifications.retry-single', id))
 }
 
 const exportExcel = () => {

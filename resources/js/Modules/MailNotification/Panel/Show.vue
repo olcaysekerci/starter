@@ -15,13 +15,13 @@
     >
       <template #actions>
         <ActionButton 
-          v-if="mailLog.status === 'failed' && mailLog.can_retry"
-          @click="retryMail" 
-          variant="warning" 
+          @click="resendMail" 
+          variant="primary" 
           size="sm"
+          :disabled="mailLog.status === 'sent'"
         >
-          <ArrowPathIcon class="w-4 h-4 mr-2" />
-          Yeniden Dene
+          <EnvelopeIcon class="w-4 h-4 mr-2" />
+          Yeniden Gönder
         </ActionButton>
       </template>
     </PageHeader>
@@ -129,97 +129,28 @@
             </div>
           </div>
         </div>
-
-        <!-- Actions -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">İşlemler</h3>
-          </div>
-          <div class="p-6 space-y-3">
-            <ActionButton 
-              @click="resendMail" 
-              variant="primary" 
-              size="sm"
-              class="w-full"
-              :disabled="mailLog.status === 'sent'"
-            >
-              <EnvelopeIcon class="w-4 h-4 mr-2" />
-              Yeniden Gönder
-            </ActionButton>
-            
-            <ActionButton 
-              @click="deleteMail" 
-              variant="danger" 
-              size="sm"
-              class="w-full"
-            >
-              <TrashIcon class="w-4 h-4 mr-2" />
-              Sil
-            </ActionButton>
-          </div>
-        </div>
       </div>
     </div>
-
-    <!-- Delete Modal -->
-    <DeleteModal
-      :show="showDeleteModal"
-      :title="deleteConfig.title"
-      :description="deleteConfig.description"
-      :additional-info="deleteConfig.additionalInfo"
-      :loading="deleteLoading"
-      @close="closeDeleteModal"
-      @confirm="confirmDelete"
-    />
   </PanelLayout>
 </template>
 
 <script setup>
 import { router } from '@inertiajs/vue3'
 import {
-  ArrowLeftIcon,
-  ArrowPathIcon,
-  EnvelopeIcon,
-  TrashIcon
+  EnvelopeIcon
 } from '@heroicons/vue/24/outline'
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
-import DeleteModal from '@/Components/Panel/DeleteModal.vue'
-import { useDeleteModal } from '@/Composables/useDeleteModal'
 
 // Props
 const props = defineProps({
   mailLog: Object,
 })
 
-// Delete modal
-const { 
-  showDeleteModal, 
-  deleteLoading, 
-  deleteConfig, 
-  openDeleteModal, 
-  closeDeleteModal, 
-  confirmDelete 
-} = useDeleteModal()
-
 // Methods
-
-const retryMail = async () => {
-  await router.post(route('panel.mail-notifications.retry-single', props.mailLog.id))
-}
-
 const resendMail = async () => {
   await router.post(route('panel.mail-notifications.resend', props.mailLog.id))
-}
-
-const deleteMail = async () => {
-  openDeleteModal(props.mailLog, {
-    title: 'Mail Log Silme Onayı',
-    description: `Bu mail logunu silmek istediğinizden emin misiniz?`,
-    additionalInfo: 'Bu işlem geri alınamaz ve mail gönderim geçmişi kalıcı olarak silinecektir.',
-    route: 'panel.mail-notifications.destroy'
-  })
 }
 
 const formatDate = (date) => {
