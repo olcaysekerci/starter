@@ -13,6 +13,33 @@ use Illuminate\Support\Facades\Activity;
 class AuthEventListener
 {
     /**
+     * Event listener'ın ana metodu
+     */
+    public function __invoke($event): void
+    {
+        switch (get_class($event)) {
+            case Login::class:
+                $this->handleLogin($event);
+                break;
+            case Logout::class:
+                $this->handleLogout($event);
+                break;
+            case Failed::class:
+                $this->handleFailed($event);
+                break;
+            case PasswordReset::class:
+                $this->handlePasswordReset($event);
+                break;
+            case Registered::class:
+                $this->handleRegistered($event);
+                break;
+            case Verified::class:
+                $this->handleVerified($event);
+                break;
+        }
+    }
+
+    /**
      * Kullanıcı giriş yaptığında
      */
     public function handleLogin(Login $event): void
