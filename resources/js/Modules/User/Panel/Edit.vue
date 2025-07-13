@@ -77,23 +77,49 @@
           </FormGroup>
 
           <FormGroup label="Yeni Şifre">
-            <TextInput
-              v-model="form.password"
-              type="password"
-              :error="form.errors.password"
-              placeholder="Değiştirmek istiyorsanız yeni şifre girin"
-              :minlength="6"
-            />
+            <div class="relative">
+              <input
+                v-model="form.password"
+                :type="showPassword ? 'text' : 'password'"
+                :error="form.errors.password"
+                placeholder="Yeni şifre girin"
+                :minlength="6"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-indigo-400 dark:focus:ring-indigo-400 sm:text-sm pr-10"
+                :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-600 dark:focus:border-red-400 dark:focus:ring-red-400': form.errors.password }"
+              />
+              <button
+                type="button"
+                @click="showPassword = !showPassword"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <EyeIcon v-if="!showPassword" class="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                <EyeSlashIcon v-else class="h-5 w-5 text-gray-400 hover:text-gray-600" />
+              </button>
+            </div>
+            <p v-if="form.errors.password" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.password }}</p>
           </FormGroup>
 
           <FormGroup label="Şifre Tekrarı">
-            <TextInput
-              v-model="form.password_confirmation"
-              type="password"
-              :error="form.errors.password_confirmation"
-              placeholder="Yeni şifreyi tekrar girin"
-              :minlength="6"
-            />
+            <div class="relative">
+              <input
+                v-model="form.password_confirmation"
+                :type="showPasswordConfirmation ? 'text' : 'password'"
+                :error="form.errors.password_confirmation"
+                placeholder="Yeni şifreyi tekrar girin"
+                :minlength="6"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-indigo-400 dark:focus:ring-indigo-400 sm:text-sm pr-10"
+                :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-600 dark:focus:border-red-400 dark:focus:ring-red-400': form.errors.password_confirmation }"
+              />
+              <button
+                type="button"
+                @click="showPasswordConfirmation = !showPasswordConfirmation"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <EyeIcon v-if="!showPasswordConfirmation" class="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                <EyeSlashIcon v-else class="h-5 w-5 text-gray-400 hover:text-gray-600" />
+              </button>
+            </div>
+            <p v-if="form.errors.password_confirmation" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.password_confirmation }}</p>
           </FormGroup>
         </div>
 
@@ -123,7 +149,8 @@
 
 <script setup>
 import { useForm } from '@inertiajs/vue3'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
@@ -144,6 +171,10 @@ const props = defineProps({
     default: () => []
   }
 })
+
+// Password visibility states
+const showPassword = ref(false)
+const showPasswordConfirmation = ref(false)
 
 // Form
 const form = useForm({

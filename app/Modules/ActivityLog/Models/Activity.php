@@ -145,17 +145,98 @@ class Activity extends SpatieActivity
         $changes = $this->properties['changes'] ?? [];
         $formatted = [];
 
+        // Field name mapping
+        $fieldNames = [
+            'first_name' => 'Ad',
+            'last_name' => 'Soyad',
+            'name' => 'Ad',
+            'email' => 'E-posta',
+            'phone' => 'Telefon',
+            'address' => 'Adres',
+            'password' => 'Şifre',
+            'role_id' => 'Rol',
+            'is_active' => 'Aktif Durum',
+            'email_verified_at' => 'E-posta Doğrulama',
+            'display_name' => 'Görünen Ad',
+            'description' => 'Açıklama',
+            'guard_name' => 'Guard Adı',
+            'permissions' => 'Yetkiler',
+            'settings' => 'Ayarlar',
+            'value' => 'Değer',
+            'type' => 'Tür',
+            'status' => 'Durum',
+            'subject' => 'Konu',
+            'content' => 'İçerik',
+            'recipient' => 'Alıcı',
+            'from_name' => 'Gönderen Adı',
+            'from_email' => 'Gönderen E-posta',
+            'sent_at' => 'Gönderilme Tarihi',
+            'attempts' => 'Deneme Sayısı',
+            'error_message' => 'Hata Mesajı',
+        ];
+
         foreach ($changes as $field => $change) {
+            $fieldName = $fieldNames[$field] ?? ucfirst(str_replace('_', ' ', $field));
+            
+            // Özel değer formatlamaları
+            $oldValue = $this->formatFieldValue($field, $change['old'] ?? null);
+            $newValue = $this->formatFieldValue($field, $change['new'] ?? null);
+            
             $formatted[] = [
                 'field' => $field,
-                'field_name' => $change['field_name'] ?? ucfirst($field),
-                'old_value' => $change['old'] ?? 'Boş',
-                'new_value' => $change['new'] ?? 'Boş',
-                'is_important' => in_array($field, ['email', 'password', 'name']),
+                'field_name' => $fieldName,
+                'old_value' => $oldValue,
+                'new_value' => $newValue,
+                'is_important' => in_array($field, ['email', 'password', 'name', 'first_name', 'last_name', 'role_id']),
             ];
         }
 
         return $formatted;
+    }
+
+    /**
+     * Field değerlerini formatla
+     */
+    private function formatFieldValue(string $field, $value): string
+    {
+        if ($value === null || $value === '') {
+            return 'Boş';
+        }
+
+        // Boolean değerler
+        if (is_bool($value)) {
+            return $value ? 'Evet' : 'Hayır';
+        }
+
+        // Tarih değerleri
+        if (in_array($field, ['email_verified_at', 'sent_at', 'created_at', 'updated_at'])) {
+            if ($value) {
+                return \Carbon\Carbon::parse($value)->format('d.m.Y H:i');
+            }
+            return 'Boş';
+        }
+
+        // Şifre alanı
+        if ($field === 'password') {
+            return '••••••••';
+        }
+
+        // Aktif durum
+        if ($field === 'is_active') {
+            return $value ? 'Aktif' : 'Pasif';
+        }
+
+        // E-posta doğrulama
+        if ($field === 'email_verified_at') {
+            return $value ? 'Doğrulanmış' : 'Doğrulanmamış';
+        }
+
+        // Array değerler
+        if (is_array($value)) {
+            return implode(', ', $value);
+        }
+
+        return (string) $value;
     }
 
     /**
