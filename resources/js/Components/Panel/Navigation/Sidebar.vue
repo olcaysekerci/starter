@@ -2,13 +2,14 @@
   <aside
     v-show="props.isOpen"
     :class="[
-      props.isCollapsed ? 'w-20' : 'w-64',
+      // Mobilde tam genişlik, desktop'ta normal genişlik
+      props.isCollapsed && !isMobile ? 'w-20' : !isMobile ? 'w-64' : 'w-full max-w-xs',
       'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-300 z-50 fixed left-0 top-0 h-screen'
     ]"
   >
     <!-- Logo ve Başlık -->
     <div class="flex items-center h-16 px-6 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
-      <span v-if="!props.isCollapsed" class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Admin Panel</span>
+      <span v-if="!props.isCollapsed || isMobile" class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Admin Panel</span>
       <span v-else class="text-lg font-bold text-gray-900 dark:text-white tracking-tight"><HomeIcon class="w-7 h-7" /></span>
       <button @click="$emit('close')" class="ml-auto p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 lg:hidden">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,7 +29,7 @@
                 ? 'bg-gradient-to-r from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 text-indigo-700 dark:text-indigo-200 shadow-sm' 
                 : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-indigo-700 dark:hover:text-indigo-300'
             ]"
-            :title="props.isCollapsed ? item.label : ''"
+            :title="props.isCollapsed && !isMobile ? item.label : ''"
           >
             <span class="mr-3 flex-shrink-0 relative">
               <component :is="item.icon" :class="[
@@ -36,10 +37,10 @@
                 isParentActive(item) ? 'text-indigo-600 dark:text-indigo-300 drop-shadow-sm' : 'text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
               ]" />
               <!-- Collapsed durumda aktif göstergesi -->
-              <div v-if="isParentActive(item) && props.isCollapsed" class="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full border-2 border-white dark:border-gray-900 shadow-sm"></div>
+              <div v-if="isParentActive(item) && props.isCollapsed && !isMobile" class="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full border-2 border-white dark:border-gray-900 shadow-sm"></div>
             </span>
-            <span v-if="!props.isCollapsed">{{ item.label }}</span>
-            <svg v-if="!props.isCollapsed" :class="[
+            <span v-if="!props.isCollapsed || isMobile">{{ item.label }}</span>
+            <svg v-if="!props.isCollapsed || isMobile" :class="[
               'ml-auto w-4 h-4 transition-all duration-200',
               isParentActive(item) ? 'text-indigo-600 dark:text-indigo-300 drop-shadow-sm' : 'text-gray-400',
               dropdownOpen === item.name ? 'rotate-180' : ''
@@ -47,7 +48,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          <div v-if="dropdownOpen === item.name && !props.isCollapsed" class="ml-4 mt-1 space-y-1">
+          <div v-if="dropdownOpen === item.name && (!props.isCollapsed || isMobile)" class="ml-4 mt-1 space-y-1">
             <Link
               v-for="child in item.children"
               :key="child.name"
@@ -72,7 +73,7 @@
               ? 'bg-gradient-to-r from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 text-indigo-700 dark:text-indigo-200 font-semibold shadow-sm' 
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-indigo-700 dark:hover:text-indigo-300'
           ]"
-          :title="props.isCollapsed ? item.label : ''"
+          :title="props.isCollapsed && !isMobile ? item.label : ''"
         >
           <span class="mr-3 flex-shrink-0 relative">
             <component :is="item.icon" :class="[
@@ -80,16 +81,16 @@
               isActive(item) ? 'text-indigo-600 dark:text-indigo-300 drop-shadow-sm' : 'text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
             ]" />
             <!-- Collapsed durumda aktif göstergesi -->
-            <div v-if="isActive(item) && props.isCollapsed" class="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full border-2 border-white dark:border-gray-900 shadow-sm"></div>
+            <div v-if="isActive(item) && props.isCollapsed && !isMobile" class="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full border-2 border-white dark:border-gray-900 shadow-sm"></div>
           </span>
-          <span v-if="!props.isCollapsed">{{ item.label }}</span>
+          <span v-if="!props.isCollapsed || isMobile">{{ item.label }}</span>
         </Link>
       </template>
     </nav>
 
     <!-- Sidebar Footer -->
     <div @click.stop class="flex-shrink-0 border-t border-gray-200 dark:border-gray-800 p-4">
-      <div v-if="!props.isCollapsed" class="space-y-3">
+      <div v-if="!props.isCollapsed || isMobile" class="space-y-3">
         <!-- Sistem Durumu -->
         <div class="flex items-center justify-between text-xs">
           <span class="text-gray-500 dark:text-gray-400">Sistem Durumu</span>
@@ -117,11 +118,11 @@
     </div>
   </aside>
   <!-- Mobilde overlay -->
-  <div v-if="props.isOpen" @click="$emit('close')" class="fixed inset-0 z-30 bg-black bg-opacity-50 lg:hidden"></div>
+  <div v-if="props.isOpen" @click="$emit('close')" class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"></div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { usePage, Link, router } from '@inertiajs/vue3'
 import { HomeIcon, UsersIcon, DocumentTextIcon, EnvelopeIcon, Cog6ToothIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline'
 
@@ -130,6 +131,13 @@ const props = defineProps({
   isOpen: { type: Boolean, default: false },
   isCollapsed: { type: Boolean, default: false }
 })
+
+// Mobil kontrolü
+const isMobile = ref(false)
+const checkMobile = () => {
+  isMobile.value = window.innerWidth < 1024
+}
+
 const page = usePage()
 const route = window.route
 const menuItems = [
@@ -182,6 +190,16 @@ const checkAndOpenDropdown = () => {
 
 // Sayfa değiştiğinde kontrol et
 watch(() => page.url, checkAndOpenDropdown, { immediate: true })
+
+// Mobil kontrolü için event listener
+onMounted(() => {
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile)
+})
 
 const toggleDropdown = (name) => {
   if (dropdownOpen.value === name) {
