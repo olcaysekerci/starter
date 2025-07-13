@@ -3,7 +3,6 @@
     title="Yeni Kullanıcı" 
     page-title="Yeni Kullanıcı Oluştur"
     :breadcrumbs="[
-      { title: 'Dashboard', url: '/dashboard' },
       { title: 'Kullanıcı Yönetimi', url: '/panel/users' },
       { title: 'Yeni Kullanıcı' }
     ]"

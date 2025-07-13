@@ -3,7 +3,6 @@
     title="Mail Ayarları" 
     page-title="Mail Ayarları"
     :breadcrumbs="[
-      { title: 'Dashboard', url: route('panel.dashboard') },
       { title: 'Ayarlar', url: route('panel.settings.index') },
       { title: 'Mail Ayarları' }
     ]"

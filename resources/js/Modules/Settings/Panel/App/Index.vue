@@ -3,7 +3,6 @@
     title="Uygulama Ayarları" 
     page-title="Uygulama Ayarları"
     :breadcrumbs="[
-      { title: 'Dashboard', url: route('panel.dashboard') },
       { title: 'Ayarlar', url: route('panel.settings.index') },
       { title: 'Uygulama Ayarları' }
     ]"

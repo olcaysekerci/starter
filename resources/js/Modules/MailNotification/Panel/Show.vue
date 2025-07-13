@@ -3,7 +3,6 @@
     title="Mail Detayı" 
     page-title="Mail Detayı"
     :breadcrumbs="[
-      { title: 'Dashboard', url: '/dashboard' },
       { title: 'Mail Bildirimleri', url: route('panel.mail-notifications.index') },
       { title: 'Mail Detayı' }
     ]"

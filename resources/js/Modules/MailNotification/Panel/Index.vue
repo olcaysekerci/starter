@@ -3,7 +3,6 @@
     title="Mail Bildirimleri" 
     page-title="Mail Bildirimleri"
     :breadcrumbs="[
-      { title: 'Dashboard', url: '/dashboard' },
       { title: 'Mail Bildirimleri' }
     ]"
   >

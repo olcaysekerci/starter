@@ -3,7 +3,6 @@
     title="Aktivite Logları" 
     page-title="Aktivite Logları"
     :breadcrumbs="[
-      { title: 'Dashboard', url: '/dashboard' },
       { title: 'Aktivite Logları' }
     ]"
   >

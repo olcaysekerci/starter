@@ -3,7 +3,6 @@
     title="Kullanıcı Yönetimi" 
     page-title="Kullanıcı Yönetimi"
     :breadcrumbs="[
-      { title: 'Dashboard', url: '/dashboard' },
       { title: 'Kullanıcı Yönetimi' }
     ]"
   >

@@ -3,7 +3,6 @@
     title="Güvenlik Ayarları" 
     page-title="Güvenlik Ayarları"
     :breadcrumbs="[
-      { title: 'Dashboard', url: route('panel.dashboard') },
       { title: 'Ayarlar', url: route('panel.settings.index') },
       { title: 'Güvenlik Ayarları' }
     ]"

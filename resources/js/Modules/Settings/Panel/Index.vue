@@ -3,7 +3,6 @@
     title="Ayarlar" 
     page-title="Ayarlar"
     :breadcrumbs="[
-      { title: 'Dashboard', url: route('panel.dashboard') },
       { title: 'Ayarlar' }
     ]"
   >

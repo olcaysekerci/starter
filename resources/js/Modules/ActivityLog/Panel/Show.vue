@@ -3,7 +3,6 @@
     title="Log Detayı" 
     page-title="Log Detayı"
     :breadcrumbs="[
-      { title: 'Dashboard', url: '/dashboard' },
       { title: 'Aktivite Logları', url: '/panel/activity-logs' },
       { title: `Log #${log.id}` }
     ]"

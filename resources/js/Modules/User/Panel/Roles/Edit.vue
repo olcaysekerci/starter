@@ -3,7 +3,6 @@
     title="Rol Düzenle" 
     page-title="Rol Düzenle"
     :breadcrumbs="[
-      { title: 'Dashboard', url: '/dashboard' },
       { title: 'Roller', url: '/panel/roles' },
       { title: role.display_name || role.name }
     ]"

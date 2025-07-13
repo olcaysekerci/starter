@@ -3,7 +3,6 @@
     title="Profil Ayarları" 
     page-title="Profil Ayarları"
     :breadcrumbs="[
-      { title: 'Dashboard', url: route('panel.dashboard') },
       { title: 'Ayarlar', url: route('panel.settings.index') },
       { title: 'Profil Ayarları' }
     ]"

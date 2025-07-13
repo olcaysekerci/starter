@@ -3,7 +3,6 @@
     title="Yeni Rol Oluştur" 
     page-title="Yeni Rol Oluştur"
     :breadcrumbs="[
-      { title: 'Dashboard', url: '/dashboard' },
       { title: 'Roller', url: '/panel/roles' },
       { title: 'Yeni Rol Oluştur' }
     ]"

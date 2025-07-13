@@ -3,7 +3,6 @@
     title="Kullanıcı Detayı" 
     page-title="Kullanıcı Detayı"
     :breadcrumbs="[
-      { title: 'Dashboard', url: '/dashboard' },
       { title: 'Kullanıcı Yönetimi', url: '/panel/users' },
       { title: user.full_name }
     ]"

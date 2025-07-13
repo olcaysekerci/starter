@@ -3,7 +3,6 @@
     title="Rol Yönetimi" 
     page-title="Rol Yönetimi"
     :breadcrumbs="[
-      { title: 'Dashboard', url: '/dashboard' },
       { title: 'Rol Yönetimi' }
     ]"
   >
