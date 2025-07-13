@@ -199,7 +199,10 @@ const saveRole = () => {
   form.put(`/panel/roles/${props.role.id}`, {
     onSuccess: () => {
       showSuccess('Rol başarıyla güncellendi')
-      router.visit(route('panel.roles.index'))
+      // Notification'ın görünmesi için kısa bir gecikme
+      setTimeout(() => {
+        router.visit(route('panel.roles.index'))
+      }, 1500)
     },
     onError: (errors) => {
       // Validation hataları form üzerinde gösterilecek

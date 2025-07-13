@@ -159,6 +159,7 @@ import TextInput from '@/Components/Panel/Forms/TextInput.vue'
 import TextArea from '@/Components/Panel/Forms/TextArea.vue'
 import Select from '@/Components/Panel/Forms/Select.vue'
 import FormCard from '@/Components/Panel/Forms/FormCard.vue'
+import { useNotification } from '@/Composables'
 import { formatTurkishPhone } from '@/utils'
 
 const props = defineProps({
@@ -171,6 +172,9 @@ const props = defineProps({
     default: () => []
   }
 })
+
+// Composables
+const { showSuccess, showError } = useNotification()
 
 // Password visibility states
 const showPassword = ref(false)
@@ -243,11 +247,14 @@ const saveUser = () => {
   
   form.put(`/panel/users/${props.user.id}`, {
     onSuccess: () => {
-      // Başarılı olduğunda yapılacak işlemler
+      showSuccess('Kullanıcı başarıyla güncellendi')
     },
     onError: (errors) => {
       // Hata durumunda yapılacak işlemler
       // Server side validation errors will be shown in the form
+      if (Object.keys(errors).length === 0) {
+        showError('Kullanıcı güncellenirken bir hata oluştu')
+      }
     }
   })
 }

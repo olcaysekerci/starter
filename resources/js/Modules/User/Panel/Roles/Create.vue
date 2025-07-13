@@ -76,6 +76,29 @@
           <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
             Yetkiler
           </h3>
+          
+          <!-- Error message for permissions -->
+          <div v-if="$page.props.errors.permissions" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3 mb-4">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                  Yetki Seçimi Hatası
+                </h3>
+                <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                  <ul class="list-disc pl-5 space-y-1">
+                    <li v-for="(error, index) in $page.props.errors.permissions" :key="index">
+                      {{ error }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="space-y-4">
             <div v-for="(modulePermissions, moduleName) in permissions" :key="moduleName" class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
               <div class="flex items-center justify-between mb-3">
@@ -125,6 +148,7 @@ import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
 import FormCard from '@/Components/Panel/Forms/FormCard.vue'
+import { useNotification } from '@/Composables'
 
 const props = defineProps({
   permissions: {
@@ -141,6 +165,9 @@ const form = reactive({
   permissions: []
 })
 
+// Composables
+const { showSuccess, showError } = useNotification()
+
 const processing = ref(false)
 
 // Form submission
@@ -150,26 +177,32 @@ function submitForm() {
   router.post(route('panel.roles.store'), form, {
     onSuccess: () => {
       processing.value = false
+      showSuccess('Rol başarıyla oluşturuldu')
+      // Notification'ın görünmesi için kısa bir gecikme
+      setTimeout(() => {
+        router.visit(route('panel.roles.index'))
+      }, 1500)
     },
-    onError: () => {
+    onError: (errors) => {
       processing.value = false
+      showError('Rol oluşturulurken bir hata oluştu')
     }
   })
 }
 
 // Modül bazında tümünü seç/kaldır
 function isAllModuleSelected(modulePermissions) {
-  return modulePermissions.every(p => form.permissions.includes(p.name))
+  return modulePermissions.every(p => form.permissions.includes(p.id))
 }
 
 function toggleModulePermissions(modulePermissions) {
   const allSelected = isAllModuleSelected(modulePermissions)
   if (allSelected) {
     // Kaldır
-    form.permissions = form.permissions.filter(p => !modulePermissions.some(mp => mp.name === p))
+    form.permissions = form.permissions.filter(p => !modulePermissions.some(mp => mp.id === p))
   } else {
     // Ekle
-    const toAdd = modulePermissions.map(p => p.name).filter(p => !form.permissions.includes(p))
+    const toAdd = modulePermissions.map(p => p.id).filter(p => !form.permissions.includes(p))
     form.permissions = [...form.permissions, ...toAdd]
   }
 }
