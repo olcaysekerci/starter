@@ -46,7 +46,7 @@ class MailLog extends Model
     /**
      * Activity log ayarları
      */
-    protected static $logAttributes = [
+    protected $loggableAttributes = [
         'recipient',
         'subject',
         'type',
@@ -56,18 +56,35 @@ class MailLog extends Model
         'retry_count'
     ];
 
-    protected static $logOnlyDirty = true;
-    protected static $submitEmptyLogs = false;
+    protected $displayName = 'Mail Log';
 
-    public function getDescriptionForEvent(string $eventName): string
+    /**
+     * Activity log options override
+     */
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
-        $descriptions = [
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logOnly($this->loggableAttributes)
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('MailLog')
+            ->setDescriptionForEvent(function (string $eventName) {
+                return $this->getDescriptionForEvent($eventName);
+            });
+    }
+
+    /**
+     * Event açıklamalarını belirle
+     */
+    protected function getDescriptionForEvent(string $eventName): string
+    {
+        return match ($eventName) {
             'created' => 'Mail log kaydı oluşturuldu',
             'updated' => 'Mail log durumu güncellendi',
             'deleted' => 'Mail log kaydı silindi',
-        ];
-
-        return $descriptions[$eventName] ?? "Mail log {$eventName}";
+            'restored' => 'Mail log kaydı geri yüklendi',
+            default => "Mail log üzerinde {$eventName} işlemi yapıldı",
+        };
     }
 
     // Scopes

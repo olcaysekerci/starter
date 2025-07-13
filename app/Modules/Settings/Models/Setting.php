@@ -40,6 +40,35 @@ class Setting extends Model
     protected $displayName = 'Ayar';
 
     /**
+     * Activity log options override
+     */
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    {
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logOnly($this->loggableAttributes)
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('Setting')
+            ->setDescriptionForEvent(function (string $eventName) {
+                return $this->getDescriptionForEvent($eventName);
+            });
+    }
+
+    /**
+     * Event açıklamalarını belirle
+     */
+    protected function getDescriptionForEvent(string $eventName): string
+    {
+        return match ($eventName) {
+            'created' => 'Ayar oluşturuldu',
+            'updated' => 'Ayar güncellendi',
+            'deleted' => 'Ayar silindi',
+            'restored' => 'Ayar geri yüklendi',
+            default => "Ayar üzerinde {$eventName} işlemi yapıldı",
+        };
+    }
+
+    /**
      * Cache key oluştur
      */
     public static function getCacheKey(string $category, string $key): string

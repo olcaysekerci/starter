@@ -17,7 +17,7 @@ class UpdateRoleRequest extends FormRequest
             'name' => 'required|string|max:255|unique:roles,name,' . $this->route('role'),
             'description' => 'nullable|string|max:500',
             'permissions' => 'nullable|array',
-            'permissions.*' => 'string|exists:permissions,name',
+            'permissions.*' => 'integer|exists:permissions,id',
         ];
     }
 
@@ -29,7 +29,7 @@ class UpdateRoleRequest extends FormRequest
             'name.unique' => 'Bu rol adı zaten kullanılıyor.',
             'description.max' => 'Açıklama en fazla 500 karakter olabilir.',
             'permissions.array' => 'Yetkiler dizi formatında olmalıdır.',
-            'permissions.*.string' => 'Yetki adı metin formatında olmalıdır.',
+            'permissions.*.integer' => 'Yetki ID\'si sayı formatında olmalıdır.',
             'permissions.*.exists' => 'Seçilen yetki mevcut değil.',
         ];
     }

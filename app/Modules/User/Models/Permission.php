@@ -33,6 +33,35 @@ class Permission extends SpatiePermission
 
     protected $displayName = 'Yetki';
 
+    /**
+     * Activity log options override
+     */
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    {
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logOnly($this->loggableAttributes)
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('Permission')
+            ->setDescriptionForEvent(function (string $eventName) {
+                return $this->getDescriptionForEvent($eventName);
+            });
+    }
+
+    /**
+     * Event açıklamalarını belirle
+     */
+    protected function getDescriptionForEvent(string $eventName): string
+    {
+        return match ($eventName) {
+            'created' => 'Yetki oluşturuldu',
+            'updated' => 'Yetki güncellendi',
+            'deleted' => 'Yetki silindi',
+            'restored' => 'Yetki geri yüklendi',
+            default => "Yetki üzerinde {$eventName} işlemi yapıldı",
+        };
+    }
+
     protected static function boot()
     {
         parent::boot();

@@ -47,6 +47,35 @@ class User extends Authenticatable
     protected $displayName = 'Kullanıcı';
 
     /**
+     * Activity log options override
+     */
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    {
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logOnly($this->loggableAttributes)
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('User')
+            ->setDescriptionForEvent(function (string $eventName) {
+                return $this->getDescriptionForEvent($eventName);
+            });
+    }
+
+    /**
+     * Event açıklamalarını belirle
+     */
+    protected function getDescriptionForEvent(string $eventName): string
+    {
+        return match ($eventName) {
+            'created' => 'Kullanıcı oluşturdu',
+            'updated' => 'Kullanıcı güncelledi',
+            'deleted' => 'Kullanıcı sildi',
+            'restored' => 'Kullanıcı geri yükledi',
+            default => "Kullanıcı üzerinde {$eventName} işlemi yapıldı",
+        };
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>

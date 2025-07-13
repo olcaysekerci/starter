@@ -133,7 +133,12 @@ class Activity extends SpatieActivity
 
     public function getHasChangesAttribute(): bool
     {
-        return isset($this->properties['changes']) && !empty($this->properties['changes']);
+        // Hem Spatie formatı hem de özel formatımızı kontrol et
+        $hasSpatieChanges = isset($this->properties['changes']) && !empty($this->properties['changes']);
+        $hasCustomChanges = isset($this->properties['updated_data']) && !empty($this->properties['updated_data']);
+        $hasOldAttributes = isset($this->properties['old']) && isset($this->properties['attributes']);
+        
+        return $hasSpatieChanges || $hasCustomChanges || $hasOldAttributes;
     }
 
     public function getFormattedChangesAttribute(): array
@@ -142,11 +147,11 @@ class Activity extends SpatieActivity
             return [];
         }
 
-        $changes = $this->properties['changes'] ?? [];
         $formatted = [];
 
         // Field name mapping
         $fieldNames = [
+            // User fields
             'first_name' => 'Ad',
             'last_name' => 'Soyad',
             'name' => 'Ad',
@@ -157,38 +162,100 @@ class Activity extends SpatieActivity
             'role_id' => 'Rol',
             'is_active' => 'Aktif Durum',
             'email_verified_at' => 'E-posta Doğrulama',
+            'status' => 'Durum',
+            'type' => 'Tür',
+            
+            // Role & Permission fields
             'display_name' => 'Görünen Ad',
             'description' => 'Açıklama',
             'guard_name' => 'Guard Adı',
             'permissions' => 'Yetkiler',
-            'settings' => 'Ayarlar',
+            'module' => 'Modül',
+            
+            // Setting fields
+            'category' => 'Kategori',
+            'key' => 'Anahtar',
             'value' => 'Değer',
-            'type' => 'Tür',
-            'status' => 'Durum',
+            'is_public' => 'Genel Erişim',
+            
+            // Mail fields
             'subject' => 'Konu',
             'content' => 'İçerik',
             'recipient' => 'Alıcı',
             'from_name' => 'Gönderen Adı',
             'from_email' => 'Gönderen E-posta',
             'sent_at' => 'Gönderilme Tarihi',
-            'attempts' => 'Deneme Sayısı',
+            'retry_count' => 'Deneme Sayısı',
             'error_message' => 'Hata Mesajı',
+            'attempts' => 'Deneme Sayısı',
+            
+            // General fields
+            'settings' => 'Ayarlar',
+            'created_at' => 'Oluşturulma Tarihi',
+            'updated_at' => 'Güncellenme Tarihi',
         ];
 
-        foreach ($changes as $field => $change) {
-            $fieldName = $fieldNames[$field] ?? ucfirst(str_replace('_', ' ', $field));
+        // 1. Spatie'nin standart formatı (old/attributes)
+        if (isset($this->properties['old']) && isset($this->properties['attributes'])) {
+            $old = $this->properties['old'];
+            $new = $this->properties['attributes'];
             
-            // Özel değer formatlamaları
-            $oldValue = $this->formatFieldValue($field, $change['old'] ?? null);
-            $newValue = $this->formatFieldValue($field, $change['new'] ?? null);
+            foreach ($new as $field => $newValue) {
+                $oldValue = $old[$field] ?? null;
+                
+                $fieldName = $fieldNames[$field] ?? ucfirst(str_replace('_', ' ', $field));
+                $formattedOldValue = $this->formatFieldValue($field, $oldValue);
+                $formattedNewValue = $this->formatFieldValue($field, $newValue);
+                
+                $formatted[] = [
+                    'field' => $field,
+                    'field_name' => $fieldName,
+                    'old_value' => $formattedOldValue,
+                    'new_value' => $formattedNewValue,
+                    'is_important' => in_array($field, ['email', 'password', 'name', 'first_name', 'last_name', 'role_id']),
+                ];
+            }
+        }
+        // 2. Spatie'nin changes formatı
+        elseif (isset($this->properties['changes'])) {
+            $changes = $this->properties['changes'];
             
-            $formatted[] = [
-                'field' => $field,
-                'field_name' => $fieldName,
-                'old_value' => $oldValue,
-                'new_value' => $newValue,
-                'is_important' => in_array($field, ['email', 'password', 'name', 'first_name', 'last_name', 'role_id']),
-            ];
+            foreach ($changes as $field => $change) {
+                $fieldName = $fieldNames[$field] ?? ucfirst(str_replace('_', ' ', $field));
+                
+                if (is_array($change)) {
+                    $oldValue = $this->formatFieldValue($field, $change['old'] ?? null);
+                    $newValue = $this->formatFieldValue($field, $change['new'] ?? null);
+                } else {
+                    $oldValue = $this->formatFieldValue($field, null);
+                    $newValue = $this->formatFieldValue($field, $change);
+                }
+                
+                $formatted[] = [
+                    'field' => $field,
+                    'field_name' => $fieldName,
+                    'old_value' => $oldValue,
+                    'new_value' => $newValue,
+                    'is_important' => in_array($field, ['email', 'password', 'name', 'first_name', 'last_name', 'role_id']),
+                ];
+            }
+        }
+        // 3. Özel formatımız (updated_data)
+        elseif (isset($this->properties['updated_data'])) {
+            $updatedData = $this->properties['updated_data'];
+            
+            foreach ($updatedData as $field => $newValue) {
+                $fieldName = $fieldNames[$field] ?? ucfirst(str_replace('_', ' ', $field));
+                $formattedNewValue = $this->formatFieldValue($field, $newValue);
+                
+                $formatted[] = [
+                    'field' => $field,
+                    'field_name' => $fieldName,
+                    'old_value' => 'Bilinmiyor', // Özel formatımızda eski değer yok
+                    'new_value' => $formattedNewValue,
+                    'is_important' => in_array($field, ['email', 'password', 'name', 'first_name', 'last_name', 'role_id']),
+                ];
+            }
         }
 
         return $formatted;

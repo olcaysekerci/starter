@@ -18,7 +18,7 @@ class CreateRoleRequest extends FormRequest
             'description' => 'nullable|string|max:500',
             'guard_name' => 'nullable|string|max:255',
             'permissions' => 'nullable|array',
-            'permissions.*' => 'string|exists:permissions,name',
+            'permissions.*' => 'integer|exists:permissions,id',
         ];
     }
 
@@ -31,7 +31,7 @@ class CreateRoleRequest extends FormRequest
             'description.max' => 'Açıklama en fazla 500 karakter olabilir.',
             'guard_name.max' => 'Guard adı en fazla 255 karakter olabilir.',
             'permissions.array' => 'Yetkiler dizi formatında olmalıdır.',
-            'permissions.*.string' => 'Yetki adı metin formatında olmalıdır.',
+            'permissions.*.integer' => 'Yetki ID\'si sayı formatında olmalıdır.',
             'permissions.*.exists' => 'Seçilen yetki mevcut değil.',
         ];
     }

@@ -31,6 +31,35 @@ class Role extends SpatieRole
 
     protected $displayName = 'Rol';
 
+    /**
+     * Activity log options override
+     */
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    {
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logOnly($this->loggableAttributes)
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('Role')
+            ->setDescriptionForEvent(function (string $eventName) {
+                return $this->getDescriptionForEvent($eventName);
+            });
+    }
+
+    /**
+     * Event açıklamalarını belirle
+     */
+    protected function getDescriptionForEvent(string $eventName): string
+    {
+        return match ($eventName) {
+            'created' => 'Rol oluşturuldu',
+            'updated' => 'Rol güncellendi',
+            'deleted' => 'Rol silindi',
+            'restored' => 'Rol geri yüklendi',
+            default => "Rol üzerinde {$eventName} işlemi yapıldı",
+        };
+    }
+
     protected static function boot()
     {
         parent::boot();
