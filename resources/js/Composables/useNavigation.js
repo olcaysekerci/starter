@@ -3,7 +3,6 @@ import { router } from '@inertiajs/vue3'
 
 // Route helper'ını global olarak kullanabilmek için
 const route = window.route || ((name, params = {}) => {
-  console.warn(`Route '${name}' not found. Using fallback route generation.`)
   // Fallback route generation
   if (name.includes('.')) {
     const [prefix, action] = name.split('.')

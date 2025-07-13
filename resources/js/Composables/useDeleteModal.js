@@ -33,7 +33,6 @@ export function useDeleteModal() {
 
   const confirmDelete = () => {
     if (!deleteConfig.value.route) {
-      console.error('Silme route\'u belirtilmemiş')
       return
     }
 
@@ -52,7 +51,6 @@ export function useDeleteModal() {
         closeDeleteModal()
       },
       onError: (errors) => {
-        console.error('Silme işlemi başarısız:', errors)
         deleteLoading.value = false
       },
       onFinish: () => {

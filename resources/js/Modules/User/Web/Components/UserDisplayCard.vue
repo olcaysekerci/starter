@@ -38,6 +38,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useFormat } from '@/Composables/useFormat'
 
 const props = defineProps({
   user: {
@@ -55,12 +56,5 @@ const userInitials = computed(() => {
     .slice(0, 2)
 })
 
-const formatDate = (dateString) => {
-  if (!dateString) return '-'
-  return new Date(dateString).toLocaleDateString('tr-TR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
-}
+const { formatDate } = useFormat()
 </script> 

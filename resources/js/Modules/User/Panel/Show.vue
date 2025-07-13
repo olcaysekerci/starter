@@ -167,6 +167,7 @@ import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
 import DeleteModal from '@/Components/Panel/DeleteModal.vue'
 import { useDeleteModal } from '@/Composables/useDeleteModal'
+import { useFormat } from '@/Composables/useFormat'
 
 const props = defineProps({
   user: {
@@ -189,22 +190,8 @@ const {
   confirmDelete 
 } = useDeleteModal()
 
-const formatDate = (dateString) => {
-  if (!dateString) return '-'
-  return new Date(dateString).toLocaleDateString('tr-TR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-const formatDateTime = (dateString) => {
-  if (!dateString) return '-'
-  const d = new Date(dateString)
-  return d.toLocaleDateString('tr-TR') + ' ' + d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-}
+// Format functions
+const { formatDate, formatDateTime } = useFormat()
 
 const getEventLabel = (event, description) => {
   // Eğer event boşsa, description'dan event'i çıkar

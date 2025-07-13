@@ -181,6 +181,7 @@ import { router } from '@inertiajs/vue3'
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
+import { useFormat } from '@/Composables/useFormat'
 
 const props = defineProps({ 
   log: {
@@ -189,16 +190,7 @@ const props = defineProps({
   }
 })
 
-const formatDate = (date) => {
-  if (!date) return '-'
-  return new Date(date).toLocaleDateString('tr-TR')
-}
-
-const formatTime = (date) => {
-  if (!date) return '-'
-  const d = new Date(date)
-  return d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-}
+const { formatDate, formatTime } = useFormat()
 
 const getUserInitials = (name) => {
   if (!name || name === 'Sistem') return 'S'

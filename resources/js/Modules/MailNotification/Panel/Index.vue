@@ -244,7 +244,8 @@ import Modal from '@/Components/Panel/Modal.vue'
 import { 
   useToggle, 
   useExport, 
-  useNotification
+  useNotification,
+  useFormat
 } from '@/Composables'
 
 // Props
@@ -258,6 +259,7 @@ const props = defineProps({
 // Composable'ları başlat
 const { showSuccess, showError } = useNotification()
 const { exportData } = useExport()
+const { formatDate } = useFormat()
 
 // Toggle states
 const { toggles, toggle } = useToggle(['showFilters', 'showStats'])
@@ -359,7 +361,5 @@ const exportExcel = () => {
   // TODO: Implement Excel export functionality
 }
 
-const formatDate = (date) => {
-  return new Date(date).toLocaleString('tr-TR')
-}
+
 </script> 

@@ -35,21 +35,12 @@
 
 <script setup>
 import TableActionButton from '@/Components/Panel/Actions/TableActionButton.vue'
+import { useFormat } from '@/Composables/useFormat'
 
 const props = defineProps({ log: Object })
 defineEmits(['view'])
 
-const formatDateTime = (date) => {
-  if (!date) return '-'
-  const d = new Date(date)
-  return d.toLocaleString('tr-TR', { 
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
+const { formatDateTime } = useFormat()
 
 const getEventLabel = (event, description) => {
   // Eğer event boşsa, description'dan event'i çıkar

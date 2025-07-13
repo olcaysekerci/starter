@@ -147,7 +147,6 @@ export function useForm(initialData = {}, options = {}) {
     const submitMethod = customMethod || method
 
     if (!submitRoute) {
-      console.error('Route belirtilmemiş')
       processing.value = false
       return false
     }
@@ -157,7 +156,6 @@ export function useForm(initialData = {}, options = {}) {
       try {
         submitRoute = window.route(submitRoute)
       } catch (error) {
-        console.error('Route çözümleme hatası:', error)
         processing.value = false
         return false
       }
@@ -184,7 +182,6 @@ export function useForm(initialData = {}, options = {}) {
       return true
     } catch (error) {
       processing.value = false
-      console.error('Form submit error:', error)
       return false
     }
   }

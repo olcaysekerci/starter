@@ -141,6 +141,7 @@ import {
 import PanelLayout from '@/Layouts/PanelLayout.vue'
 import PageHeader from '@/Components/Panel/Page/PageHeader.vue'
 import ActionButton from '@/Components/Panel/Actions/ActionButton.vue'
+import { useFormat } from '@/Composables/useFormat'
 
 // Props
 const props = defineProps({
@@ -152,7 +153,5 @@ const resendMail = async () => {
   await router.post(route('panel.mail-notifications.resend', props.mailLog.id))
 }
 
-const formatDate = (date) => {
-  return new Date(date).toLocaleString('tr-TR')
-}
+const { formatDate } = useFormat()
 </script> 

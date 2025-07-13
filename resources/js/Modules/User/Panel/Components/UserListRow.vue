@@ -32,17 +32,9 @@
 
 <script setup>
 import TableActionButton from '@/Components/Panel/Actions/TableActionButton.vue'
+import { useFormat } from '@/Composables/useFormat'
 
 const props = defineProps({ user: Object })
 
-const formatDate = (date) => {
-  if (!date) return '-'
-  return new Date(date).toLocaleDateString('tr-TR')
-}
-
-const formatDateTime = (date) => {
-  if (!date) return '-'
-  const d = new Date(date)
-  return d.toLocaleDateString('tr-TR') + ' ' + d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-}
+const { formatDate, formatDateTime } = useFormat()
 </script> 
