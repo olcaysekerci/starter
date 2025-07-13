@@ -4,15 +4,14 @@
     page-title="Rol Düzenle"
     :breadcrumbs="[
       { title: 'Dashboard', url: '/dashboard' },
-      { title: 'Kullanıcı Yönetimi', url: '/panel/users' },
-      { title: 'Roller', url: '/panel/users/roles' },
-      { title: role.name }
+      { title: 'Roller', url: '/panel/roles' },
+      { title: role.display_name || role.name }
     ]"
   >
     <!-- Page Header -->
     <PageHeader
       title="Rol Düzenle"
-      :description="`${role.name} rolünün bilgilerini ve izinlerini güncelleyin.`"
+      :description="`${role.display_name || role.name} rolünün bilgilerini ve izinlerini güncelleyin.`"
     >
       <template #actions>
         <ActionButton 
@@ -32,28 +31,19 @@
     <!-- Form Card -->
     <FormCard
       title="Rol Bilgileri"
-      :description="`${role.name} rolünün bilgilerini güncelleyin.`"
+      :description="`${role.display_name || role.name} rolünün bilgilerini güncelleyin.`"
       submit-text="Değişiklikleri Kaydet"
       :processing="form.processing"
       @submit="saveRole"
     >
       <div class="space-y-6">
         <!-- Basic Information -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 gap-6">
           <FormGroup label="Rol Adı" required>
             <TextInput
               v-model="form.name"
               :error="form.errors.name"
               placeholder="Örn: Admin, Editor, Viewer"
-              required
-            />
-          </FormGroup>
-
-          <FormGroup label="Guard Name" required>
-            <TextInput
-              v-model="form.guard_name"
-              :error="form.errors.guard_name"
-              placeholder="web"
               required
             />
           </FormGroup>

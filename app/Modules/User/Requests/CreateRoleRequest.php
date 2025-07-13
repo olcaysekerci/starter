@@ -15,10 +15,8 @@ class CreateRoleRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255|unique:roles,name',
-            'display_name' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
             'guard_name' => 'nullable|string|max:255',
-            'is_active' => 'boolean',
             'permissions' => 'nullable|array',
             'permissions.*' => 'string|exists:permissions,name',
         ];
@@ -30,8 +28,6 @@ class CreateRoleRequest extends FormRequest
             'name.required' => 'Rol adı zorunludur.',
             'name.max' => 'Rol adı en fazla 255 karakter olabilir.',
             'name.unique' => 'Bu rol adı zaten kullanılıyor.',
-            'display_name.required' => 'Görünen ad zorunludur.',
-            'display_name.max' => 'Görünen ad en fazla 255 karakter olabilir.',
             'description.max' => 'Açıklama en fazla 500 karakter olabilir.',
             'guard_name.max' => 'Guard adı en fazla 255 karakter olabilir.',
             'permissions.array' => 'Yetkiler dizi formatında olmalıdır.',

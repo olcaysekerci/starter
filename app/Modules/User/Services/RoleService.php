@@ -49,7 +49,14 @@ class RoleService
      */
     public function getRoleById(int $id): ?Role
     {
-        return $this->roleRepository->findById($id);
+        $role = $this->roleRepository->findById($id);
+        
+        if ($role) {
+            // users_count attribute'unu yükle
+            $role->loadCount('users');
+        }
+        
+        return $role;
     }
 
     /**
@@ -73,10 +80,39 @@ class RoleService
                 $data['guard_name'] = 'web';
             }
 
+            // Display name otomatik oluştur
+            if (!isset($data['display_name']) && isset($data['name'])) {
+                $data['display_name'] = $this->generateDisplayName($data['name']);
+            }
+
+            // Rol aktif olarak oluştur
+            $data['is_active'] = true;
+
             $role = $this->roleRepository->create($data);
             
             return $role;
         }, 'rol oluşturma');
+    }
+
+    /**
+     * Display name otomatik oluştur
+     */
+    private function generateDisplayName(string $name): string
+    {
+        // Önce name'i temizle (tire, alt çizgi vs. kaldır)
+        $cleanName = str_replace(['-', '_', '.'], ' ', $name);
+        
+        // İlk harfleri büyük yap
+        $displayName = ucwords($cleanName);
+        
+        // Türkçe karakterleri düzelt
+        $displayName = str_replace(
+            ['İ', 'I', 'İ̇', 'İ̇̇'], 
+            ['İ', 'ı', 'İ', 'İ'], 
+            $displayName
+        );
+        
+        return $displayName;
     }
 
     /**
@@ -85,6 +121,11 @@ class RoleService
     public function updateRole(int $id, array $data): bool
     {
         return $this->updateInTransaction(function() use ($id, $data) {
+            // Display name otomatik oluştur
+            if (isset($data['name'])) {
+                $data['display_name'] = $this->generateDisplayName($data['name']);
+            }
+            
             $result = $this->roleRepository->update($id, $data);
             
             return $result;
