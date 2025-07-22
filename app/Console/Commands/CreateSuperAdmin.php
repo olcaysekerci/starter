@@ -13,7 +13,7 @@ class CreateSuperAdmin extends Command
      *
      * @var string
      */
-    protected $signature = 'make:super-admin {email} {password} {name?}';
+    protected $signature = 'make:super-admin {email} {password} {first_name?} {last_name?}';
 
     /**
      * The console command description.
@@ -29,7 +29,8 @@ class CreateSuperAdmin extends Command
     {
         $email = $this->argument('email');
         $password = $this->argument('password');
-        $name = $this->argument('name') ?? 'Super Admin';
+        $firstName = $this->argument('first_name') ?? 'Admin';
+        $lastName = $this->argument('last_name') ?? 'User';
 
         // Check if user already exists
         $existingUser = User::where('email', $email)->first();
@@ -40,10 +41,14 @@ class CreateSuperAdmin extends Command
 
         // Create user
         $user = User::create([
-            'name' => $name,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
             'email' => $email,
             'password' => bcrypt($password),
             'email_verified_at' => now(),
+            'status' => 'active',
+            'type' => 'admin',
+            'is_active' => true,
         ]);
 
         // Assign super-admin role
@@ -51,6 +56,7 @@ class CreateSuperAdmin extends Command
         if ($superAdminRole) {
             $user->assignRole($superAdminRole);
             $this->info("Super admin user created successfully!");
+            $this->info("Name: {$firstName} {$lastName}");
             $this->info("Email: {$email}");
             $this->info("Password: {$password}");
         } else {
