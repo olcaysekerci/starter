@@ -21,5 +21,10 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
+    // Dashboard route'u - Fortify'un home path'i için
+    Route::get('/dashboard', function () {
+        return redirect()->route('panel.dashboard');
+    })->name('dashboard');
+    
     // Tüm modülleri otomatik yükle
 });
